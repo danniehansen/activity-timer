@@ -1,2 +1,2 @@
-# activity-timer
-Activity timer for Trello
+# Activity timer
+Trello Power-up for tracking time.
