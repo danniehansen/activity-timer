@@ -188,14 +188,14 @@ window.TrelloPowerUp.initialize({
                             }
 
                             return 0;
-                        }).forEach((member) => {
+                        }).forEach((member, memberIndex) => {
                             const memberRanges = ranges.filter((range) => {
                                 return range[0] == member.id;
                             });
 
                             if (memberRanges.length > 0) {
                                 items.push({
-                                    'text': member.fullName
+                                    'text': member.fullName + ':'
                                 });
 
                                 memberRanges.forEach(function (range, rangeIndex) {
@@ -265,6 +265,10 @@ window.TrelloPowerUp.initialize({
                                 });
                             }
                         });
+
+                        if (items.length > 0) {
+                            delete items[items.length - 1];
+                        }
 
                         return items;
                     }
