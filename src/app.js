@@ -1,3 +1,5 @@
+const clockImg = require('../images/clock.svg');
+
 async function getRanges(t, noCurrent) {
     noCurrent = noCurrent || false;
 
@@ -116,7 +118,7 @@ window.TrelloPowerUp.initialize({
     },
     'card-buttons': function (t) {
         return [{
-            icon: require('../images/clock.svg'),
+            icon: clickImg,
             text: 'Clear data',
             callback: async function () {
                 await t.remove('card', 'private', 'act-timer-start');
@@ -124,7 +126,7 @@ window.TrelloPowerUp.initialize({
             },
             condition: 'edit'
         }, {
-            icon: require('../images/clock.svg'),
+            icon: clockImg,
             text: 'Manage time',
             callback: function (t) {
                 return t.popup({
