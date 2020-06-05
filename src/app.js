@@ -18,8 +18,7 @@ async function getRanges(t, noCurrent) {
 }
 
 async function isRunning(t) {
-    const data = t.get('card', 'private', 'act-timer-start');
-    console.log('1:', data);
+    const data = await t.get('card', 'private', 'act-timer-start');
     return !!data;
 }
 
@@ -103,9 +102,7 @@ window.TrelloPowerUp.initialize({
                         const startTime = await t.get('card', 'private', 'act-timer-start');
                         const data = await t.card('idList');
 
-                        console.log('startTime:', startTime);
-
-                        if (typeof startTime !== 'undefined' && startTime[1] !== data.idList) {
+                        if (startTime[1] !== data.idList) {
                             await stopTimer(t);
                         } else {
                             object.color = 'red';
