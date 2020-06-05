@@ -270,6 +270,10 @@ window.TrelloPowerUp.initialize({
                                 items.splice(items.length - 1, 1);
                             }
 
+                            if (items.length === 0) {
+                                items.push({ 'text': 'No activity yet' });
+                            }
+
                             return items;
                         }
                     });
@@ -318,8 +322,8 @@ window.TrelloPowerUp.initialize({
                                 }
                             });
 
-                            if (items.length > 0) {
-                                items.splice(items.length - 1, 1);
+                            if (items.length === 0) {
+                                items.push({ 'text': 'No activity yet' });
                             }
 
                             return items;
