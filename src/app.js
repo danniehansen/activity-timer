@@ -265,7 +265,7 @@ window.TrelloPowerUp.initialize({
                         });
 
                         if (items.length > 0) {
-                            delete items[items.length - 1];
+                            items = items.splice(items.length - 1, 1);
                         }
 
                         console.log('items:', items);
