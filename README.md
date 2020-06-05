@@ -30,6 +30,6 @@ Want to extract logged time and process it in another system? No problem! Activi
 - 1: Start time (unix timestamp)
 - 2: End time (unix timestamp)
 
-## Get in touch
+## Open Source
 
 Activity timer is open source! Yes you heard it. Head over to https://github.com/danniehansen/activity-timer and submit your issues, ideas or even your very own PR with new and exciting features.
