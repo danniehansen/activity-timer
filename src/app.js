@@ -19,7 +19,7 @@ async function getRanges(t, noCurrent) {
 
 async function isRunning(t) {
     const data = t.get('card', 'private', 'act-timer-start');
-
+    console.log('1:', data);
     return !!data;
 }
 
@@ -90,7 +90,6 @@ window.TrelloPowerUp.initialize({
         return [{
             dynamic: async function() {
                 const running = await isRunning(t);
-
                 const time = await getTotalSeconds(t);
 
                 const object = {
@@ -104,7 +103,9 @@ window.TrelloPowerUp.initialize({
                         const startTime = await t.get('card', 'private', 'act-timer-start');
                         const data = await t.card('idList');
 
-                        if (startTime[1] !== data.idList) {
+                        console.log('startTime:', startTime);
+
+                        if (typeof startTime !== 'undefined' && startTime[1] !== data.idList) {
                             await stopTimer(t);
                         } else {
                             object.color = 'red';
