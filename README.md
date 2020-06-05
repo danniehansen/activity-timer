@@ -22,6 +22,13 @@ In addition to this you'll be able to quickly peak at the total time spent for a
 
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot4.png "Time spent")
 
+## Highlights
+
+1. Easy access to start / stop of timer
+2. Powerful time management editor to edit previous recordings
+3. When you move card from 1 list to another it will automatically stop the timer.
+4. All data on card in a compressed format, easy to access through REST API
+
 ## Card data (REST API)
 
 Want to extract logged time and process it in another system? No problem! Activity timer keeps logs in the shared data for the card. This means you can query the logged time for a card using Trello's own REST API. All of the time ranges saved by Activity timer is saved within key 'act-timer-ranges' in shared card data. 'act-timer-ranges' consists of an array where each items index equals to:
