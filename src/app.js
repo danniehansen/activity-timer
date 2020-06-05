@@ -173,10 +173,10 @@ window.TrelloPowerUp.initialize({
                         const items = [];
 
                         let board = await t.board('members');
-                        console.log('board:', board);
+
                         board.members.sort((a, b) => {
-                            const nameA = a.name.toUpperCase();
-                            const nameB = b.name.toUpperCase();
+                            const nameA = a.fullName.toUpperCase();
+                            const nameB = b.fullName.toUpperCase();
 
                             if (nameA < nameB) {
                                 return -1;
@@ -187,16 +187,13 @@ window.TrelloPowerUp.initialize({
 
                             return 0;
                         }).forEach((member) => {
-                            console.log('member:', member);
                             const memberRanges = ranges.filter((range) => {
                                 return range[0] == member.id;
                             });
 
-                            console.log('memberRanges:', memberRanges);
-
                             if (memberRanges.length > 0) {
                                 items.push({
-                                    'text': member.name
+                                    'text': member.fullName
                                 });
 
                                 memberRanges.forEach(function (range, rangeIndex) {
