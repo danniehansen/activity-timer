@@ -155,7 +155,7 @@ window.TrelloPowerUp.initialize({
     },
     'card-buttons': function (t) {
         return [{
-            icon: clickImg,
+            icon: clockImg,
             text: 'Clear data',
             callback: async function () {
                 await t.remove('card', 'private', dataPrefix + '-start');
