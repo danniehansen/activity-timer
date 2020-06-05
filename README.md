@@ -32,4 +32,4 @@ Want to extract logged time and process it in another system? No problem! Activi
 
 ## Get in touch
 
-Found a bug? Need a guidance? or just got a feature request? Shoot me an email over at danniehansenweb@gmail.com and I'll look into your request. 
+Activity timer is open source! Yes you heard it. Head over to https://github.com/danniehansen/activity-timer and submit your issues, ideas or even your very own PR with new and exciting features.
