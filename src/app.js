@@ -285,7 +285,7 @@ window.TrelloPowerUp.initialize({
                 text: 'Time spent',
                 callback: function (t) {
                     return t.popup({
-                        title: 'Manage time',
+                        title: 'Time spent',
                         items: async function (t) {
                             const ranges = await getRanges(t, true);
                             const items = [];
@@ -317,7 +317,7 @@ window.TrelloPowerUp.initialize({
                                     });
 
                                     items.push({
-                                        'text': member.fullName + ':' +  formatTime(totalTime)
+                                        'text': member.fullName + ': ' +  formatTime(totalTime)
                                     });
                                 }
                             });
