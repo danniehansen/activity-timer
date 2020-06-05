@@ -1,15 +1,24 @@
 const clockImg = require('../images/clock.svg');
+const dataPrefix = 'act-timer';
 
+/**
+ * Get all tracked ranges.
+ *
+ * @param t
+ * @param noCurrent
+ *
+ * @returns {Promise<*>}
+ */
 async function getRanges(t, noCurrent) {
     noCurrent = noCurrent || false;
 
-    const ranges = await t.get('card', 'shared', 'act-timer-ranges', []);
+    const ranges = await t.get('card', 'shared', dataPrefix + '-ranges', []);
 
     if (noCurrent) {
         return ranges;
     }
 
-    const startTime = await t.get('card', 'private', 'act-timer-start');
+    const startTime = await t.get('card', 'private', dataPrefix + '-start');
     const member = await t.member('id');
 
     if (startTime) {
@@ -19,11 +28,25 @@ async function getRanges(t, noCurrent) {
     return ranges;
 }
 
+/**
+ * Whether or not tracker is running
+ *
+ * @param t
+ *
+ * @returns {Promise<boolean>}
+ */
 async function isRunning(t) {
-    const data = await t.get('card', 'private', 'act-timer-start');
+    const data = await t.get('card', 'private', dataPrefix + '-start');
     return !!data;
 }
 
+/**
+ * Get total seconds tracked
+ *
+ * @param t
+ *
+ * @returns {Promise<number>}
+ */
 async function getTotalSeconds(t) {
     const ranges = await getRanges(t);
 
@@ -38,18 +61,32 @@ async function getTotalSeconds(t) {
     return totalSeconds;
 }
 
+/**
+ * Start timer
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
 async function startTimer(t) {
     const data = await t.card('idList');
-    await t.set('card', 'private', 'act-timer-start', [Math.floor((new Date().getTime() / 1000)), data.idList]);
+    await t.set('card', 'private', dataPrefix + '-start', [Math.floor((new Date().getTime() / 1000)), data.idList]);
 }
 
+/**
+ * Stop timer
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
 async function stopTimer(t) {
-    const data = await t.get('card', 'private', 'act-timer-start');
+    const data = await t.get('card', 'private', dataPrefix + '-start');
 
     if (data) {
         const ranges = await getRanges(t);
-        await t.set('card', 'shared', 'act-timer-ranges', ranges);
-        await t.remove('card', 'private', 'act-timer-start');
+        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+        await t.remove('card', 'private', dataPrefix + '-start');
     }
 }
 
@@ -101,7 +138,7 @@ window.TrelloPowerUp.initialize({
                     object.text = 'Time: ' + formatTime(time);
 
                     if (running) {
-                        const startTime = await t.get('card', 'private', 'act-timer-start');
+                        const startTime = await t.get('card', 'private', dataPrefix + '-start');
                         const data = await t.card('idList');
 
                         if (startTime[1] !== data.idList) {
@@ -121,8 +158,8 @@ window.TrelloPowerUp.initialize({
             icon: clickImg,
             text: 'Clear data',
             callback: async function () {
-                await t.remove('card', 'private', 'act-timer-start');
-                await t.remove('card', 'shared', 'act-timer-ranges');
+                await t.remove('card', 'private', dataPrefix + '-start');
+                await t.remove('card', 'shared', dataPrefix + '-ranges');
             },
             condition: 'edit'
         }, {
@@ -160,7 +197,7 @@ window.TrelloPowerUp.initialize({
                                                             callback: async function(t, opts) {
                                                                 _range[1] = Math.floor(new Date(opts.date).getTime() / 1000);
                                                                 ranges[_rangeIndex] = _range;
-                                                                await t.set('card', 'shared', 'act-timer-ranges', ranges);
+                                                                await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
                                                                 return t.closePopup();
                                                             }
                                                         });
@@ -175,7 +212,7 @@ window.TrelloPowerUp.initialize({
                                                             callback: async function(t, opts) {
                                                                 _range[2] = Math.floor(new Date(opts.date).getTime() / 1000);
                                                                 ranges[_rangeIndex] = _range;
-                                                                await t.set('card', 'shared', 'act-timer-ranges', ranges);
+                                                                await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
                                                                 return t.closePopup();
                                                             },
                                                             date: _end
@@ -186,7 +223,7 @@ window.TrelloPowerUp.initialize({
                                                     text: 'Delete',
                                                     callback: async function (t) {
                                                         ranges.splice(_rangeIndex, 1);
-                                                        await t.set('card', 'shared', 'act-timer-ranges', ranges);
+                                                        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
                                                         return t.closePopup();
                                                     }
                                                 }
