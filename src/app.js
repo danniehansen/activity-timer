@@ -1,6 +1,8 @@
 const clockImg = require('../images/clock.svg');
 const dataPrefix = 'act-timer';
 
+console.log('clockImg:', clockImg);
+
 /**
  * Get all tracked ranges.
  *
