@@ -126,7 +126,7 @@ function formatDate(date) {
 window.TrelloPowerUp.initialize({
     'card-badges': function (t) {
         return [{
-            dynamic: async function() {
+            dynamic: async function () {
                 const running = await isRunning(t);
                 const time = await getTotalSeconds(t);
 
@@ -154,128 +154,181 @@ window.TrelloPowerUp.initialize({
         }];
     },
     'card-buttons': function (t) {
-        return [{
-            icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
-            text: 'Clear data',
-            callback: async function () {
-                await t.remove('card', 'private', dataPrefix + '-start');
-                await t.remove('card', 'shared', dataPrefix + '-ranges');
+        return [
+            {
+                icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
+                text: 'Clear data',
+                callback: async function () {
+                    await t.remove('card', 'private', dataPrefix + '-start');
+                    await t.remove('card', 'shared', dataPrefix + '-ranges');
+                },
+                condition: 'edit'
             },
-            condition: 'edit'
-        }, {
-            icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
-            text: 'Manage time',
-            callback: function (t) {
-                return t.popup({
-                    title: 'Manage time',
-                    items: async function (t) {
-                        const ranges = await getRanges(t, true);
-                        const items = [];
+            {
+                icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
+                text: 'Manage time',
+                callback: function (t) {
+                    return t.popup({
+                        title: 'Manage time',
+                        items: async function (t) {
+                            const ranges = await getRanges(t, true);
+                            const items = [];
 
-                        let board = await t.board('members');
+                            let board = await t.board('members');
 
-                        board.members.sort((a, b) => {
-                            const nameA = a.fullName.toUpperCase();
-                            const nameB = b.fullName.toUpperCase();
+                            board.members.sort((a, b) => {
+                                const nameA = a.fullName.toUpperCase();
+                                const nameB = b.fullName.toUpperCase();
 
-                            if (nameA < nameB) {
-                                return -1;
-                            }
-                            if (nameA > nameB) {
-                                return 1;
-                            }
+                                if (nameA < nameB) {
+                                    return -1;
+                                }
+                                if (nameA > nameB) {
+                                    return 1;
+                                }
 
-                            return 0;
-                        }).forEach((member, memberIndex) => {
-                            const memberRanges = ranges.filter((range) => {
-                                return range[0] == member.id;
-                            });
-
-                            if (memberRanges.length > 0) {
-                                items.push({
-                                    'text': member.fullName + ':'
+                                return 0;
+                            }).forEach((member, memberIndex) => {
+                                const memberRanges = ranges.filter((range) => {
+                                    return range[0] == member.id;
                                 });
 
-                                memberRanges.forEach(function (range, rangeIndex) {
-                                    const start = new Date(range[1] * 1000);
-                                    const end = new Date(range[2] * 1000);
-                                    const _rangeIndex = rangeIndex;
-                                    const _range = range;
+                                if (memberRanges.length > 0) {
+                                    items.push({
+                                        'text': member.fullName + ':'
+                                    });
+
+                                    memberRanges.forEach(function (range, rangeIndex) {
+                                        const start = new Date(range[1] * 1000);
+                                        const end = new Date(range[2] * 1000);
+                                        const _rangeIndex = rangeIndex;
+                                        const _range = range;
+
+                                        items.push({
+                                            text: formatDate(start) + ' - ' + formatDate(end),
+                                            callback: function (t) {
+                                                return t.popup({
+                                                    title: 'Edit time range',
+                                                    items: function (t) {
+                                                        const _start = new Date(_range[1] * 1000);
+                                                        const _end = new Date(_range[2] * 1000);
+
+                                                        return [
+                                                            {
+                                                                text: 'Edit start (' + formatDate(start) + ')',
+                                                                callback: function (t) {
+                                                                    return t.popup({
+                                                                        type: 'datetime',
+                                                                        title: 'Change start from (' + formatDate(_start) + ')',
+                                                                        callback: async function(t, opts) {
+                                                                            _range[1] = Math.floor(new Date(opts.date).getTime() / 1000);
+                                                                            ranges[_rangeIndex] = _range;
+                                                                            await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+                                                                            return t.closePopup();
+                                                                        }
+                                                                    });
+                                                                }
+                                                            },
+                                                            {
+                                                                text: 'Edit end (' + formatDate(end) + ')',
+                                                                callback: function (t) {
+                                                                    return t.popup({
+                                                                        type: 'datetime',
+                                                                        title: 'Change end from (' + formatDate(_end) + ')',
+                                                                        callback: async function(t, opts) {
+                                                                            _range[2] = Math.floor(new Date(opts.date).getTime() / 1000);
+                                                                            ranges[_rangeIndex] = _range;
+                                                                            await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+                                                                            return t.closePopup();
+                                                                        },
+                                                                        date: _end
+                                                                    });
+                                                                }
+                                                            },
+                                                            {
+                                                                text: 'Delete',
+                                                                callback: async function (t) {
+                                                                    ranges.splice(_rangeIndex, 1);
+                                                                    await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+                                                                    return t.closePopup();
+                                                                }
+                                                            }
+                                                        ];
+                                                    }
+                                                });
+                                            },
+                                        });
+                                    });
 
                                     items.push({
-                                        text: formatDate(start) + ' - ' + formatDate(end),
-                                        callback: function (t) {
-                                            return t.popup({
-                                                title: 'Edit time range',
-                                                items: function (t) {
-                                                    const _start = new Date(_range[1] * 1000);
-                                                    const _end = new Date(_range[2] * 1000);
-
-                                                    return [
-                                                        {
-                                                            text: 'Edit start (' + formatDate(start) + ')',
-                                                            callback: function (t) {
-                                                                return t.popup({
-                                                                    type: 'datetime',
-                                                                    title: 'Change start from (' + formatDate(_start) + ')',
-                                                                    callback: async function(t, opts) {
-                                                                        _range[1] = Math.floor(new Date(opts.date).getTime() / 1000);
-                                                                        ranges[_rangeIndex] = _range;
-                                                                        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
-                                                                        return t.closePopup();
-                                                                    }
-                                                                });
-                                                            }
-                                                        },
-                                                        {
-                                                            text: 'Edit end (' + formatDate(end) + ')',
-                                                            callback: function (t) {
-                                                                return t.popup({
-                                                                    type: 'datetime',
-                                                                    title: 'Change end from (' + formatDate(_end) + ')',
-                                                                    callback: async function(t, opts) {
-                                                                        _range[2] = Math.floor(new Date(opts.date).getTime() / 1000);
-                                                                        ranges[_rangeIndex] = _range;
-                                                                        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
-                                                                        return t.closePopup();
-                                                                    },
-                                                                    date: _end
-                                                                });
-                                                            }
-                                                        },
-                                                        {
-                                                            text: 'Delete',
-                                                            callback: async function (t) {
-                                                                ranges.splice(_rangeIndex, 1);
-                                                                await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
-                                                                return t.closePopup();
-                                                            }
-                                                        }
-                                                    ];
-                                                }
-                                            });
-                                        },
+                                        'text': '--------'
                                     });
-                                });
+                                }
+                            });
 
-                                items.push({
-                                    'text': '--------'
-                                });
+                            if (items.length > 0) {
+                                items.splice(items.length - 1, 1);
                             }
-                        });
 
-                        if (items.length > 0) {
-                            items.splice(items.length - 1, 1);
+                            return items;
                         }
-
-                        console.log('items:', items);
-
-                        return items;
-                    }
-                });
+                    });
+                },
+                condition: 'edit'
             },
-            condition: 'edit'
-        }];
+            {
+                icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
+                text: 'Time spent',
+                callback: function (t) {
+                    return t.popup({
+                        title: 'Manage time',
+                        items: async function (t) {
+                            const ranges = await getRanges(t, true);
+                            const items = [];
+
+                            let board = await t.board('members');
+
+                            board.members.sort((a, b) => {
+                                const nameA = a.fullName.toUpperCase();
+                                const nameB = b.fullName.toUpperCase();
+
+                                if (nameA < nameB) {
+                                    return -1;
+                                }
+                                if (nameA > nameB) {
+                                    return 1;
+                                }
+
+                                return 0;
+                            }).forEach((member, memberIndex) => {
+                                const memberRanges = ranges.filter((range) => {
+                                    return range[0] == member.id;
+                                });
+
+                                if (memberRanges.length > 0) {
+                                    let totalTime = 0;
+
+                                    memberRanges.forEach(function (range, rangeIndex) {
+                                        totalTime += range[2] - range[1];
+                                    });
+
+                                    items.push({
+                                        'text': member.fullName + ':' +  formatTime(totalTime)
+                                    });
+                                }
+                            });
+
+                            if (items.length > 0) {
+                                items.splice(items.length - 1, 1);
+                            }
+
+                            return items;
+                        }
+                    });
+                },
+                condition: 'edit'
+            }
+        ];
     },
     'card-detail-badges': function (t) {
         return [{
