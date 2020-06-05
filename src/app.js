@@ -172,66 +172,99 @@ window.TrelloPowerUp.initialize({
                         const ranges = await getRanges(t, true);
                         const items = [];
 
-                        ranges.forEach(function (range, rangeIndex) {
-                            const start = new Date(range[1] * 1000);
-                            const end = new Date(range[2] * 1000);
-                            const _rangeIndex = rangeIndex;
-                            const _range = range;
+                        let members = await t.member('all');
+                        console.log('members:', members);
+                        members.sort((a, b) => {
+                            const nameA = a.fullName.toUpperCase();
+                            const nameB = b.fullName.toUpperCase();
 
-                            items.push({
-                                text: formatDate(start) + ' - ' + formatDate(end),
-                                callback: function (t) {
-                                    return t.popup({
-                                        title: 'Edit time range',
-                                        items: function (t) {
-                                            const _start = new Date(_range[1] * 1000);
-                                            const _end = new Date(_range[2] * 1000);
+                            if (nameA < nameB) {
+                                return -1;
+                            }
+                            if (nameA > nameB) {
+                                return 1;
+                            }
 
-                                            return [
-                                                {
-                                                    text: 'Edit start (' + formatDate(start) + ')',
-                                                    callback: function (t) {
-                                                        return t.popup({
-                                                            type: 'datetime',
-                                                            title: 'Change start from (' + formatDate(_start) + ')',
-                                                            callback: async function(t, opts) {
-                                                                _range[1] = Math.floor(new Date(opts.date).getTime() / 1000);
-                                                                ranges[_rangeIndex] = _range;
+                            return 0;
+                        }).forEach((member) => {
+                            console.log('member:', member);
+                            const memberRanges = ranges.filter((range) => {
+                                return range[0] == member.id;
+                            });
+
+                            console.log('memberRanges:', memberRanges);
+
+                            if (memberRanges.length > 0) {
+                                items.push({
+                                    'text': member.fullName
+                                });
+
+                                memberRanges.forEach(function (range, rangeIndex) {
+                                    const start = new Date(range[1] * 1000);
+                                    const end = new Date(range[2] * 1000);
+                                    const _rangeIndex = rangeIndex;
+                                    const _range = range;
+
+                                    items.push({
+                                        text: formatDate(start) + ' - ' + formatDate(end),
+                                        callback: function (t) {
+                                            return t.popup({
+                                                title: 'Edit time range',
+                                                items: function (t) {
+                                                    const _start = new Date(_range[1] * 1000);
+                                                    const _end = new Date(_range[2] * 1000);
+
+                                                    return [
+                                                        {
+                                                            text: 'Edit start (' + formatDate(start) + ')',
+                                                            callback: function (t) {
+                                                                return t.popup({
+                                                                    type: 'datetime',
+                                                                    title: 'Change start from (' + formatDate(_start) + ')',
+                                                                    callback: async function(t, opts) {
+                                                                        _range[1] = Math.floor(new Date(opts.date).getTime() / 1000);
+                                                                        ranges[_rangeIndex] = _range;
+                                                                        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+                                                                        return t.closePopup();
+                                                                    }
+                                                                });
+                                                            }
+                                                        },
+                                                        {
+                                                            text: 'Edit end (' + formatDate(end) + ')',
+                                                            callback: function (t) {
+                                                                return t.popup({
+                                                                    type: 'datetime',
+                                                                    title: 'Change end from (' + formatDate(_end) + ')',
+                                                                    callback: async function(t, opts) {
+                                                                        _range[2] = Math.floor(new Date(opts.date).getTime() / 1000);
+                                                                        ranges[_rangeIndex] = _range;
+                                                                        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+                                                                        return t.closePopup();
+                                                                    },
+                                                                    date: _end
+                                                                });
+                                                            }
+                                                        },
+                                                        {
+                                                            text: 'Delete',
+                                                            callback: async function (t) {
+                                                                ranges.splice(_rangeIndex, 1);
                                                                 await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
                                                                 return t.closePopup();
                                                             }
-                                                        });
-                                                    }
-                                                },
-                                                {
-                                                    text: 'Edit end (' + formatDate(end) + ')',
-                                                    callback: function (t) {
-                                                        return t.popup({
-                                                            type: 'datetime',
-                                                            title: 'Change end from (' + formatDate(_end) + ')',
-                                                            callback: async function(t, opts) {
-                                                                _range[2] = Math.floor(new Date(opts.date).getTime() / 1000);
-                                                                ranges[_rangeIndex] = _range;
-                                                                await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
-                                                                return t.closePopup();
-                                                            },
-                                                            date: _end
-                                                        });
-                                                    }
-                                                },
-                                                {
-                                                    text: 'Delete',
-                                                    callback: async function (t) {
-                                                        ranges.splice(_rangeIndex, 1);
-                                                        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
-                                                        return t.closePopup();
-                                                    }
+                                                        }
+                                                    ];
                                                 }
-                                            ];
-                                        }
+                                            });
+                                        },
                                     });
-                                },
-                            });
+                                });
+
+                                items.push({
+                                    'text': '--------'
+                                });
+                            }
                         });
 
                         return items;
