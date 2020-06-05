@@ -1,8 +1,6 @@
 const clockImg = require('../images/clock.svg');
 const dataPrefix = 'act-timer';
 
-console.log('clockImg:', clockImg);
-
 /**
  * Get all tracked ranges.
  *
@@ -157,7 +155,7 @@ window.TrelloPowerUp.initialize({
     },
     'card-buttons': function (t) {
         return [{
-            icon: clockImg,
+            icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
             text: 'Clear data',
             callback: async function () {
                 await t.remove('card', 'private', dataPrefix + '-start');
@@ -165,7 +163,7 @@ window.TrelloPowerUp.initialize({
             },
             condition: 'edit'
         }, {
-            icon: clockImg,
+            icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
             text: 'Manage time',
             callback: function (t) {
                 return t.popup({
@@ -269,6 +267,8 @@ window.TrelloPowerUp.initialize({
                         if (items.length > 0) {
                             delete items[items.length - 1];
                         }
+
+                        console.log('items:', items);
 
                         return items;
                     }
