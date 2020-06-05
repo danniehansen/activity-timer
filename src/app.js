@@ -172,9 +172,9 @@ window.TrelloPowerUp.initialize({
                         const ranges = await getRanges(t, true);
                         const items = [];
 
-                        let members = await t.organization('all');
-                        console.log('members:', members);
-                        members.sort((a, b) => {
+                        let board = await t.board('members');
+                        console.log('board:', board);
+                        board.members.sort((a, b) => {
                             const nameA = a.name.toUpperCase();
                             const nameB = b.name.toUpperCase();
 
