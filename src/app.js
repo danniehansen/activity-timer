@@ -1,4 +1,5 @@
 const clockImg = require('../images/clock.svg');
+const clockImage = 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default;
 const dataPrefix = 'act-timer';
 
 /**
@@ -156,7 +157,7 @@ window.TrelloPowerUp.initialize({
     'card-buttons': function (t) {
         return [
             {
-                icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
+                icon: clockImage,
                 text: 'Clear data',
                 callback: async function () {
                     await t.remove('card', 'private', dataPrefix + '-start');
@@ -165,7 +166,7 @@ window.TrelloPowerUp.initialize({
                 condition: 'edit'
             },
             {
-                icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
+                icon: clockImage,
                 text: 'Manage time',
                 callback: function (t) {
                     return t.popup({
@@ -329,14 +330,19 @@ window.TrelloPowerUp.initialize({
                             return items;
                         }
                     });
-                },
-                condition: 'edit'
+                }
             }
         ];
     },
     'card-detail-badges': function (t) {
         return [{
             dynamic: async function () {
+                const context = t.getContext();
+
+                if (!context.permissions || context.permissions.card !== 'write') {
+                    return;
+                }
+
                 const running = await isRunning(t);
                 const object = {
                     refresh: 10
