@@ -23,7 +23,11 @@ async function getRanges(t, noCurrent) {
     const member = await t.member('id');
 
     if (startTime) {
-        ranges.push([member.id, startTime[0], Math.floor((new Date().getTime() / 1000))]);
+        ranges.push([
+            member.id,
+            startTime[0],
+            Math.floor((new Date().getTime() / 1000))
+        ]);
     }
 
     return ranges;
@@ -53,7 +57,7 @@ async function getTotalSeconds(t) {
 
     let totalSeconds = 0;
 
-    ranges.forEach(function (range) {
+    ranges.forEach((range) => {
         if (typeof range[1] !== 'undefined' && typeof range[2] !== 'undefined') {
             totalSeconds += (range[2] - range[1]);
         }
@@ -71,7 +75,10 @@ async function getTotalSeconds(t) {
  */
 async function startTimer(t) {
     const data = await t.card('idList');
-    await t.set('card', 'private', dataPrefix + '-start', [Math.floor((new Date().getTime() / 1000)), data.idList]);
+    await t.set('card', 'private', dataPrefix + '-start', [
+        Math.floor((new Date().getTime() / 1000)),
+        data.idList
+    ]);
 }
 
 /**
@@ -199,7 +206,7 @@ window.TrelloPowerUp.initialize({
                                         'text': member.fullName + ':'
                                     });
 
-                                    memberRanges.forEach(function (range, rangeIndex) {
+                                    memberRanges.forEach((range, rangeIndex) => {
                                         const start = new Date(range[1] * 1000);
                                         const end = new Date(range[2] * 1000);
                                         const _rangeIndex = rangeIndex;
