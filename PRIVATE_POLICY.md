@@ -1,12 +1,10 @@
 # Private policy
-
 Your privacy is important to us, and so is being transparent about how we collect, use, and share information about you.
 
 ## What information we collect about you
 At this time Activity timer only collects time spent on cards & store this withing the Trello card it-self. No data leaves Trello.
 
 ## How we use information we collect
-
 Information collected is used to show different metrics within the card/board it-self.
 
 ## How we store and secure information we collect
