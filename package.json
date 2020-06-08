@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --output-public-path=/dist/  --mode development --progress --open --hot",
-    "build": "webpack --mode production --progress"
+    "build": "webpack --mode production --progress",
+    "build-develop": "webpack --mode development --progress"
   },
   "author": "Dannie Hansen",
   "license": "MIT",

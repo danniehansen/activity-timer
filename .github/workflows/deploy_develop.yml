@@ -15,7 +15,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Build
-        run: yarn run build
+        run: yarn build-develop
       - name: Deploy
         run: aws s3 sync dist/ s3://activity-timer-develop --acl public-read
       - name: Clear CF cache
