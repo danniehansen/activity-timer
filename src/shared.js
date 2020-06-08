@@ -135,6 +135,44 @@ function formatDate(date) {
 }
 
 /**
+ * Card badges capability handler.
+ *
+ * @param t
+ *
+ * @returns {{dynamic: (function(): {refresh: number})}[]}
+ */
+function cardBadges (t) {
+    return [{
+        dynamic: async function () {
+            const running = await isRunning(t);
+            const time = await getTotalSeconds(t);
+
+            const object = {
+                refresh: 10
+            };
+
+            if (time !== 0) {
+                object.text = formatTime(time);
+                object.icon = clockImage;
+
+                if (running) {
+                    const startTime = await t.get('card', 'private', dataPrefix + '-start');
+                    const data = await t.card('idList');
+
+                    if (startTime[1] !== data.idList) {
+                        await stopTimer(t);
+                    } else {
+                        object.color = 'red';
+                    }
+                }
+            }
+
+            return object;
+        }
+    }];
+}
+
+/**
  * Card buttons capability handler.
  *
  * @param t
@@ -323,56 +361,6 @@ function cardButtons (t) {
 }
 
 /**
- * Card detail badges capability handler.
- *
- * @param t
- *
- * @returns {({dynamic: (function(): {refresh: number})}|{dynamic: (function(): {refresh: number})})[]}
- */
-function cardDetailBadges (t) {
-    return [{
-        dynamic: async function () {
-            const context = t.getContext();
-
-            if (!context.permissions || context.permissions.card !== 'write') {
-                return;
-            }
-
-            const running = await isRunning(t);
-            const object = {
-                refresh: 10
-            };
-
-            if (running) {
-                object.text = 'Stop timer';
-                object.color = 'red';
-                object.callback = stopTimer;
-            } else {
-                object.text = 'Start timer';
-                object.color = 'green';
-                object.callback = startTimer;
-            }
-
-            return object;
-        }
-    }, {
-        dynamic: async function() {
-            const time = await getTotalSeconds(t);
-            const object = {
-                refresh: 10
-            };
-
-            if (time !== 0) {
-                object.text = formatTime(time);
-                object.icon = clockImage;
-            }
-
-            return object;
-        }
-    }];
-}
-
-/**
  * Card back section capability handler.
  *
  * @param t
@@ -392,8 +380,8 @@ function cardBackSection (t) {
 }
 
 module.exports = {
+    cardBadges,
     cardButtons,
-    cardDetailBadges,
     getRanges,
     isRunning,
     getTotalSeconds,
