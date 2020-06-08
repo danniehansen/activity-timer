@@ -419,7 +419,7 @@ function cardDetailBadges (t) {
  */
 function cardBackSection (t) {
     return {
-        title: 'Card back section',
+        title: 'Activity timer',
         icon: clockImage,
         content: {
             type: 'iframe',
