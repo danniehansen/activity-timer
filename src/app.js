@@ -75,6 +75,10 @@ async function getTotalSeconds(t) {
  */
 async function startTimer(t) {
     const data = await t.card('idList');
+    const cards = await t.cards('all');
+
+    console.log('cards:', cards);
+
     await t.set('card', 'private', dataPrefix + '-start', [
         Math.floor((new Date().getTime() / 1000)),
         data.idList
@@ -143,7 +147,8 @@ window.TrelloPowerUp.initialize({
                 };
 
                 if (time !== 0) {
-                    object.text = 'Time: ' + formatTime(time);
+                    object.text = formatTime(time);
+                    object.icon = clockImage;
 
                     if (running) {
                         const startTime = await t.get('card', 'private', dataPrefix + '-start');
@@ -375,7 +380,8 @@ window.TrelloPowerUp.initialize({
                 };
 
                 if (time !== 0) {
-                    object.text = 'Time: ' + formatTime(time);
+                    object.text = formatTime(time);
+                    object.icon = clockImage;
                 }
 
                 return object;
