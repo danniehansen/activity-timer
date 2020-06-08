@@ -420,9 +420,9 @@ function cardDetailBadges (t) {
 function cardBackSection (t) {
     return {
         title: 'Card back section',
+        icon: clockImage,
         content: {
             type: 'iframe',
-            icon: clockImage,
             url: t.signUrl('./card_back_section.html'),
             height: 230
         }
