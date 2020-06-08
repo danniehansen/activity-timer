@@ -307,7 +307,7 @@ function cardButtons (t) {
             condition: 'edit'
         },
         {
-            icon: 'https://d3eyxhmqemauky.cloudfront.net/' + clockImg.default,
+            icon: clockImage,
             text: 'Time spent',
             callback: function (t) {
                 return t.popup({
