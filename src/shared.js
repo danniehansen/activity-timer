@@ -374,7 +374,7 @@ function cardBackSection (t) {
         content: {
             type: 'iframe',
             url: t.signUrl('./card_back_section.html'),
-            height: 230
+            height: 40
         }
     };
 }
