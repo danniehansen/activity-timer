@@ -26,7 +26,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       filename: "card_back_section.html",
-      template: 'index.html',
+      template: 'card_back_section.html',
       chunks: ['card_back_section']
     })
   ],
