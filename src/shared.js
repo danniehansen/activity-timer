@@ -1,5 +1,4 @@
-const clockImg = require('../images/clock.svg');
-const clockImage = 'https://' + window.powerupHost + '/' + clockImg.default;
+const clockImage = 'https://' + window.powerupHost + '/images/clock.svg';
 const dataPrefix = 'act-timer';
 
 /**
