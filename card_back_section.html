@@ -4,6 +4,36 @@
     <meta charset="UTF-8" />
     <title>Activity timer develop</title>
     <link href="https://p.trellocdn.com/power-up.min.css" rel="stylesheet" />
+    <style type="text/css">
+      .tracked-time {
+        border-radius: 3px;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+        margin: 8px 4px 0 0;
+        text-align: center;
+        -webkit-appearance: none;
+        background-color: rgba(9,30,66,.04);
+        box-shadow: none;
+        border: none;
+        position: relative;
+        padding: 6px 12px 6px 35px;
+      }
+
+      .tracked-time::before {
+        display: inline-block;
+        background: url(https://d3eyxhmqemauky.cloudfront.net/images/clock.svg?color=42526e) no-repeat center center;
+        width: 15px;
+        height: 15px;
+        content: "";
+        position: absolute;
+        left: 11px;
+        top: 8px;
+      }
+    </style>
   </head>
   <body>
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
@@ -11,9 +41,9 @@
 
     <div class="card">
       <button class="mod-primary btn-start-timer">Start timer</button>
-      <button class="mod-primary btn-stop-timer">Stop timer</button>
+      <button class="mod-danger btn-stop-timer">Stop timer</button>
 
-      <div class="tracked-time"></div>
+      <div class="tracked-time">00:00:00</div>
     </div>
   </body>
 </html>
