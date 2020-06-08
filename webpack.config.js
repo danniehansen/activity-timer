@@ -5,7 +5,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
-    app: ['@babel/polyfill', './src/app.js']
+    main: ['@babel/polyfill', './src/main.js'],
+    card_back_section: ['@babel/polyfill', './src/card_back_section.js']
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -19,7 +20,14 @@ module.exports = {
       ],
     }),
     new HtmlWebpackPlugin({
-      template: 'index.html'
+      filename: "index.html",
+      template: 'index.html',
+      chunks: ['main']
+    }),
+    new HtmlWebpackPlugin({
+      filename: "card_back_section.html",
+      template: 'index.html',
+      chunks: ['card_back_section']
     })
   ],
   module: {
