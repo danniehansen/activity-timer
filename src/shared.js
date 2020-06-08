@@ -135,44 +135,6 @@ function formatDate(date) {
 }
 
 /**
- * Card badges capability handler.
- *
- * @param t
- *
- * @returns {{dynamic: (function(): {refresh: number})}[]}
- */
-function cardBadges (t) {
-    return [{
-        dynamic: async function () {
-            const running = await isRunning(t);
-            const time = await getTotalSeconds(t);
-
-            const object = {
-                refresh: 10
-            };
-
-            if (time !== 0) {
-                object.text = formatTime(time);
-                object.icon = clockImage;
-
-                if (running) {
-                    const startTime = await t.get('card', 'private', dataPrefix + '-start');
-                    const data = await t.card('idList');
-
-                    if (startTime[1] !== data.idList) {
-                        await stopTimer(t);
-                    } else {
-                        object.color = 'red';
-                    }
-                }
-            }
-
-            return object;
-        }
-    }];
-}
-
-/**
  * Card buttons capability handler.
  *
  * @param t
@@ -430,7 +392,6 @@ function cardBackSection (t) {
 }
 
 module.exports = {
-    cardBadges,
     cardButtons,
     cardDetailBadges,
     getRanges,
