@@ -10,7 +10,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'app.bundle.[hash].js'
+    filename: 'app.bundle.[name].[hash].js'
   },
   plugins: [
     new CleanWebpackPlugin(),
