@@ -423,6 +423,7 @@ function cardBackSection (t) {
         title: 'Card back section',
         content: {
             type: 'iframe',
+            icon: clockImage,
             url: t.signUrl('./card_back_section.html'),
             height: 230
         }
