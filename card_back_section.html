@@ -23,7 +23,8 @@
         padding: 6px 12px 6px 35px;
       }
 
-      .tracked-time::before {
+      .tracked-time::before,
+      .tracked-time::after {
         display: inline-block;
         background: url(https://d3eyxhmqemauky.cloudfront.net/images/clock.svg?color=42526e) no-repeat center center;
         width: 15px;
@@ -34,8 +35,23 @@
         top: 8px;
       }
 
-      .tracked-time--running::before {
+      .tracked-time::after {
         background: url(https://d3eyxhmqemauky.cloudfront.net/images/clock_white.svg?color=42526e) no-repeat center center;
+        opacity: 0;
+      }
+
+      .tracked-time--running::before {
+        opacity: 0;
+      }
+
+      .tracked-time--running::after {
+        opacity: 0;
+      }
+
+      .card,
+      .btn-start-timer,
+      .btn-stop-timer {
+        display: none;
       }
     </style>
   </head>
