@@ -74,9 +74,6 @@ async function getTotalSeconds(t) {
  */
 async function startTimer(t) {
     const data = await t.card('idList');
-    const cards = await t.cards('all');
-
-    console.log('cards:', cards);
 
     await t.set('card', 'private', dataPrefix + '-start', [
         Math.floor((new Date().getTime() / 1000)),
