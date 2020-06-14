@@ -415,7 +415,7 @@ function boardButtons (t) {
         },
         text: 'Activity timer',
         callback: onBoardButtonClick,
-        condition: 'read'
+        condition: 'always'
     }];
 }
 
