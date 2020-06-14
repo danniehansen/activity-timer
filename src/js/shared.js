@@ -109,11 +109,11 @@ function formatTime(secondsToFormat) {
     const minutes = Math.floor((secondsToFormat % 3600) / 60);
     const timeFormat = [];
 
-    if (hours.length > 0) {
+    if (hours > 0) {
         timeFormat.push(hours + 'h');
     }
 
-    if (minutes.length > 0) {
+    if (minutes > 0) {
         timeFormat.push(minutes + 'm');
     }
 
