@@ -1,7 +1,34 @@
+require('../../sass/main.scss');
+
 const t = window.TrelloPowerUp.iframe();
 
-t.render(async function() {
-    const cards = await t.card('all');
-    console.log('cards:', cards);
-    t.sizeTo('body');
-});
+async function tokenHandler () {
+    const token = await t.getRestApi().getToken();
+
+    console.log('token:', token);
+}
+
+;(async () => {
+    const isAuthorized = await t.getRestApi().isAuthorized();
+    const authorizeEl = document.querySelector('.authorize');
+
+    if (isAuthorized) {
+        await tokenHandler();
+    } else {
+        authorizeEl.style.display = 'block';
+        authorizeEl.addEventListener('click', async () => {
+            if (!isAuthorized) {
+                await t.getRestApi().authorize({
+                    scope: 'read',
+                    expiration: '30days'
+                });
+
+                await tokenHandler();
+            }
+        });
+    }
+
+    t.render(async () => {
+        t.sizeTo('body');
+    });
+})();
