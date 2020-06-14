@@ -1,6 +1,8 @@
 const clockImage = 'https://' + window.powerupHost + '/images/clock.svg';
 const clockImageWhite = 'https://' + window.powerupHost + '/images/clock.svg';
 const dataPrefix = 'act-timer';
+const apiKey = '2de5d228d2ca7b7bc4c9decc4ee3cbac';
+const appName = 'Activity timer develop';
 
 /**
  * Get all tracked ranges.
@@ -393,6 +395,14 @@ function cardBackSection (t) {
  * @returns {Promise<void>}
  */
 async function onBoardButtonClick (t) {
+    const isAuthorized = await t.getRestApi().isAuthorized();
+
+    if (!isAuthorized) {
+        t = await t.getRestApi().authorize({scope: 'read'});
+    }
+
+    console.log('t:', t);
+
     await t.modal({
         url: t.signUrl('./history.html'),
         title: 'Activity timer',
@@ -431,5 +441,7 @@ module.exports = {
     formatDate,
     clockImage,
     cardBackSection,
-    boardButtons
+    boardButtons,
+    apiKey,
+    appName
 };
