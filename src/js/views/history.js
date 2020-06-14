@@ -14,7 +14,7 @@ async function tokenHandler () {
 
     const board = await t.board('id');
 
-    const data = await fetch('/1/boards/' + board.id + '/cards/all?key=' + token);
+    const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?key=' + token);
     const json = await data.json();
 
     console.log('json:', json);
