@@ -1,0 +1,33 @@
+.tracked-time {
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 8px 4px 0 0;
+  text-align: center;
+  -webkit-appearance: none;
+  background-color: rgba(9,30,66,.04);
+  box-shadow: none;
+  border: none;
+  position: relative;
+  padding: 6px 12px 6px 35px;
+
+  &::before {
+    display: inline-block;
+    background: url(https://d3eyxhmqemauky.cloudfront.net/images/clock.svg?color=42526e) no-repeat center center;
+    width: 15px;
+    height: 15px;
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 8px;
+  }
+}
+
+.card,
+.btn-start-timer,
+.btn-stop-timer {
+  display: none;
+}

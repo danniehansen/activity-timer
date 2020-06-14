@@ -1,4 +1,5 @@
 const clockImage = 'https://' + window.powerupHost + '/images/clock.svg';
+const clockImageWhite = 'https://' + window.powerupHost + '/images/clock.svg';
 const dataPrefix = 'act-timer';
 
 /**
@@ -376,6 +377,40 @@ function cardBackSection (t) {
     };
 }
 
+/**
+ * Click handler for board button.
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
+async function onBoardButtonClick (t) {
+    await t.modal({
+        url: t.signUrl('./history.html'),
+        title: 'Activity timer',
+        fullscreen: false
+    });
+}
+
+/**
+ * Board button capability handler.
+ *
+ * @param t
+ *
+ * @returns {{condition: string, icon: {light: *, dark: *}, callback: onBoardButtonClick, text: string}[]}
+ */
+function boardbuttons (t) {
+    return [{
+        icon: {
+            dark: clockImage,
+            light: clockImageWhite
+        },
+        text: 'Activity timer',
+        callback: onBoardButtonClick,
+        condition: 'read'
+    }];
+}
+
 module.exports = {
     cardBadges,
     cardButtons,
@@ -387,5 +422,6 @@ module.exports = {
     formatTime,
     formatDate,
     clockImage,
-    cardBackSection
+    cardBackSection,
+    boardbuttons
 };
