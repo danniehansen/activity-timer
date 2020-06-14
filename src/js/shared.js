@@ -398,7 +398,10 @@ async function onBoardButtonClick (t) {
     const isAuthorized = await t.getRestApi().isAuthorized();
 
     if (!isAuthorized) {
-        t = await t.getRestApi().authorize({scope: 'read'});
+        t = await t.getRestApi().authorize({
+            scope: 'read',
+            expiration: '30days'
+        });
     }
 
     console.log('t:', t);
