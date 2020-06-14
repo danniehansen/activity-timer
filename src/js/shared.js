@@ -119,7 +119,7 @@ function formatTime(secondsToFormat) {
         timeFormat.push(minutes + 'm');
     }
 
-    return timeFormat.join(' ');
+    return (timeFormat.length > 0 ? timeFormat.join(' ') : '0m');
 }
 
 /**
