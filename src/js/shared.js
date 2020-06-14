@@ -107,9 +107,17 @@ async function stopTimer(t) {
 function formatTime(secondsToFormat) {
     const hours = Math.floor(secondsToFormat / 3600);
     const minutes = Math.floor((secondsToFormat % 3600) / 60);
-    const seconds = Math.floor(secondsToFormat % 60);
+    const timeFormat = [];
 
-    return [(hours < 10 ? '0' : '') + hours, (minutes < 10 ? '0' : '') + minutes, (seconds < 10 ? '0' : '') + seconds].join(':');
+    if (hours.length > 0) {
+        timeFormat.push(hours + 'h');
+    }
+
+    if (minutes.length > 0) {
+        timeFormat.push(minutes + 'm');
+    }
+
+    return timeFormat.join(' ');
 }
 
 /**
