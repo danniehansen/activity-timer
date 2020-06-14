@@ -10,23 +10,33 @@ const t = window.TrelloPowerUp.iframe({
 async function tokenHandler () {
     const token = await t.getRestApi().getToken();
 
-    console.log('token:', token);
+    document.querySelector('.wrapper').style.display = 'block';
+
+    const board = await t.board('id');
+
+    const data = await fetch('/1/boards/' + board.id + '/cards/all?key=' + token);
+    const json = await data.json();
+
+    console.log('json:', json);
 }
 
 ;(async () => {
     const isAuthorized = await t.getRestApi().isAuthorized();
     const authorizeEl = document.querySelector('.authorize');
+    const authorizeBtnEl = document.querySelector('.authorize-btn');
 
     if (isAuthorized) {
         await tokenHandler();
     } else {
         authorizeEl.style.display = 'block';
-        authorizeEl.addEventListener('click', async () => {
+        authorizeBtnEl.addEventListener('click', async () => {
             if (!isAuthorized) {
                 await t.getRestApi().authorize({
                     scope: 'read',
                     expiration: '30days'
                 });
+
+                authorizeEl.style.display = 'block';
 
                 await tokenHandler();
             }
