@@ -1,6 +1,11 @@
 require('../../sass/main.scss');
 
-const t = window.TrelloPowerUp.iframe();
+const { apiKey, appName } = require('../shared.js');
+
+const t = window.TrelloPowerUp.iframe({
+    appKey: apiKey,
+    appName: appName
+});
 
 async function tokenHandler () {
     const token = await t.getRestApi().getToken();
