@@ -407,7 +407,7 @@ async function onBoardButtonClick (t) {
  *
  * @returns {{condition: string, icon: {light: *, dark: *}, callback: onBoardButtonClick, text: string}[]}
  */
-function boardbuttons (t) {
+function boardButtons (t) {
     return [{
         icon: {
             dark: clockImage,
@@ -431,5 +431,5 @@ module.exports = {
     formatDate,
     clockImage,
     cardBackSection,
-    boardbuttons
+    boardButtons
 };
