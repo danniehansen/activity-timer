@@ -33,13 +33,7 @@ class Card {
     constructor(data) {
         this.id = data.id;
         this.ranges = [];
-        this.labels = [];
-
-        if (typeof data.labels !== 'undefined') {
-            this.labels = data.labels.map((label) => {
-                return label.name;
-            });
-        }
+        this.labels = data.labels || [];
 
         if (typeof data.pluginData !== 'undefined') {
             data.pluginData.forEach((pluginData) => {
@@ -110,6 +104,8 @@ async function fetchData () {
             }),
             labels,
         };
+
+        console.log(dataCache);
     }
 
     return dataCache;
