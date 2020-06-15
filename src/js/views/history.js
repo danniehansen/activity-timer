@@ -247,24 +247,20 @@ async function analyticsRenderer () {
             card.ranges.forEach((range) => {
                 if (selectedMembers.length === 0 || selectedMembers.indexOf(range.memberId) !== -1) {
                     if (
+                        dateFromFilter !== null &&
                         !(
-                            dateFromFilter !== null &&
-                            (
-                                dateFromFilter <= range.startTime ||
-                                dateFromFilter <= range.endTime
-                            )
+                            dateFromFilter <= range.startTime ||
+                            dateFromFilter <= range.endTime
                         )
                     ) {
                         return;
                     }
 
                     if (
+                        dateToFilter !== null &&
                         !(
-                            dateToFilter !== null &&
-                            (
-                                dateToFilter <= range.startTime ||
-                                dateToFilter <= range.endTime
-                            )
+                            dateToFilter <= range.startTime ||
+                            dateToFilter <= range.endTime
                         )
                     ) {
                         return;
