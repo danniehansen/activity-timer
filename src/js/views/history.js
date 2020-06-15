@@ -159,6 +159,10 @@ async function analyticsRenderer () {
     const selectedMembers = [];
     const selectedLabels = [];
 
+    // Date filter
+    const dateFromFilter = (dateFrom.value ? new Date(dateFrom.value).getTime() : null);
+    const dateToFilter = (dateTo.value ? new Date(dateTo.value).getTime() : null);
+
     // Fetch selected members
     document.querySelectorAll('.members__item-input:checked').forEach((el) => {
         selectedMembers.push(el.getAttribute('data-id'));
@@ -242,6 +246,30 @@ async function analyticsRenderer () {
         if (selectedLabels.length === 0 || card.hasEitherLabels(selectedLabels)) {
             card.ranges.forEach((range) => {
                 if (selectedMembers.length === 0 || selectedMembers.indexOf(range.memberId) !== -1) {
+                    if (
+                        !(
+                            dateFromFilter !== null &&
+                            (
+                                dateFromFilter <= range.startTime ||
+                                dateFromFilter <= range.endTime
+                            )
+                        )
+                    ) {
+                        return;
+                    }
+
+                    if (
+                        !(
+                            dateToFilter !== null &&
+                            (
+                                dateToFilter <= range.startTime ||
+                                dateToFilter <= range.endTime
+                            )
+                        )
+                    ) {
+                        return;
+                    }
+
                     if (typeof timeSpentByMember[range.memberId] === 'undefined') {
                         timeSpentByMember[range.memberId] = 0;
                     }
@@ -268,9 +296,6 @@ async function analyticsRenderer () {
     resultsEl.appendChild(resultsFragment);
 
     document.querySelector('.wrapper').style.display = 'block';
-
-    console.log('dateFrom:', dateFrom.value);
-    console.log('dateTo:', dateTo.value);
 }
 
 ;(async () => {
