@@ -218,7 +218,7 @@ async function analyticsRenderer () {
 
     labelsEl.appendChild(labelsFragment);
 
-    const timeSpentByMember = [];
+    const timeSpentByMember = {};
 
     processedData.cards.forEach((card) => {
         card.ranges.forEach((range) => {
@@ -232,12 +232,14 @@ async function analyticsRenderer () {
         });
     });
 
-    timeSpentByMember.forEach((timeSpent, memberId) => {
+    console.log('timeSpentByMember:', timeSpentByMember);
+
+    for (const memberId in timeSpentByMember) {
         const resultEl = document.createElement('div');
-        resultEl.innerText = dataCache.membersById[memberId].username + ': ' + formatTime(timeSpent);
+        resultEl.innerText = dataCache.membersById[memberId].username + ': ' + formatTime(timeSpentByMember[memberId]);
 
         resultsFragment.appendChild(resultEl);
-    });
+    }
 
     while (resultsEl.firstChild) {
         resultsEl.removeChild(resultsEl.lastChild);
