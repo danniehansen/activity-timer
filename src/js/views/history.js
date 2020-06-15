@@ -160,8 +160,8 @@ async function analyticsRenderer () {
     const selectedLabels = [];
 
     // Date filter
-    const dateFromFilter = (dateFrom.value ? new Date(dateFrom.value).getTime() : null);
-    const dateToFilter = (dateTo.value ? new Date(dateTo.value).getTime() : null);
+    const dateFromFilter = (dateFrom.value ? Math.floor(new Date(dateFrom.value).getTime() / 1000) : null);
+    const dateToFilter = (dateTo.value ? Math.floor(new Date(dateTo.value).getTime() / 1000) : null);
 
     // Fetch selected members
     document.querySelectorAll('.members__item-input:checked').forEach((el) => {
