@@ -7,17 +7,58 @@ const t = window.TrelloPowerUp.iframe({
     appName: appName
 });
 
-async function tokenHandler () {
-    const token = await t.getRestApi().getToken();
+let dataCache = null;
 
+function Range (data) {
+    this.memberId = data[0];
+    this.startTime = data[1];
+    this.endTime = data[2];
+}
+
+function Card (data) {
+    this.id = data.id;
+    this.ranges = [];
+
+    if (typeof data.pluginData !== 'undefined') {
+        data.pluginData.forEach((pluginData) => {
+            if (pluginData.scope === 'card' && pluginData.access === 'shared') {
+                pluginData.value = JSON.parse(pluginData.value);
+
+                if (
+                    typeof pluginData.value['act-timer-ranges'] !== 'undefined' &&
+                    pluginData.value['act-timer-ranges'].length > 0
+                ) {
+                    pluginData.value['act-timer-ranges'].forEach((range) => {
+                        this.ranges.push(new Range(range));
+                    });
+                }
+            }
+        });
+    }
+}
+
+async function fetchData () {
+    if (dataCache == null) {
+        const token = await t.getRestApi().getToken();
+        const board = await t.board('id');
+
+        const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,labels,pluginData,closed&key=' + apiKey + '&token=' + token);
+        const json = await data.json();
+
+        dataCache = json.map((item) => {
+            return new Card(item);
+        });
+    }
+
+    return dataCache;
+}
+
+async function tokenHandler () {
     document.querySelector('.wrapper').style.display = 'block';
 
-    const board = await t.board('id');
+    const processedData = await fetchData();
 
-    const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?key=' + apiKey + '&token=' + token);
-    const json = await data.json();
-
-    console.log('json:', json);
+    console.log('processedData:', processedData);
 }
 
 ;(async () => {
