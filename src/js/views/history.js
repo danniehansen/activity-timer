@@ -143,6 +143,7 @@ async function analyticsRenderer () {
         checkboxEl.type = 'checkbox';
         checkboxEl.className = 'members__item-input';
         checkboxEl.id = 'member-' + member.id;
+        checkboxEl.setAttribute('data-id', member.id);
         checkboxEl.addEventListener('change', analyticsRenderer);
         checkboxEl.checked = selectedMembers.indexOf(member.id) !== -1;
 
@@ -150,7 +151,6 @@ async function analyticsRenderer () {
         labelEl.for = 'member-' + member.id;
         labelEl.className = 'members__item-label';
         labelEl.innerText = member.username;
-        labelEl.setAttribute('data-id', member.id);
 
         memberEl.appendChild(checkboxEl);
         memberEl.appendChild(labelEl);
@@ -172,6 +172,7 @@ async function analyticsRenderer () {
         checkboxEl.type = 'checkbox';
         checkboxEl.className = 'labels__item-input';
         checkboxEl.id = 'label-' + label.id;
+        checkboxEl.setAttribute('data-id', label.id);
         checkboxEl.addEventListener('change', analyticsRenderer);
         checkboxEl.checked = selectedLabels.indexOf(label.id) !== -1;
 
@@ -179,7 +180,6 @@ async function analyticsRenderer () {
         labelEl.for = 'label-' + label.id;
         labelEl.className = 'labels__item-label';
         labelEl.innerText = label.name;
-        labelEl.setAttribute('data-id', label.id);
 
         labelWrapEl.appendChild(checkboxEl);
         labelWrapEl.appendChild(labelEl);
