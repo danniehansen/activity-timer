@@ -158,9 +158,9 @@ async function analyticsRenderer () {
         membersFragment.appendChild(memberEl);
     });
 
-    membersEl.childNodes.forEach((node) => {
-        membersEl.removeChild(node);
-    });
+    while (membersEl.firstChild) {
+        membersEl.removeChild(membersEl.lastChild);
+    }
 
     membersEl.appendChild(membersFragment);
 
@@ -187,9 +187,9 @@ async function analyticsRenderer () {
         labelsFragment.appendChild(labelWrapEl);
     });
 
-    labelsEl.childNodes.forEach((node) => {
-        labelsEl.removeChild(node);
-    });
+    while (labelsEl.firstChild) {
+        labelsEl.removeChild(labelsEl.lastChild);
+    }
 
     labelsEl.appendChild(labelsFragment);
 
