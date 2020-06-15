@@ -165,8 +165,8 @@ async function analyticsRenderer () {
         labelEl.for = 'label-' + label.id;
         labelEl.className = 'labels__item-label';
 
-        labelEl.appendChild(checkboxEl);
-        labelEl.appendChild(labelEl);
+        labelWrapEl.appendChild(checkboxEl);
+        labelWrapEl.appendChild(labelEl);
 
         membersFragment.appendChild(labelWrapEl);
     });
