@@ -78,7 +78,8 @@ async function fetchData () {
         });
 
         const members = [];
-        const labels = [];
+        let labels = [];
+        const labelsById = {};
 
         cards.forEach((card) => {
             card.ranges.forEach((range) => {
@@ -88,10 +89,15 @@ async function fetchData () {
             });
 
             card.labels.forEach((label) => {
-                if (labels.indexOf(label) === -1) {
-                    labels.push(label);
+                if (labels.indexOf(label.id) === -1) {
+                    labels.push(label.id);
+                    labelsById[label.id] = label;
                 }
             });
+        });
+
+        labels = labels.map((labelId) => {
+            return labelsById[labelId];
         });
 
         const memberData = await fetch('https://api.trello.com/1/boards/' + board.id + '/members?fields=id,username,avatarUrl&key=' + apiKey + '&token=' + token);
@@ -148,15 +154,15 @@ async function analyticsRenderer () {
     processedData.labels.forEach((label) => {
         let labelWrapEl = document.createElement('div');
         labelWrapEl.className = 'labels__item';
-        labelWrapEl.innerText = label;
+        labelWrapEl.innerText = label.name;
 
         let checkboxEl = document.createElement('input');
         checkboxEl.type = 'checkbox';
         checkboxEl.className = 'labels__item-input';
-        checkboxEl.id = 'label-' + member.id;
+        checkboxEl.id = 'label-' + label.id;
 
         let labelEl = document.createElement('label');
-        labelEl.for = 'label-' + member.id;
+        labelEl.for = 'label-' + label.id;
         labelEl.className = 'labels__item-label';
 
         labelEl.appendChild(checkboxEl);
