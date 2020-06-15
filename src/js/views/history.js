@@ -7,7 +7,7 @@ const t = window.TrelloPowerUp.iframe({
     appName: appName
 });
 
-const usersEl = document.querySelector('.users');
+const membersEl = document.querySelector('.members');
 const labelsEl = document.querySelector('.labels');
 const resultsEl = document.querySelector('.results');
 
@@ -97,11 +97,11 @@ async function fetchData () {
         const memberData = await fetch('https://api.trello.com/1/boards/' + board.id + '/members?fields=id,username,avatarUrl&key=' + apiKey + '&token=' + token);
         const memberJson = await memberData.json();
 
-        console.log('memberJson:', memberJson);
-
         dataCache = {
             cards,
-            members,
+            'members': memberJson.filter((member) => {
+                return members.indexOf(member.id) !== -1;
+            }),
             labels,
         };
     }
@@ -116,7 +116,60 @@ async function fetchData () {
  */
 async function analyticsRenderer () {
     const processedData = await fetchData();
-    const usersFragment = document.createDocumentFragment();
+    const membersFragment = document.createDocumentFragment();
+    const labelsFragment = document.createDocumentFragment();
+
+    processedData.members.forEach((member) => {
+        const memberEl = document.createElement('div');
+        memberEl.className = 'members__item';
+        memberEl.innerText = member.username;
+
+        const checkboxEl = document.createElement('input');
+        checkboxEl.type = 'checkbox';
+        checkboxEl.className = 'members__item-input';
+        checkboxEl.id = 'member-' + member.id;
+
+        const labelEl = document.createElement('label');
+        labelEl.for = 'member-' + member.id;
+        labelEl.className = 'members__item-label';
+
+        memberEl.appendChild(checkboxEl);
+        memberEl.appendChild(labelEl);
+
+        membersFragment.appendChild(memberEl);
+    });
+
+    membersEl.childNodes.forEach((node) => {
+        membersEl.removeChild(node);
+    });
+
+    membersEl.appendChild(membersFragment);
+
+    processedData.labels.forEach((label) => {
+        let labelWrapEl = document.createElement('div');
+        labelWrapEl.className = 'labels__item';
+        labelWrapEl.innerText = label;
+
+        let checkboxEl = document.createElement('input');
+        checkboxEl.type = 'checkbox';
+        checkboxEl.className = 'labels__item-input';
+        checkboxEl.id = 'label-' + member.id;
+
+        let labelEl = document.createElement('label');
+        labelEl.for = 'label-' + member.id;
+        labelEl.className = 'labels__item-label';
+
+        labelEl.appendChild(checkboxEl);
+        labelEl.appendChild(labelEl);
+
+        membersFragment.appendChild(labelWrapEl);
+    });
+
+    labelsEl.childNodes.forEach((node) => {
+        labelsEl.removeChild(node);
+    });
+
+    labelsEl.appendChild(labelsFragment);
 
     console.log('processedData:', processedData);
 
