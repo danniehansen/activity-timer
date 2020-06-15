@@ -56,6 +56,22 @@ class Card {
             });
         }
     }
+
+    hasEitherLabels (labels) {
+        if (this.labels === null || this.labels.length === 0) {
+            return false;
+        }
+
+        let match = false;
+
+        this.labels.forEach((label) => {
+            if (labels.indexOf(label.id) !== -1) {
+                match = true;
+            }
+        });
+
+        return match;
+    }
 }
 
 /**
@@ -221,15 +237,17 @@ async function analyticsRenderer () {
     const timeSpentByMember = {};
 
     processedData.cards.forEach((card) => {
-        card.ranges.forEach((range) => {
-            if (selectedMembers.indexOf(range.memberId) !== -1) {
-                if (typeof timeSpentByMember[range.memberId] === 'undefined') {
-                    timeSpentByMember[range.memberId] = 0;
-                }
+        if (selectedLabels.length === 0 || card.hasEitherLabels(selectedLabels)) {
+            card.ranges.forEach((range) => {
+                if (selectedMembers.length === 0 || selectedMembers.indexOf(range.memberId) !== -1) {
+                    if (typeof timeSpentByMember[range.memberId] === 'undefined') {
+                        timeSpentByMember[range.memberId] = 0;
+                    }
 
-                timeSpentByMember[range.memberId] += range.getTimeSpend();
-            }
-        });
+                    timeSpentByMember[range.memberId] += range.getTimeSpend();
+                }
+            });
+        }
     });
 
     console.log('timeSpentByMember:', timeSpentByMember);
