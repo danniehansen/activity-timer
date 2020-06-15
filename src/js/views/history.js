@@ -132,6 +132,9 @@ async function analyticsRenderer () {
         selectedLabels.push(el.getAttribute('data-id'));
     });
 
+    console.log('selectedMembers: ', selectedMembers);
+    console.log('selectedLabels: ', selectedLabels);
+
     processedData.members.forEach((member) => {
         const memberEl = document.createElement('div');
         memberEl.className = 'members__item';
