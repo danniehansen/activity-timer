@@ -121,19 +121,33 @@ async function analyticsRenderer () {
     const membersFragment = document.createDocumentFragment();
     const labelsFragment = document.createDocumentFragment();
 
+    const selectedMembers = [];
+    const selectedLabels = [];
+
+    document.querySelectorAll('.members__item-input:checked').forEach((el) => {
+        selectedMembers.push(el.getAttribute('data-id'));
+    });
+
+    document.querySelectorAll('.labels__item-input:checked').forEach((el) => {
+        selectedLabels.push(el.getAttribute('data-id'));
+    });
+
     processedData.members.forEach((member) => {
         const memberEl = document.createElement('div');
         memberEl.className = 'members__item';
-        memberEl.innerText = member.username;
 
         const checkboxEl = document.createElement('input');
         checkboxEl.type = 'checkbox';
         checkboxEl.className = 'members__item-input';
         checkboxEl.id = 'member-' + member.id;
+        checkboxEl.addEventListener('change', analyticsRenderer);
+        checkboxEl.checked = selectedMembers.indexOf(member.id) !== -1;
 
         const labelEl = document.createElement('label');
         labelEl.for = 'member-' + member.id;
         labelEl.className = 'members__item-label';
+        labelEl.innerText = member.username;
+        labelEl.setAttribute('data-id', member.id);
 
         memberEl.appendChild(checkboxEl);
         memberEl.appendChild(labelEl);
@@ -150,16 +164,19 @@ async function analyticsRenderer () {
     processedData.labels.forEach((label) => {
         let labelWrapEl = document.createElement('div');
         labelWrapEl.className = 'labels__item';
-        labelWrapEl.innerText = label.name;
 
         let checkboxEl = document.createElement('input');
         checkboxEl.type = 'checkbox';
         checkboxEl.className = 'labels__item-input';
         checkboxEl.id = 'label-' + label.id;
+        checkboxEl.addEventListener('change', analyticsRenderer);
+        checkboxEl.checked = selectedLabels.indexOf(label.id) !== -1;
 
         let labelEl = document.createElement('label');
         labelEl.for = 'label-' + label.id;
         labelEl.className = 'labels__item-label';
+        labelEl.innerText = label.name;
+        labelEl.setAttribute('data-id', label.id);
 
         labelWrapEl.appendChild(checkboxEl);
         labelWrapEl.appendChild(labelEl);
