@@ -10,6 +10,8 @@ const t = window.TrelloPowerUp.iframe({
 const membersEl = document.querySelector('.members');
 const labelsEl = document.querySelector('.labels');
 const resultsEl = document.querySelector('.results');
+const dateFrom = document.getElementById('date-from');
+const dateTo = document.getElementById('date-to');
 
 let dataCache = null;
 
@@ -266,6 +268,9 @@ async function analyticsRenderer () {
     resultsEl.appendChild(resultsFragment);
 
     document.querySelector('.wrapper').style.display = 'block';
+
+    console.log('dateFrom:', dateFrom.value);
+    console.log('dateTo:', dateTo.value);
 }
 
 ;(async () => {
