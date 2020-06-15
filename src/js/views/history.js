@@ -278,6 +278,9 @@ async function analyticsRenderer () {
     const authorizeEl = document.querySelector('.authorize');
     const authorizeBtnEl = document.querySelector('.authorize-btn');
 
+    dateFrom.addEventListener('change', analyticsRenderer);
+    dateTo.addEventListener('change', analyticsRenderer);
+
     if (isAuthorized) {
         await analyticsRenderer();
     } else {
