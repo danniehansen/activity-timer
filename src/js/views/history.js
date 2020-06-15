@@ -164,7 +164,7 @@ async function analyticsRenderer () {
         labelWrapEl.appendChild(checkboxEl);
         labelWrapEl.appendChild(labelEl);
 
-        membersFragment.appendChild(labelWrapEl);
+        labelsFragment.appendChild(labelWrapEl);
     });
 
     labelsEl.childNodes.forEach((node) => {
