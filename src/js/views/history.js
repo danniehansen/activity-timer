@@ -1,6 +1,6 @@
 require('../../sass/main.scss');
 
-const { apiKey, appName } = require('../shared.js');
+const { apiKey, appName, formatTime } = require('../shared.js');
 
 const t = window.TrelloPowerUp.iframe({
     appKey: apiKey,
@@ -22,6 +22,10 @@ class Range {
         this.memberId = data[0];
         this.startTime = data[1];
         this.endTime = data[2];
+    }
+
+    getTimeSpend () {
+        return this.endTime - this.startTime;
     }
 }
 
@@ -97,11 +101,20 @@ async function fetchData () {
         const memberData = await fetch('https://api.trello.com/1/boards/' + board.id + '/members?fields=id,username,avatarUrl&key=' + apiKey + '&token=' + token);
         const memberJson = await memberData.json();
 
+        const cardMembers = memberJson.filter((member) => {
+            return members.indexOf(member.id) !== -1;
+        });
+
+        const membersById = {};
+
+        cardMembers.forEach((member) => {
+            membersById[member.id] = member;
+        });
+
         dataCache = {
             cards,
-            'members': memberJson.filter((member) => {
-                return members.indexOf(member.id) !== -1;
-            }),
+            members: cardMembers,
+            membersById,
             labels,
         };
 
@@ -117,23 +130,31 @@ async function fetchData () {
  * @returns {Promise<void>}
  */
 async function analyticsRenderer () {
+    // Fetch processed trello data
     const processedData = await fetchData();
+
+    // Construct fragments
     const membersFragment = document.createDocumentFragment();
     const labelsFragment = document.createDocumentFragment();
+    const resultsFragment = document.createDocumentFragment();
 
     const selectedMembers = [];
     const selectedLabels = [];
 
+    // Fetch selected members
     document.querySelectorAll('.members__item-input:checked').forEach((el) => {
         selectedMembers.push(el.getAttribute('data-id'));
     });
 
+    // Fetch selected labels
     document.querySelectorAll('.labels__item-input:checked').forEach((el) => {
         selectedLabels.push(el.getAttribute('data-id'));
     });
 
     console.log('selectedMembers: ', selectedMembers);
     console.log('selectedLabels: ', selectedLabels);
+
+    // Process members
 
     processedData.members.forEach((member) => {
         const memberEl = document.createElement('div');
@@ -158,11 +179,14 @@ async function analyticsRenderer () {
         membersFragment.appendChild(memberEl);
     });
 
+    // Cleanup existing member DOM nodes
     while (membersEl.firstChild) {
         membersEl.removeChild(membersEl.lastChild);
     }
 
     membersEl.appendChild(membersFragment);
+
+    // Process labels
 
     processedData.labels.forEach((label) => {
         let labelWrapEl = document.createElement('div');
@@ -187,13 +211,39 @@ async function analyticsRenderer () {
         labelsFragment.appendChild(labelWrapEl);
     });
 
+    // Cleanup existing label DOM nodes
     while (labelsEl.firstChild) {
         labelsEl.removeChild(labelsEl.lastChild);
     }
 
     labelsEl.appendChild(labelsFragment);
 
-    console.log('processedData:', processedData);
+    const timeSpentByMember = [];
+
+    processedData.cards.forEach((card) => {
+        card.ranges.forEach((range) => {
+            if (selectedMembers.indexOf(range.memberId) !== -1) {
+                if (typeof timeSpentByMember[range.memberId] === 'undefined') {
+                    timeSpentByMember[range.memberId] = 0;
+                }
+
+                timeSpentByMember[range.memberId] += range.getTimeSpend();
+            }
+        });
+    });
+
+    timeSpentByMember.forEach((timeSpent, memberId) => {
+        const resultEl = document.createElement('div');
+        resultEl.innerText = dataCache.membersById[memberId].username + ': ' + formatTime(timeSpent);
+
+        resultsFragment.appendChild(resultEl);
+    });
+
+    while (resultsEl.firstChild) {
+        resultsEl.removeChild(resultsEl.lastChild);
+    }
+
+    resultsEl.appendChild(resultsFragment);
 
     document.querySelector('.wrapper').style.display = 'block';
 }
