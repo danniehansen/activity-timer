@@ -138,8 +138,6 @@ async function fetchData () {
             membersById,
             labels,
         };
-
-        console.log(dataCache);
     }
 
     return dataCache;
@@ -164,7 +162,12 @@ async function analyticsRenderer () {
 
     // Date filter
     const dateFromFilter = (dateFrom.value ? Math.floor(new Date(dateFrom.value).getTime() / 1000) : null);
-    const dateToFilter = (dateTo.value ? Math.floor(new Date(dateTo.value).getTime() / 1000) : null);
+    let dateToFilter = null;
+
+    if (dateTo.value) {
+        let dateTo = new Date(dateTo.value);
+        dateToFilter = Math.floor(new Date(dateTo.getFullYear(), dateTo.getMonth(), dateTo.getDate(), 23, 59, 59).getTime() / 1000);
+    }
 
     // Fetch selected members
     document.querySelectorAll('.members__item-input:checked').forEach((el) => {
@@ -175,9 +178,6 @@ async function analyticsRenderer () {
     document.querySelectorAll('.labels__item-input:checked').forEach((el) => {
         selectedLabels.push(el.getAttribute('data-id'));
     });
-
-    console.log('selectedMembers: ', selectedMembers);
-    console.log('selectedLabels: ', selectedLabels);
 
     // Process members
 
@@ -279,13 +279,18 @@ async function analyticsRenderer () {
         }
     });
 
-    console.log('timeSpentByMember:', timeSpentByMember);
+    if (Object.keys(timeSpentByMember).length > 0) {
+        for (const memberId in timeSpentByMember) {
+            const resultEl = document.createElement('div');
+            resultEl.innerText = (dataCache.membersById[memberId].fullName || dataCache.membersById[memberId].username) + ': ' + formatTime(timeSpentByMember[memberId]);
 
-    for (const memberId in timeSpentByMember) {
-        const resultEl = document.createElement('div');
-        resultEl.innerText = (dataCache.membersById[memberId].fullName || dataCache.membersById[memberId].username) + ': ' + formatTime(timeSpentByMember[memberId]);
+            resultsFragment.appendChild(resultEl);
+        }
+    } else {
+        const paragraphEl = document.createElement('p');
+        paragraphEl.innerText = 'No results found';
 
-        resultsFragment.appendChild(resultEl);
+        resultsFragment.appendChild(paragraphEl);
     }
 
     while (resultsEl.firstChild) {
