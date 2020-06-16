@@ -259,7 +259,8 @@ function cardButtons (t) {
                                                                         ranges[_rangeIndex] = _range;
                                                                         await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
                                                                         return t.closePopup();
-                                                                    }
+                                                                    },
+                                                                    date: _start
                                                                 });
                                                             }
                                                         },
