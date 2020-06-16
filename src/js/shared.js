@@ -2,7 +2,7 @@ const clockImage = 'https://' + window.powerupHost + '/images/clock.svg';
 const clockImageWhite = 'https://' + window.powerupHost + '/images/clock.svg';
 const dataPrefix = 'act-timer';
 const apiKey = '2de5d228d2ca7b7bc4c9decc4ee3cbac';
-const appName = 'Activity timer develop';
+const appName = 'Activity timer';
 
 /**
  * Get all tracked ranges.
@@ -156,7 +156,7 @@ function cardBadges (t) {
             const time = await getTotalSeconds(t);
 
             const object = {
-                refresh: 10
+                refresh: 60
             };
 
             if (time !== 0) {
@@ -378,7 +378,7 @@ function cardButtons (t) {
  */
 function cardBackSection (t) {
     return {
-        title: 'Activity timer filter',
+        title: 'Activity timer',
         icon: clockImage,
         content: {
             type: 'iframe',
@@ -398,7 +398,7 @@ function cardBackSection (t) {
 async function onBoardButtonClick (t) {
     await t.modal({
         url: t.signUrl('./history.html'),
-        title: 'Activity timer',
+        title: 'Activity timer history',
         fullscreen: false
     });
 }
@@ -416,7 +416,7 @@ function boardButtons (t) {
             dark: clockImage,
             light: clockImageWhite
         },
-        text: 'Activity timer',
+        text: 'Activity timer history',
         callback: onBoardButtonClick,
         condition: 'always'
     }];
