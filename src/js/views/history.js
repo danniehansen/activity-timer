@@ -192,7 +192,7 @@ async function analyticsRenderer () {
         checkboxEl.checked = selectedMembers.indexOf(member.id) !== -1;
 
         const labelEl = document.createElement('label');
-        labelEl.for = 'member-' + member.id;
+        labelEl.setAttribute('for', 'member-' + member.id);
         labelEl.className = 'members__item-label';
         labelEl.innerText = member.username;
 
@@ -224,7 +224,7 @@ async function analyticsRenderer () {
         checkboxEl.checked = selectedLabels.indexOf(label.id) !== -1;
 
         let labelEl = document.createElement('label');
-        labelEl.for = 'label-' + label.id;
+        labelEl.setAttribute('for', 'label-' + label.id)
         labelEl.className = 'labels__item-label';
         labelEl.innerText = label.name;
 
