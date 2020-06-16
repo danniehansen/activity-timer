@@ -292,6 +292,7 @@ async function analyticsRenderer () {
 
     resultsEl.appendChild(resultsFragment);
 
+    document.querySelector('.loader').style.display = 'none';
     document.querySelector('.wrapper').style.display = 'block';
 
     t.sizeTo('body');
