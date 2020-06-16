@@ -185,7 +185,7 @@ async function analyticsRenderer () {
 
         const checkboxEl = document.createElement('input');
         checkboxEl.type = 'checkbox';
-        checkboxEl.className = 'members__item-input';
+        checkboxEl.className = 'members__item-input checkbox';
         checkboxEl.id = 'member-' + member.id;
         checkboxEl.setAttribute('data-id', member.id);
         checkboxEl.addEventListener('change', analyticsRenderer);
@@ -213,7 +213,7 @@ async function analyticsRenderer () {
 
     processedData.labels.forEach((label) => {
         let labelWrapEl = document.createElement('div');
-        labelWrapEl.className = 'labels__item';
+        labelWrapEl.className = 'labels__item checkbox';
 
         let checkboxEl = document.createElement('input');
         checkboxEl.type = 'checkbox';
@@ -293,6 +293,8 @@ async function analyticsRenderer () {
     resultsEl.appendChild(resultsFragment);
 
     document.querySelector('.wrapper').style.display = 'block';
+
+    t.sizeTo('body');
 }
 
 ;(async () => {
