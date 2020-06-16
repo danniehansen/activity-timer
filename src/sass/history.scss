@@ -5,10 +5,11 @@
 
 .row {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .col {
   flex-grow: 1;
   flex-shrink: 1;
+  flex-basis: 0;
 }
