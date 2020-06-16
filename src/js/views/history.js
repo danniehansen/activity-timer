@@ -162,13 +162,11 @@ async function analyticsRenderer () {
 
     // Date filter
     const dateFromFilter = (dateFrom.value ? Math.floor(new Date(dateFrom.value).getTime() / 1000) : null);
-    console.log('dateFromFilter:', dateFromFilter);
     let dateToFilter = null;
 
     if (dateTo.value) {
         let dateToObj = new Date(dateTo.value);
         dateToFilter = Math.floor(new Date(dateToObj.getFullYear(), dateToObj.getMonth(), dateToObj.getDate(), 23, 59, 59).getTime() / 1000);
-        console.log('dateToFilter:', dateToFilter);
     }
 
     // Fetch selected members
