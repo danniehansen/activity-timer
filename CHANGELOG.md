@@ -10,11 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.1] - 2020-06-14
 
 ### Changed
-- Removed zero fill from time preview.
-- Changed time preview format from `HH:II:SS` to `Hh Mm`
+- Changed time format from `HH:II:SS` to `Hh Mm`.
 
-## Removed
-- Removed seconds from time preview.
+## Fixed
+- Fixed issue when changing start time on a time range not having current start as initial value.
 
 ## [1.0.0] - 2020-06-08
 - Initial release
