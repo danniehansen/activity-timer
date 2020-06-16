@@ -2,6 +2,7 @@ require('../../sass/main.scss');
 require('../../sass/history.scss');
 
 const { apiKey, appName, formatTime } = require('../shared.js');
+const gravatar = require('gravatar');
 
 const t = window.TrelloPowerUp.iframe({
     appKey: apiKey,
@@ -294,7 +295,12 @@ async function analyticsRenderer () {
     if (Object.keys(timeSpentByMember).length > 0) {
         for (const memberId in timeSpentByMember) {
             const resultEl = document.createElement('div');
-            resultEl.innerText = (dataCache.membersById[memberId].fullName || dataCache.membersById[memberId].username) + ': ' + formatTime(timeSpentByMember[memberId]);
+            resultEl.className = 'result-item';
+
+            const usernameEl = document.createElement('div');
+            usernameEl.className = 'result-item__username';
+            usernameEl.innerText = (dataCache.membersById[memberId].fullName != dataCache.membersById[memberId].username ? dataCache.membersById[memberId].fullName + ' (' + dataCache.membersById[memberId].username + ')' : dataCache.membersById[memberId].username) + ': ' + formatTime(timeSpentByMember[memberId]);
+            resultEl.appendChild(usernameEl);
 
             resultsFragment.appendChild(resultEl);
         }
