@@ -117,7 +117,7 @@ async function fetchData () {
             return labelsById[labelId];
         });
 
-        const memberData = await fetch('https://api.trello.com/1/boards/' + board.id + '/members?fields=id,username,avatarUrl&key=' + apiKey + '&token=' + token);
+        const memberData = await fetch('https://api.trello.com/1/boards/' + board.id + '/members?fields=id,username,fullName,avatarUrl&key=' + apiKey + '&token=' + token);
         const memberJson = await memberData.json();
 
         const cardMembers = memberJson.filter((member) => {
@@ -181,11 +181,11 @@ async function analyticsRenderer () {
 
     processedData.members.forEach((member) => {
         const memberEl = document.createElement('div');
-        memberEl.className = 'members__item';
+        memberEl.className = 'members__item checkbox';
 
         const checkboxEl = document.createElement('input');
         checkboxEl.type = 'checkbox';
-        checkboxEl.className = 'members__item-input checkbox';
+        checkboxEl.className = 'members__item-input';
         checkboxEl.id = 'member-' + member.id;
         checkboxEl.setAttribute('data-id', member.id);
         checkboxEl.addEventListener('change', analyticsRenderer);
@@ -194,7 +194,7 @@ async function analyticsRenderer () {
         const labelEl = document.createElement('label');
         labelEl.setAttribute('for', 'member-' + member.id);
         labelEl.className = 'members__item-label';
-        labelEl.innerText = member.username;
+        labelEl.innerText = member.fullName || member.username;
 
         memberEl.appendChild(checkboxEl);
         memberEl.appendChild(labelEl);
@@ -281,7 +281,7 @@ async function analyticsRenderer () {
 
     for (const memberId in timeSpentByMember) {
         const resultEl = document.createElement('div');
-        resultEl.innerText = dataCache.membersById[memberId].username + ': ' + formatTime(timeSpentByMember[memberId]);
+        resultEl.innerText = (dataCache.membersById[memberId].fullName || dataCache.membersById[memberId].username) + ': ' + formatTime(timeSpentByMember[memberId]);
 
         resultsFragment.appendChild(resultEl);
     }
