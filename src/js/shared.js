@@ -378,7 +378,7 @@ function cardButtons (t) {
  */
 function cardBackSection (t) {
     return {
-        title: 'Activity timer',
+        title: 'Activity timer filter',
         icon: clockImage,
         content: {
             type: 'iframe',

@@ -13,6 +13,8 @@ const labelsEl = document.querySelector('.labels');
 const resultsEl = document.querySelector('.result-items');
 const dateFrom = document.getElementById('date-from');
 const dateTo = document.getElementById('date-to');
+const loaderEl = document.querySelector('.loader');
+const wrapperEl = document.querySelector('.wrapper');
 
 let dataCache = null;
 
@@ -292,8 +294,8 @@ async function analyticsRenderer () {
 
     resultsEl.appendChild(resultsFragment);
 
-    document.querySelector('.loader').style.display = 'none';
-    document.querySelector('.wrapper').style.display = 'block';
+    wrapperEl.style.display = 'none';
+    loaderEl.style.display = 'block';
 
     t.sizeTo('body');
 }
@@ -307,6 +309,7 @@ async function analyticsRenderer () {
     dateTo.addEventListener('change', analyticsRenderer);
 
     if (isAuthorized) {
+        loaderEl.style.display = 'block';
         await analyticsRenderer();
     } else {
         authorizeEl.style.display = 'block';
@@ -317,7 +320,8 @@ async function analyticsRenderer () {
                     expiration: '30days'
                 });
 
-                authorizeEl.style.display = 'block';
+                authorizeEl.style.display = 'none';
+                loaderEl.style.display = 'block';
 
                 await analyticsRenderer();
             }
