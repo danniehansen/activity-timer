@@ -294,8 +294,8 @@ async function analyticsRenderer () {
 
     resultsEl.appendChild(resultsFragment);
 
-    wrapperEl.style.display = 'none';
-    loaderEl.style.display = 'block';
+    wrapperEl.style.display = 'block';
+    loaderEl.style.display = 'none';
 
     t.sizeTo('body');
 }
