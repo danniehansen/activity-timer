@@ -15,7 +15,9 @@ module.exports = {
     filename: 'app.bundle.[name].[hash].js'
   },
   plugins: [
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: '[name].[hash].css',
+    }),
     new CleanWebpackPlugin(),
     new CopyPlugin({
       patterns: [
