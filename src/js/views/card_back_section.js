@@ -13,8 +13,13 @@ setInterval(async () => {
     trackedTimeEl.innerHTML = formatTime(totalTime);
 }, 1000 * 10);
 
-startTimerBtn.addEventListener('click', startTimer);
-stopTimerBtn.addEventListener('click', stopTimer);
+startTimerBtn.addEventListener('click', () => {
+    startTimer(t);
+});
+
+stopTimerBtn.addEventListener('click', () => {
+    stopTimer(t);
+});
 
 t.render(async function() {
     const running = await isRunning(t);
