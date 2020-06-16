@@ -22,12 +22,17 @@ In addition to this you'll be able to quickly peak at the total time spent for a
 
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot4.png "Time spent")
 
+At last we have our simple `Activity timer filter` board button. This board button allows you to easily filter through cards (including archived) with no easy! Filter by date, member or label. Find out where you're spending your time.
+
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot6.png "Activity timer filter")
+
 ## Highlights
 
 1. Easy access to start / stop of timer.
 2. Powerful time management editor to edit previous recordings.
 3. When you move card from one list to another it will automatically stop the timer.
 4. All data on a card is stored in a compressed format that's easy to access through REST API.
+5. Easy access to previous recordings from our very own filter.
 
 ## Card data (REST API)
 
