@@ -2,7 +2,6 @@ require('../../sass/main.scss');
 require('../../sass/history.scss');
 
 const { apiKey, appName, formatTime } = require('../shared.js');
-const gravatar = require('gravatar');
 
 const t = window.TrelloPowerUp.iframe({
     appKey: apiKey,
