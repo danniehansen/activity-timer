@@ -264,8 +264,8 @@ async function analyticsRenderer () {
                     if (
                         dateToFilter !== null &&
                         !(
-                            dateToFilter <= range.startTime ||
-                            dateToFilter <= range.endTime
+                            dateToFilter >= range.startTime ||
+                            dateToFilter >= range.endTime
                         )
                     ) {
                         return;
