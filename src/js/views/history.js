@@ -180,29 +180,35 @@ async function analyticsRenderer () {
     });
 
     // Process members
+    if (processedData.members.length > 0) {
+        processedData.members.forEach((member) => {
+            const memberEl = document.createElement('div');
+            memberEl.className = 'members__item checkbox';
 
-    processedData.members.forEach((member) => {
-        const memberEl = document.createElement('div');
-        memberEl.className = 'members__item checkbox';
+            const checkboxEl = document.createElement('input');
+            checkboxEl.type = 'checkbox';
+            checkboxEl.className = 'members__item-input';
+            checkboxEl.id = 'member-' + member.id;
+            checkboxEl.setAttribute('data-id', member.id);
+            checkboxEl.addEventListener('change', analyticsRenderer);
+            checkboxEl.checked = selectedMembers.indexOf(member.id) !== -1;
 
-        const checkboxEl = document.createElement('input');
-        checkboxEl.type = 'checkbox';
-        checkboxEl.className = 'members__item-input';
-        checkboxEl.id = 'member-' + member.id;
-        checkboxEl.setAttribute('data-id', member.id);
-        checkboxEl.addEventListener('change', analyticsRenderer);
-        checkboxEl.checked = selectedMembers.indexOf(member.id) !== -1;
+            const labelEl = document.createElement('label');
+            labelEl.setAttribute('for', 'member-' + member.id);
+            labelEl.className = 'members__item-label';
+            labelEl.innerText = member.fullName || member.username;
 
-        const labelEl = document.createElement('label');
-        labelEl.setAttribute('for', 'member-' + member.id);
-        labelEl.className = 'members__item-label';
-        labelEl.innerText = member.fullName || member.username;
+            memberEl.appendChild(checkboxEl);
+            memberEl.appendChild(labelEl);
 
-        memberEl.appendChild(checkboxEl);
-        memberEl.appendChild(labelEl);
+            membersFragment.appendChild(memberEl);
+        });
+    } else {
+        const paragraphMembersEl = document.createElement('p');
+        paragraphMembersEl.innerText = 'No labels found';
 
-        membersFragment.appendChild(memberEl);
-    });
+        membersFragment.appendChild(paragraphMembersEl);
+    }
 
     // Cleanup existing member DOM nodes
     while (membersEl.firstChild) {
@@ -212,29 +218,35 @@ async function analyticsRenderer () {
     membersEl.appendChild(membersFragment);
 
     // Process labels
+    if (processedData.labels.length > 0) {
+        processedData.labels.forEach((label) => {
+            let labelWrapEl = document.createElement('div');
+            labelWrapEl.className = 'labels__item checkbox';
 
-    processedData.labels.forEach((label) => {
-        let labelWrapEl = document.createElement('div');
-        labelWrapEl.className = 'labels__item checkbox';
+            let checkboxEl = document.createElement('input');
+            checkboxEl.type = 'checkbox';
+            checkboxEl.className = 'labels__item-input';
+            checkboxEl.id = 'label-' + label.id;
+            checkboxEl.setAttribute('data-id', label.id);
+            checkboxEl.addEventListener('change', analyticsRenderer);
+            checkboxEl.checked = selectedLabels.indexOf(label.id) !== -1;
 
-        let checkboxEl = document.createElement('input');
-        checkboxEl.type = 'checkbox';
-        checkboxEl.className = 'labels__item-input';
-        checkboxEl.id = 'label-' + label.id;
-        checkboxEl.setAttribute('data-id', label.id);
-        checkboxEl.addEventListener('change', analyticsRenderer);
-        checkboxEl.checked = selectedLabels.indexOf(label.id) !== -1;
+            let labelEl = document.createElement('label');
+            labelEl.setAttribute('for', 'label-' + label.id)
+            labelEl.className = 'labels__item-label';
+            labelEl.innerText = label.name;
 
-        let labelEl = document.createElement('label');
-        labelEl.setAttribute('for', 'label-' + label.id)
-        labelEl.className = 'labels__item-label';
-        labelEl.innerText = label.name;
+            labelWrapEl.appendChild(checkboxEl);
+            labelWrapEl.appendChild(labelEl);
 
-        labelWrapEl.appendChild(checkboxEl);
-        labelWrapEl.appendChild(labelEl);
+            labelsFragment.appendChild(labelWrapEl);
+        });
+    } else {
+        const paragraphLabelsEl = document.createElement('p');
+        paragraphLabelsEl.innerText = 'No labels found';
 
-        labelsFragment.appendChild(labelWrapEl);
-    });
+        labelsFragment.appendChild(paragraphLabelsEl);
+    }
 
     // Cleanup existing label DOM nodes
     while (labelsEl.firstChild) {
