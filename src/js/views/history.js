@@ -1,4 +1,5 @@
 require('../../sass/main.scss');
+require('../../sass/history.scss');
 
 const { apiKey, appName, formatTime } = require('../shared.js');
 
@@ -9,7 +10,7 @@ const t = window.TrelloPowerUp.iframe({
 
 const membersEl = document.querySelector('.members');
 const labelsEl = document.querySelector('.labels');
-const resultsEl = document.querySelector('.results');
+const resultsEl = document.querySelector('.result-items');
 const dateFrom = document.getElementById('date-from');
 const dateTo = document.getElementById('date-to');
 

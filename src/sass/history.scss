@@ -1,0 +1,14 @@
+.wrapper {
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+}
+
+.col {
+  flex-grow: 1;
+  flex-shrink: 1;
+}

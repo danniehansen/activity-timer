@@ -15,26 +15,36 @@
     </div>
 
     <div class="wrapper">
-      <h4>Date range:</h4>
+      <div class="row">
+        <div class="col filter filter--date">
+          <h4>Date range:</h4>
 
-      <div class="date">
-        <label>Date from:</label>
-        <input type="date" id="date-from" />
+          <div class="date">
+            <label>Date from:</label>
+            <input type="date" id="date-from" />
+          </div>
+
+          <div class="date">
+            <label>Date to:</label>
+            <input type="date" id="date-to" />
+          </div>
+        </div>
+
+        <div class="col filter filter--members">
+          <h4>Members:</h4>
+          <div class="members"></div>
+        </div>
+
+        <div class="col filter filter--labels">
+          <h4>Labels:</h4>
+          <div class="labels"></div>
+        </div>
       </div>
 
-      <div class="date">
-        <label>Date to:</label>
-        <input type="date" id="date-to" />
+      <div class="result">
+        <h4>Result:</h4>
+        <div class="result-items"></div>
       </div>
-
-      <h4>Members:</h4>
-      <div class="members"></div>
-
-      <h4>Labels:</h4>
-      <div class="labels"></div>
-
-      <h4>Result:</h4>
-      <div class="results"></div>
     </div>
   </body>
 </html>
