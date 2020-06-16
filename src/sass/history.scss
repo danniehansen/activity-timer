@@ -56,11 +56,16 @@ label {
   }
 }
 
+.authorize {
+  padding: 20px;
+}
+
 .loader {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  display: none;
 
   &__el {
     font-size: 10px;
