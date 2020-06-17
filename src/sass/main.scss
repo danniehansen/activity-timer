@@ -1,4 +1,4 @@
-.tracked-time {
+.time-display {
   border-radius: 3px;
   box-sizing: border-box;
   display: inline-block;
@@ -14,8 +14,8 @@
   position: relative;
   padding: 6px 12px 6px 35px;
 
-  &::before {
-    display: inline-block;
+  &::after {
+    display: block;
     background: url(https://d3eyxhmqemauky.cloudfront.net/images/clock.svg?color=42526e) no-repeat center center;
     width: 15px;
     height: 15px;
@@ -24,6 +24,19 @@
     left: 11px;
     top: 8px;
   }
+}
+
+.estimate,
+.total-estimate {
+  cursor: pointer;
+}
+
+.estimate::before {
+  content: 'Estimate: ';
+}
+
+.total-estimate::before {
+  content: 'Total estimate: ';
 }
 
 .card,
