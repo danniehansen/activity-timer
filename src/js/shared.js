@@ -5,6 +5,17 @@ const apiKey = '2de5d228d2ca7b7bc4c9decc4ee3cbac';
 const appName = 'Activity timer';
 
 /**
+ * Get estimates for card.
+ *
+ * @param t
+ *
+ * @returns {Promise<*>}
+ */
+async function getEstimates (t) {
+    return await t.get('card', 'shared', dataPrefix + '-estimates', []);
+}
+
+/**
  * Get all tracked ranges.
  *
  * @param t
@@ -159,7 +170,7 @@ function cardBadges (t) {
                 refresh: 60
             };
 
-            if (time !== 0) {
+            if (time !== 0 || running) {
                 object.text = formatTime(time);
                 object.icon = clockImage;
 
