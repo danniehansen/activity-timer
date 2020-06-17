@@ -71,6 +71,8 @@ async function createEstimate(t, seconds) {
     });
 
     estimates.push(member.id, seconds);
+
+    await t.set('card', 'shared', dataPrefix + '-estimates', estimates);
 }
 
 /**
