@@ -28,8 +28,9 @@ stopTimerBtn.addEventListener('click', () => {
     stopTimer(t);
 });
 
-estimateEl.addEventListener('click', () => {
+estimateEl.addEventListener('click', (e) => {
     t.popup({
+        mouseEvent: e,
         title: 'Change estimate',
         url: './change-estimate.html',
         height: 100
