@@ -12,9 +12,13 @@
   box-shadow: none;
   border: none;
   position: relative;
-  padding: 6px 12px 6px 35px;
+  padding: 6px 12px;
+}
 
-  &::after {
+.time-display {
+  padding-left: 36px;
+
+  &::before {
     display: block;
     background: url(https://d3eyxhmqemauky.cloudfront.net/images/clock.svg?color=42526e) no-repeat center center;
     width: 15px;
