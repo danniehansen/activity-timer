@@ -66,7 +66,7 @@ async function getTotalEstimate(t) {
 async function createEstimate(t, seconds) {
     const member = await t.member('id');
 
-    const estimates = await getEstimates(t).filter((estimate) => {
+    const estimates = (await getEstimates(t)).filter((estimate) => {
         return estimate[0] !== member.id;
     });
 
