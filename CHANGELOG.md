@@ -7,15 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [1.0.1] - 2020-06-16
+## [1.0.2] - 2020-06-17
+### Removed
+- Removed `Clear data` button.
+## Fixed
+- Fixed wrong label being used for no members paragraph under new history page.
 
+## [1.0.1] - 2020-06-16
 ### Changed
 - Changed time format from `HH:II:SS` to `Hh Mm`.
 - changed update timer for card badge in board from 10 seconds to 60 seconds. This is due to us removing seconds from time format.
-
 ## Fixed
 - Fixed issue when changing start time on a time range not having current start as initial value.
-
 ## Added
 - Added new history view to filter through past trackings.
 
