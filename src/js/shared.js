@@ -191,15 +191,6 @@ function cardButtons (t) {
     return [
         {
             icon: clockImage,
-            text: 'Clear data',
-            callback: async function () {
-                await t.remove('card', 'private', dataPrefix + '-start');
-                await t.remove('card', 'shared', dataPrefix + '-ranges');
-            },
-            condition: 'edit'
-        },
-        {
-            icon: clockImage,
             text: 'Manage time',
             callback: function (t) {
                 return t.popup({
