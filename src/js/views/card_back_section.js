@@ -32,7 +32,7 @@ estimateEl.addEventListener('click', (e) => {
     t.popup({
         mouseEvent: e,
         title: 'Change estimate',
-        url: './change-estimate.html',
+        url: './change_estimate.html',
         height: 100
     })
 });
