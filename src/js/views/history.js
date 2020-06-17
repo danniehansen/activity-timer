@@ -205,7 +205,7 @@ async function analyticsRenderer () {
         });
     } else {
         const paragraphMembersEl = document.createElement('p');
-        paragraphMembersEl.innerText = 'No labels found';
+        paragraphMembersEl.innerText = 'No members found';
 
         membersFragment.appendChild(paragraphMembersEl);
     }
