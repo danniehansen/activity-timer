@@ -51,11 +51,13 @@ t.render(async function() {
         stopTimerBtn.style.display = 'none';
     }
 
-    estimateEl.innerText = formatTime(ownEstimate);
+    console.log('ownEstimate:', ownEstimate);
+
+    estimateEl.innerHTML = formatTime(ownEstimate);
     estimateEl.style.display = 'block';
 
     if (ownEstimate !== totalEstimate) {
-        totalEstimateEl.innerText = formatTime(totalEstimate);
+        totalEstimateEl.innerHTML = formatTime(totalEstimate);
         totalEstimateEl.style.display = 'block';
     } else {
         totalEstimateEl.style.display = 'none';
