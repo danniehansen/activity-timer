@@ -8,6 +8,7 @@ module.exports = {
   entry: {
     main: ['@babel/polyfill', './src/js/views/main.js'],
     card_back_section: ['@babel/polyfill', './src/js/views/card_back_section.js'],
+    change_estimate: ['@babel/polyfill', './src/js/views/change_estimate.js'],
     history: ['@babel/polyfill', './src/js/views/history.js']
   },
   output: {
@@ -33,6 +34,11 @@ module.exports = {
       filename: "card_back_section.html",
       template: 'card_back_section.html',
       chunks: ['card_back_section']
+    }),
+    new HtmlWebpackPlugin({
+      filename: "change_estimate.html",
+      template: 'change_estimate.html',
+      chunks: ['change_estimate']
     }),
     new HtmlWebpackPlugin({
       filename: "history.html",

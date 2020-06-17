@@ -11,8 +11,66 @@ const appName = 'Activity timer';
  *
  * @returns {Promise<*>}
  */
-async function getEstimates (t) {
+async function getEstimates(t) {
     return await t.get('card', 'shared', dataPrefix + '-estimates', []);
+}
+
+/**
+ * Get own estimate in seconds.
+ *
+ * @param t
+ *
+ * @returns {Promise<number>}
+ */
+async function getOwnEstimate(t) {
+    const estimates = await getEstimates(t);
+    const member = await t.member('id');
+    let time = 0;
+
+    estimates.forEach((estimate) => {
+        if (estimate[0] === member.id) {
+            time += estimate[1];
+        }
+    });
+
+    return time;
+}
+
+/**
+ * Get total estimate time in seconds.
+ *
+ * @param t
+ *
+ * @returns {Promise<number>}
+ */
+async function getTotalEstimate(t) {
+    const estimates = await getEstimates(t);
+    let time = 0;
+
+    estimates.forEach((estimate) => {
+        time += estimate[1];
+    });
+
+    return time;
+}
+
+/**
+ * Create estimate for current member. This will delete past
+ * estimates made by same user.
+ *
+ * @param t
+ * @param seconds
+ *
+ * @returns {Promise<void>}
+ */
+async function createEstimate(t, seconds) {
+    const member = await t.member('id');
+
+    const estimates = await getEstimates(t).filter((estimate) => {
+        return estimate[0] !== member.id;
+    });
+
+    estimates.push(member.id, seconds);
 }
 
 /**
@@ -438,5 +496,8 @@ module.exports = {
     cardBackSection,
     boardButtons,
     apiKey,
-    appName
+    appName,
+    getOwnEstimate,
+    getTotalEstimate,
+    createEstimate
 };
