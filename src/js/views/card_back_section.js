@@ -1,12 +1,19 @@
 require('../../sass/main.scss');
 
-const { isRunning, getTotalSeconds, formatTime, startTimer, stopTimer } = require('../shared.js');
+const {
+    isRunning, getTotalSeconds, formatTime,
+    startTimer, stopTimer, getOwnEstimate,
+    getTotalEstimate
+} = require('../shared.js');
+
 const t = window.TrelloPowerUp.iframe();
 
 const startTimerBtn = document.querySelector('.btn-start-timer');
 const stopTimerBtn = document.querySelector('.btn-stop-timer');
 const trackedTimeEl = document.querySelector('.tracked-time');
 const cardEl = document.querySelector('.card');
+const totalEstimateEl = document.querySelector('.total-estimate');
+const estimateEl = document.querySelector('.estimate');
 
 setInterval(async () => {
     const totalTime = await getTotalSeconds(t);
@@ -21,9 +28,19 @@ stopTimerBtn.addEventListener('click', () => {
     stopTimer(t);
 });
 
+estimateEl.addEventListener('click', () => {
+    t.popup({
+        title: 'Change estimate',
+        url: './change-estimate.html',
+        height: 100
+    })
+});
+
 t.render(async function() {
     const running = await isRunning(t);
     const totalTime = await getTotalSeconds(t);
+    const ownEstimate = await getOwnEstimate(t);
+    const totalEstimate = await getTotalEstimate(t);
 
     if (running) {
         startTimerBtn.style.display = 'none';
@@ -31,6 +48,16 @@ t.render(async function() {
     } else {
         startTimerBtn.style.display = 'inline-block';
         stopTimerBtn.style.display = 'none';
+    }
+
+    estimateEl.innerText = formatTime(ownEstimate);
+    estimateEl.style.display = 'block';
+
+    if (ownEstimate !== totalEstimate) {
+        totalEstimateEl.innerText = formatTime(totalEstimate);
+        totalEstimateEl.style.display = 'block';
+    } else {
+        totalEstimateEl.style.display = 'none';
     }
 
     trackedTimeEl.innerHTML = formatTime(totalTime);

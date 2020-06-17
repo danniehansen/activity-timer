@@ -15,7 +15,7 @@
   padding: 6px 12px;
 }
 
-.time-display {
+.tracked-time {
   padding-left: 36px;
 
   &::before {
@@ -30,9 +30,19 @@
   }
 }
 
+.card::after {
+  content: '';
+  display: block;
+  line-height: 0;
+  font-size: 0;
+  clear: both;
+}
+
 .estimate,
 .total-estimate {
+  display: none;
   cursor: pointer;
+  float: right;
 }
 
 .estimate::before {
