@@ -26,7 +26,7 @@ async function getOwnEstimate(t) {
     const estimates = await getEstimates(t);
     const member = await t.member('id');
     let time = 0;
-
+    console.log(member, estimates);
     estimates.forEach((estimate) => {
         if (estimate[0] === member.id) {
             time += estimate[1];
