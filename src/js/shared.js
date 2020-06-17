@@ -26,9 +26,9 @@ async function getOwnEstimate(t) {
     const estimates = await getEstimates(t);
     const member = await t.member('id');
     let time = 0;
-    console.log(member, estimates);
+
     estimates.forEach((estimate) => {
-        if (estimate[0] == member.id) {
+        if (estimate[0] === member.id) {
             time += estimate[1];
         }
     });
@@ -70,7 +70,7 @@ async function createEstimate(t, seconds) {
         return estimate[0] !== member.id;
     });
 
-    estimates.push(member.id, seconds);
+    estimates.push([member.id, seconds]);
 
     await t.set('card', 'shared', dataPrefix + '-estimates', estimates);
 }
