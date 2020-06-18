@@ -1,4 +1,5 @@
 const clockImage = 'https://' + window.powerupHost + '/images/clock.svg';
+const estimateImage = 'https://' + window.powerupHost + '/images/estimate.svg';
 const clockImageWhite = 'https://' + window.powerupHost + '/images/clock.svg';
 const dataPrefix = 'act-timer';
 const apiKey = '2de5d228d2ca7b7bc4c9decc4ee3cbac';
@@ -220,8 +221,8 @@ function formatDate(date) {
  *
  * @returns {{dynamic: (function(): {refresh: number})}[]}
  */
-function cardBadges (t) {
-    return [{
+async function cardBadges (t) {
+    const items = {
         dynamic: async function () {
             const running = await isRunning(t);
             const time = await getTotalSeconds(t);
@@ -248,7 +249,18 @@ function cardBadges (t) {
 
             return object;
         }
-    }];
+    };
+
+    const totalEstimate = await getTotalEstimate(t);
+
+    if (totalEstimate > 0) {
+        items.push({
+            icon: estimateImage,
+            text: 'Estimate: ' + formatTime(totalEstimate)
+        });
+    }
+
+    return items;
 }
 
 /**

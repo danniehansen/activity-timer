@@ -33,7 +33,7 @@ estimateEl.addEventListener('click', (e) => {
         mouseEvent: e,
         title: 'Change estimate',
         url: './change_estimate.html',
-        height: 100
+        height: 120
     })
 });
 
