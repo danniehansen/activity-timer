@@ -18,5 +18,5 @@ saveEstimateBtn.addEventListener('click', async () => {
 });
 
 t.render(async function() {
-    t.sizeTo('body');
+    t.sizeTo('.estimate-wrapper');
 });
