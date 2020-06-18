@@ -7,15 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [1.0.3] - 
+## [1.0.3] - 2020-06-18
 ### Fixed
 - Fixed issue with timer not initially showing with `0m` as time on board list when starting.
+### Added
+- Added back clear functionality. Now available under `Manage time` together with a confirm.
+- Added new estimate functionality. Each member can now put an estimate on the card. This will later be used for possible notifications when nearing the end of a estimate.
 
 ## [1.0.2] - 2020-06-17
 ### Removed
 - Removed `Clear data` button.
 ## Fixed
-- Fixed wrong label being used for no members paragraph under new history page.
+- Fixed wrong label used for no members paragraph under new history page.
 
 ## [1.0.1] - 2020-06-16
 ### Changed
