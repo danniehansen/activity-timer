@@ -3,7 +3,7 @@ require('../../sass/main.scss');
 const {
     isRunning, getTotalSeconds, formatTime,
     startTimer, stopTimer, getOwnEstimate,
-    getTotalEstimate
+    getTotalEstimate, getEstimates
 } = require('../shared.js');
 
 const t = window.TrelloPowerUp.iframe();
@@ -35,6 +35,50 @@ estimateEl.addEventListener('click', (e) => {
         url: './change_estimate.html',
         height: 100
     })
+});
+
+totalEstimateEl.addEventListener('click', (e) => {
+    t.popup({
+        mouseEvent: e,
+        title: 'Estimates',
+        items: async function (t) {
+            const items = [];
+            const estimates = await getEstimates(t);
+            let board = await t.board('members');
+
+            board.members.sort((a, b) => {
+                const nameA = a.fullName.toUpperCase();
+                const nameB = b.fullName.toUpperCase();
+
+                if (nameA < nameB) {
+                    return -1;
+                }
+                if (nameA > nameB) {
+                    return 1;
+                }
+
+                return 0;
+            }).forEach((member, memberIndex) => {
+                const memberEstimates = estimates.filter((estimate) => {
+                    return estimate[0] == member.id;
+                });
+
+                let memberEstimate = 0;
+
+                memberEstimates.forEach((estimate) => {
+                    memberEstimate += estimate[1];
+                });
+
+                if (memberEstimate > 0) {
+                    items.push({
+                        'text': member.fullName + ':' + formatTime(memberEstimate)
+                    });
+                }
+            });
+
+            return items;
+        }
+    });
 });
 
 t.render(async function() {
