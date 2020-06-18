@@ -312,7 +312,7 @@ function cardButtons (t) {
                                                     return [
                                                         {
                                                             text: 'Edit start (' + formatDate(start) + ')',
-                                                            callback: function (t) {
+                                                            callback: (t) => {
                                                                 return t.popup({
                                                                     type: 'datetime',
                                                                     title: 'Change start from (' + formatDate(_start) + ')',
@@ -328,7 +328,7 @@ function cardButtons (t) {
                                                         },
                                                         {
                                                             text: 'Edit end (' + formatDate(end) + ')',
-                                                            callback: function (t) {
+                                                            callback: (t) => {
                                                                 return t.popup({
                                                                     type: 'datetime',
                                                                     title: 'Change end from (' + formatDate(_end) + ')',
@@ -344,7 +344,7 @@ function cardButtons (t) {
                                                         },
                                                         {
                                                             text: 'Delete',
-                                                            callback: async function (t) {
+                                                            callback: async (t) => {
                                                                 ranges.splice(_rangeIndex, 1);
                                                                 await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
                                                                 return t.closePopup();
@@ -367,7 +367,25 @@ function cardButtons (t) {
                             items.splice(items.length - 1, 1);
                         }
 
-                        if (items.length === 0) {
+                        if (items.length > 0) {
+                            items.push({
+                                'text': 'Clear',
+                                callback: async (t) => {
+                                    return t.popup({
+                                        type: 'confirm',
+                                        title: 'Clear',
+                                        message: 'Do you wish to clear tracked time?',
+                                        confirmText: 'Yes, clear tracked time',
+                                        onConfirm: async (t) => {
+                                            await t.remove('card', 'shared', dataPrefix + '-ranges');
+                                            await t.remove('card', 'private', dataPrefix + '-start');
+                                        },
+                                        confirmStyle: 'danger',
+                                        cancelText: 'No, cancel'
+                                    });
+                                }
+                            });
+                        } else {
                             items.push({ 'text': 'No activity yet' });
                         }
 
