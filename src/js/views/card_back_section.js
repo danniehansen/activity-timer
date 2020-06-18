@@ -71,7 +71,7 @@ totalEstimateEl.addEventListener('click', (e) => {
 
                 if (memberEstimate > 0) {
                     items.push({
-                        'text': member.fullName + ':' + formatTime(memberEstimate)
+                        'text': member.fullName + (member.fullName != member.username ? ' (' + member.username + ')' : '') + ': ' + formatTime(memberEstimate)
                     });
                 }
             });

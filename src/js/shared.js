@@ -303,7 +303,7 @@ function cardButtons (t) {
 
                             if (memberRanges.length > 0) {
                                 items.push({
-                                    'text': member.fullName + ':'
+                                    'text': member.fullName + (member.fullName != member.username ? ' (' + member.username + ')' : '') + ':'
                                 });
 
                                 memberRanges.forEach((range, rangeIndex) => {
@@ -449,7 +449,7 @@ function cardButtons (t) {
                                 });
 
                                 items.push({
-                                    'text': member.fullName + ': ' +  formatTime(totalTime)
+                                    'text': member.fullName + (member.fullName != member.username ? ' (' + member.username + ')' : '') + ': ' +  formatTime(totalTime)
                                 });
                             }
                         });
