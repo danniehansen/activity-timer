@@ -369,16 +369,21 @@ function cardButtons (t) {
 
                         if (items.length > 0) {
                             items.push({
+                                'text': '--------'
+                            });
+
+                            items.push({
                                 'text': 'Clear',
                                 callback: async (t) => {
                                     return t.popup({
                                         type: 'confirm',
-                                        title: 'Clear',
+                                        title: 'Clear time',
                                         message: 'Do you wish to clear tracked time?',
                                         confirmText: 'Yes, clear tracked time',
                                         onConfirm: async (t) => {
                                             await t.remove('card', 'shared', dataPrefix + '-ranges');
                                             await t.remove('card', 'private', dataPrefix + '-start');
+                                            await t.closePopup();
                                         },
                                         confirmStyle: 'danger',
                                         cancelText: 'No, cancel'
@@ -519,5 +524,6 @@ module.exports = {
     appName,
     getOwnEstimate,
     getTotalEstimate,
-    createEstimate
+    createEstimate,
+    getEstimates
 };
