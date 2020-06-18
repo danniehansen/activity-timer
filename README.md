@@ -6,37 +6,37 @@ Time is precious, this we know. Keeping track of this precious time is hard. Act
 
 To start tracking your time you need to manually start timer. This you do up top of your card as simple as clicking "Start timer". Once timer has started you will be able to see total time spent right next to the button you clicked. 
 
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot1.png "Start timer & time spent")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot1.png?r=1 "Start timer & time spent")
 
 Once timer has started "Start timer" will switch over to a "Stop timer" button. Clicking this will stop the timer and register your time slot in the logs.
 
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot2.png "Stop timer & time spent")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot2.png?r=1 "Stop timer & time spent")
 
 At any given time you can in the card "Power-ups" section manage time and even see a list over time spent by every team member for this card.
 
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot3.png "Clear data, manage time and time spent")
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot5.png "Manage time")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot3.png?r=1 "Clear data, manage time and time spent")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot5.png?r=1 "Manage time")
 
 In addition to this you'll be able to quickly peak at the total time spent for a card when viewing the board.
 
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot4.png "Time spent")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot4.png?r=1 "Time spent")
 
 Activity timer also provides you with the ability to put estimates on your cards.
 
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot7.png "Estimate")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot7.png?r=1 "Estimate")
 
 Clicking the estimate box will show a popup where you can create/update your estimate.
 
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot10.png "Change estimate")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot10.png?r=1 "Change estimate")
 
 Once an estimate have been saved it will show on the board view & also when on the card. If multiple members have set an estimate another box will appear with the total estimate across members. Clicking this will open a popup showing which member estimated what on the task. Very useful for when members collaborate on the same cards.
 
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot9.png "Estimate")
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot8.png "Estimates")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot9.png?r=1 "Estimate")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot8.png?r=1 "Estimates")
 
 At last, we have our simple `Activity timer history` board button. This board button allows you to easily filter through cards (including archived) with no easy! Filter by date, member or label. Find out where you're spending your time.
 
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot6.png "Activity timer history")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot6.png?r=1 "Activity timer history")
 
 ## Highlights
 
