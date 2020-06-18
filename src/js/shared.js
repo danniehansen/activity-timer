@@ -222,7 +222,7 @@ function formatDate(date) {
  * @returns {{dynamic: (function(): {refresh: number})}[]}
  */
 async function cardBadges (t) {
-    const items = {
+    const items = [{
         dynamic: async function () {
             const running = await isRunning(t);
             const time = await getTotalSeconds(t);
@@ -249,7 +249,7 @@ async function cardBadges (t) {
 
             return object;
         }
-    };
+    }];
 
     const totalEstimate = await getTotalEstimate(t);
 
