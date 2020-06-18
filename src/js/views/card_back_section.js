@@ -95,9 +95,6 @@ t.render(async function() {
         stopTimerBtn.style.display = 'none';
     }
 
-    console.log('ownEstimate:', ownEstimate);
-    console.log('totalEstimate:', totalEstimate);
-
     estimateEl.innerHTML = formatTime(ownEstimate);
     estimateEl.style.display = 'block';
 
