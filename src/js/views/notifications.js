@@ -1,7 +1,7 @@
 require('../../sass/main.scss');
 
 const t = window.TrelloPowerUp.iframe();
-const enableNotificationsBtn = document.getElementById('btn-enable-notifications');
+const enableNotificationsBtn = document.querySelector('.btn-enable-notifications');
 
 if (Notification.permission !== 'granted') {
     enableNotificationsBtn.style.display = 'block';
