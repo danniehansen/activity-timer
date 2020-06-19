@@ -17,7 +17,6 @@ saveSettingsBtn.addEventListener('click', async () => {
 });
 
 hasEstimateFeature(t).then((hasEstimateFeature) => {
-    console.log('hasEstimateFeature 2:', hasEstimateFeature);
     if (!hasEstimateFeature) {
         disableEstimateEl.checked = true;
     }
