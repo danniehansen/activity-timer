@@ -248,40 +248,6 @@ async function enableEstimateFeature (t) {
 }
 
 /**
- * Is estimate feature enabled?
- *
- * @param t
- *
- * @returns {Promise<boolean>}
- */
-async function hasNotificationsFeature (t) {
-    const hasNotificationsFeature = await t.get('board', 'shared', 'act-timer-notifications');
-    return !!hasNotificationsFeature;
-}
-
-/**
- * Disable notifications feature.
- *
- * @param t
- *
- * @returns {Promise<void>}
- */
-async function disableNotificationsFeature (t) {
-    await t.set('board', 'shared', 'act-timer-notifications', 1);
-}
-
-/**
- * Enable notifications feature
- *
- * @param t
- *
- * @returns {Promise<void>}
- */
-async function enableNotificationsFeature (t) {
-    await t.remove('board', 'shared', 'act-timer-notifications');
-}
-
-/**
  * Card badges capability handler.
  *
  * @param t
@@ -643,8 +609,5 @@ module.exports = {
     showSettings,
     hasEstimateFeature,
     disableEstimateFeature,
-    enableEstimateFeature,
-    hasNotificationsFeature,
-    disableNotificationsFeature,
-    enableNotificationsFeature
+    enableEstimateFeature
 };
