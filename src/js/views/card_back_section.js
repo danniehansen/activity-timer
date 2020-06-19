@@ -3,7 +3,8 @@ require('../../sass/main.scss');
 const {
     isRunning, getTotalSeconds, formatTime,
     startTimer, stopTimer, getOwnEstimate,
-    getTotalEstimate, getEstimates
+    getTotalEstimate, getEstimates,
+    hasEstimateFeature
 } = require('../shared.js');
 
 const t = window.TrelloPowerUp.iframe();
@@ -95,13 +96,20 @@ t.render(async function() {
         stopTimerBtn.style.display = 'none';
     }
 
-    estimateEl.innerHTML = formatTime(ownEstimate);
-    estimateEl.style.display = 'block';
+    const hasEstimateFeature = await hasEstimateFeature(t);
 
-    if (ownEstimate !== totalEstimate) {
-        totalEstimateEl.innerHTML = formatTime(totalEstimate);
-        totalEstimateEl.style.display = 'block';
+    if (hasEstimateFeature) {
+        estimateEl.innerHTML = formatTime(ownEstimate);
+        estimateEl.style.display = 'block';
+
+        if (ownEstimate !== totalEstimate) {
+            totalEstimateEl.innerHTML = formatTime(totalEstimate);
+            totalEstimateEl.style.display = 'block';
+        } else {
+            totalEstimateEl.style.display = 'none';
+        }
     } else {
+        estimateEl.style.display = 'none';
         totalEstimateEl.style.display = 'none';
     }
 

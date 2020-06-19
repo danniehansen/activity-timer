@@ -30,6 +30,16 @@
   }
 }
 
+input[type="checkbox"] {
+  box-shadow: inset 0 0 0 2px #DFE1E6 !important;
+  position: relative;
+  top: 2px;
+
+  &:checked {
+    box-shadow: inset 0 0 0 2px #172B4D !important;
+  }
+}
+
 .card::after {
   content: '';
   display: block;

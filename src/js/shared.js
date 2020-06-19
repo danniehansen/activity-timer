@@ -12,7 +12,7 @@ const appName = 'Activity timer';
  *
  * @returns {Promise<*>}
  */
-async function getEstimates(t) {
+async function getEstimates (t) {
     return await t.get('card', 'shared', dataPrefix + '-estimates', []);
 }
 
@@ -23,7 +23,7 @@ async function getEstimates(t) {
  *
  * @returns {Promise<number>}
  */
-async function getOwnEstimate(t) {
+async function getOwnEstimate (t) {
     const estimates = await getEstimates(t);
     const member = await t.member('id');
     let time = 0;
@@ -44,7 +44,7 @@ async function getOwnEstimate(t) {
  *
  * @returns {Promise<number>}
  */
-async function getTotalEstimate(t) {
+async function getTotalEstimate (t) {
     const estimates = await getEstimates(t);
     let time = 0;
 
@@ -64,7 +64,7 @@ async function getTotalEstimate(t) {
  *
  * @returns {Promise<void>}
  */
-async function createEstimate(t, seconds) {
+async function createEstimate (t, seconds) {
     const member = await t.member('id');
 
     const estimates = (await getEstimates(t)).filter((estimate) => {
@@ -84,7 +84,7 @@ async function createEstimate(t, seconds) {
  *
  * @returns {Promise<*>}
  */
-async function getRanges(t, noCurrent) {
+async function getRanges (t, noCurrent) {
     noCurrent = noCurrent || false;
 
     const ranges = await t.get('card', 'shared', dataPrefix + '-ranges', []);
@@ -114,9 +114,8 @@ async function getRanges(t, noCurrent) {
  *
  * @returns {Promise<boolean>}
  */
-async function isRunning(t) {
-    const data = await t.get('card', 'private', dataPrefix + '-start');
-    return !!data;
+async function isRunning (t) {
+    return !!(await t.get('card', 'private', dataPrefix + '-start'));
 }
 
 /**
@@ -126,7 +125,7 @@ async function isRunning(t) {
  *
  * @returns {Promise<number>}
  */
-async function getTotalSeconds(t) {
+async function getTotalSeconds (t) {
     const ranges = await getRanges(t);
 
     let totalSeconds = 0;
@@ -147,7 +146,7 @@ async function getTotalSeconds(t) {
  *
  * @returns {Promise<void>}
  */
-async function startTimer(t) {
+async function startTimer (t) {
     const data = await t.card('idList');
 
     await t.set('card', 'private', dataPrefix + '-start', [
@@ -163,7 +162,7 @@ async function startTimer(t) {
  *
  * @returns {Promise<void>}
  */
-async function stopTimer(t) {
+async function stopTimer (t) {
     const data = await t.get('card', 'private', dataPrefix + '-start');
 
     if (data) {
@@ -178,7 +177,7 @@ async function stopTimer(t) {
  *
  * @returns {string}
  */
-function formatTime(secondsToFormat) {
+function formatTime (secondsToFormat) {
     const hours = Math.floor(secondsToFormat / 3600);
     const minutes = Math.floor((secondsToFormat % 3600) / 60);
     const timeFormat = [];
@@ -199,7 +198,7 @@ function formatTime(secondsToFormat) {
  *
  * @returns {string}
  */
-function formatDate(date) {
+function formatDate (date) {
     const dateStr = [
         date.getFullYear(),
         ((date.getMonth() + 1) < 10 ? '0' : '') + (date.getMonth() + 1),
@@ -212,6 +211,39 @@ function formatDate(date) {
     ];
 
     return dateStr.join('-') + ' ' + timeStr.join(':');
+}
+
+/**
+ * Is estimate feature enabled?
+ *
+ * @param t
+ *
+ * @returns {Promise<boolean>}
+ */
+async function hasEstimateFeature (t) {
+    return !(await t.get('board', 'shared', 'act-timer-disable-estimate'));
+}
+
+/**
+ * Disable estimate feature.
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
+async function disableEstimateFeature (t) {
+    await t.set('board', 'shared', 'act-timer-disable-estimate', 1);
+}
+
+/**
+ * Enable estimate feature
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
+async function enableEstimateFeature (t) {
+    await t.remove('board', 'shared', 'act-timer-disable-estimate');
 }
 
 /**
@@ -268,7 +300,7 @@ async function cardBadges (t) {
  *
  * @param t
  *
- * @returns {({condition: string, icon: string, callback: callback, text: string}|{condition: string, icon: string, callback: (function(*): *), text: string}|{icon: string, callback: (function(*): *), text: string})[]}
+ * @returns {({condition: string, icon: string, callback: (function(*): *), text: string}|{icon: string, callback: (function(*): *), text: string})[]}
  */
 function cardButtons (t) {
     return [
@@ -519,6 +551,21 @@ function boardButtons (t) {
     }];
 }
 
+/**
+ * Show settings capability handler.
+ *
+ * @param t
+ *
+ * @returns {*}
+ */
+function showSettings (t) {
+    return t.popup({
+        title: 'Activity timer settings',
+        url: t.signUrl('./settings.html'),
+        height: 180
+    });
+}
+
 module.exports = {
     cardBadges,
     cardButtons,
@@ -537,5 +584,9 @@ module.exports = {
     getOwnEstimate,
     getTotalEstimate,
     createEstimate,
-    getEstimates
+    getEstimates,
+    showSettings,
+    hasEstimateFeature,
+    disableEstimateFeature,
+    enableEstimateFeature
 };
