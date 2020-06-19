@@ -1,6 +1,6 @@
 require('../../sass/main.scss');
 
-const { disableEstimateFeature, enableEstimateFeature } = require('../shared.js');
+const { disableEstimateFeature, enableEstimateFeature, hasEstimateFeature } = require('../shared.js');
 const t = window.TrelloPowerUp.iframe();
 
 const saveSettingsBtn = document.querySelector('.btn-save-settings');
@@ -17,7 +17,11 @@ saveSettingsBtn.addEventListener('click', async () => {
 });
 
 (async () => {
-    const disableEstimate = await t.get('board', 'shared', 'act-timer-disable-estimate');
+    const hasEstimateFeature = await hasEstimateFeature(t);
+
+    if (!hasEstimateFeature) {
+        disableEstimateEl.checked = true;
+    }
 })();
 
 t.render(async function() {

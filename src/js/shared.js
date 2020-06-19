@@ -562,7 +562,7 @@ function showSettings (t) {
     return t.popup({
         title: 'Activity timer settings',
         url: t.signUrl('./settings.html'),
-        height: 180
+        height: 85
     });
 }
 
