@@ -19,7 +19,7 @@ jobs:
       - name: Deploy
         run: aws s3 sync dist/ s3://activity-timer-develop --acl public-read
       - name: Clear CF cache
-        run: aws cloudfront create-invalidation --distribution-id E2MS8GHZWJZE05 --paths "/index.html" "/card_back_section.html" "/history.html" "/change_estimate.html" "/settings.html"
+        run: aws cloudfront create-invalidation --distribution-id E2MS8GHZWJZE05 --paths "/index.html" "/card_back_section.html" "/history.html" "/change_estimate.html" "/settings.html" "/notifications.html"
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
