@@ -308,7 +308,7 @@ async function cardBadges (t) {
  * @returns {({condition: string, icon: string, callback: (function(*): *), text: string}|{icon: string, callback: (function(*): *), text: string})[]}
  */
 function cardButtons (t) {
-    return [
+    const items = [
         {
             icon: clockImage,
             text: 'Manage time',
@@ -501,6 +501,22 @@ function cardButtons (t) {
             }
         }
     ];
+
+    if ('Notification' in window) {
+        items.push({
+            icon: clockImage,
+            text: 'Notifications',
+            callback: (t) => {
+                return t.popup({
+                    title: 'Activity timer notifications',
+                    url: t.signUrl('./notifications.html'),
+                    height: 85
+                });
+            }
+        });
+    }
+
+    return items;
 }
 
 /**

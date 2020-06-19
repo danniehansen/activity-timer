@@ -10,7 +10,8 @@ module.exports = {
     card_back_section: ['@babel/polyfill', './src/js/views/card_back_section.js'],
     change_estimate: ['@babel/polyfill', './src/js/views/change_estimate.js'],
     history: ['@babel/polyfill', './src/js/views/history.js'],
-    settings: ['@babel/polyfill', './src/js/views/settings.js']
+    settings: ['@babel/polyfill', './src/js/views/settings.js'],
+    notifications: ['@babel/polyfill', './src/js/views/notifications.js']
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -50,6 +51,11 @@ module.exports = {
       filename: "settings.html",
       template: 'settings.html',
       chunks: ['settings']
+    }),
+    new HtmlWebpackPlugin({
+      filename: "notifications.html",
+      template: 'notifications.html',
+      chunks: ['notifications']
     })
   ],
   module: {
