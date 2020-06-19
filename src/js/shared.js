@@ -284,13 +284,17 @@ async function cardBadges (t) {
         }
     }];
 
-    const totalEstimate = await getTotalEstimate(t);
+    const hasEstimateVar = await hasEstimateFeature(t);
 
-    if (totalEstimate > 0) {
-        items.push({
-            icon: estimateImage,
-            text: 'Estimate: ' + formatTime(totalEstimate)
-        });
+    if (hasEstimateVar) {
+        const totalEstimate = await getTotalEstimate(t);
+
+        if (totalEstimate > 0) {
+            items.push({
+                icon: estimateImage,
+                text: 'Estimate: ' + formatTime(totalEstimate)
+            });
+        }
     }
 
     return items;
