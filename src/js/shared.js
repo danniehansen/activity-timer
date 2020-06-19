@@ -222,7 +222,6 @@ function formatDate (date) {
  */
 async function hasEstimateFeature (t) {
     const hasEstimateFeature = await t.get('board', 'shared', 'act-timer-disable-estimate');
-    console.log('hasEstimateFeature:', hasEstimateFeature);
     return !hasEstimateFeature;
 }
 

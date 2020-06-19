@@ -96,9 +96,9 @@ t.render(async function() {
         stopTimerBtn.style.display = 'none';
     }
 
-    const hasEstimateFeature = await hasEstimateFeature(t);
+    const hasEstimateFeatureVar = await hasEstimateFeature(t);
 
-    if (hasEstimateFeature) {
+    if (hasEstimateFeatureVar) {
         estimateEl.innerHTML = formatTime(ownEstimate);
         estimateEl.style.display = 'block';
 
