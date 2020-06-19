@@ -16,13 +16,12 @@ saveSettingsBtn.addEventListener('click', async () => {
     await t.closePopup();
 });
 
-(async () => {
-    const hasEstimateFeature = await hasEstimateFeature(t);
+hasEstimateFeature(t).then((hasEstimateFeature) => {
     console.log('hasEstimateFeature 2:', hasEstimateFeature);
     if (!hasEstimateFeature) {
         disableEstimateEl.checked = true;
     }
-})();
+});
 
 t.render(async function() {
     t.sizeTo('.settings-wrapper');
