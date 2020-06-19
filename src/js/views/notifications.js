@@ -1,14 +1,14 @@
 require('../../sass/main.scss');
 
 const t = window.TrelloPowerUp.iframe();
-const enableNotificationsEl = document.getElementById('enable-notifications');
+const enableNotificationsBtn = document.getElementById('btn-enable-notifications');
 
-enableNotificationsEl.checked = Notification.permission === 'granted';
+if (Notification.permission !== 'granted') {
+    enableNotificationsBtn.style.display = 'block';
+}
 
-enableNotificationsEl.addEventListener('change', () => {
-    if (enableNotificationsEl.checked && Notification.permission !== 'granted') {
-        Notification.requestPermission();
-    }
+enableNotificationsBtn.addEventListener('click', () => {
+   window.open(t.signUrl('./enable_notifications.html'));
 });
 
 t.render(async function() {

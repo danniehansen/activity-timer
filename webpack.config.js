@@ -11,7 +11,8 @@ module.exports = {
     change_estimate: ['@babel/polyfill', './src/js/views/change_estimate.js'],
     history: ['@babel/polyfill', './src/js/views/history.js'],
     settings: ['@babel/polyfill', './src/js/views/settings.js'],
-    notifications: ['@babel/polyfill', './src/js/views/notifications.js']
+    notifications: ['@babel/polyfill', './src/js/views/notifications.js'],
+    enable_notifications: ['@babel/polyfill', './src/js/views/enable_notifications.js']
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -56,6 +57,11 @@ module.exports = {
       filename: "notifications.html",
       template: 'notifications.html',
       chunks: ['notifications']
+    }),
+    new HtmlWebpackPlugin({
+      filename: "enable_notifications.html",
+      template: 'enable_notifications.html',
+      chunks: ['enable_notifications']
     })
   ],
   module: {
