@@ -223,6 +223,7 @@ function formatDate (date) {
 async function hasNotificationsFeature (t) {
     const hasNotificationsFeature = await t.get('member', 'private', dataPrefix + '-disable-notifications');
     console.log('hasNotificationsFeature:', hasNotificationsFeature);
+    console.log('#1:', Notification.permission === 'granted');
     return !hasNotificationsFeature && Notification.permission === 'granted';
 }
 
