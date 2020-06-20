@@ -222,8 +222,6 @@ function formatDate (date) {
  */
 async function hasNotificationsFeature (t) {
     const hasNotificationsFeature = await t.get('member', 'private', dataPrefix + '-disable-notifications');
-    console.log('hasNotificationsFeature:', hasNotificationsFeature);
-    console.log('#1:', Notification.permission === 'granted');
     return !hasNotificationsFeature && Notification.permission === 'granted';
 }
 
@@ -247,6 +245,17 @@ async function disableNotificationsFeature (t) {
  */
 async function enableNotificationsFeature (t) {
     await t.remove('member', 'private', dataPrefix + '-disable-notifications');
+}
+
+/**
+ * @param t
+ *
+ * @param percentage
+ *
+ * @returns {Promise<void>}
+ */
+async function setNotificationPercentage (t, percentage) {
+    await t.remove('member', 'private', dataPrefix + '-notifications-percentage', parseInt(percentage, 10));
 }
 
 /**
@@ -648,5 +657,6 @@ module.exports = {
     enableEstimateFeature,
     enableNotificationsFeature,
     disableNotificationsFeature,
-    hasNotificationsFeature
+    hasNotificationsFeature,
+    setNotificationPercentage
 };

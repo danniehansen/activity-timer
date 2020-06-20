@@ -67,11 +67,9 @@ input[type="checkbox"] {
 .btn-start-timer,
 .btn-stop-timer,
 .authorize,
-.wrapper {
-  display: none;
-}
-
+.wrapper,
 .btn-enable-notifications,
-.btn-disable-notifications {
+.btn-disable-notifications,
+.notify-on-percentage {
   display: none;
 }

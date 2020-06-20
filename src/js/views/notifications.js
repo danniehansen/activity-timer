@@ -3,12 +3,15 @@ require('../../sass/main.scss');
 const {
     hasNotificationsFeature,
     enableNotificationsFeature,
-    disableNotificationsFeature
+    disableNotificationsFeature,
+    setNotificationPercentage
 } = require('../shared.js');
 
 const t = window.TrelloPowerUp.iframe();
 const enableNotificationsBtn = document.querySelector('.btn-enable-notifications');
 const disableNotificationsBtn = document.querySelector('.btn-disable-notifications');
+const notifyOnPercentageEl = document.querySelector('.notify-on-percentage');
+const notifyOnPercentageInput = document.getElementById('notify-on-percentage');
 
 enableNotificationsBtn.addEventListener('click', async () => {
     if (Notification.permission === 'granted') {
@@ -24,15 +27,21 @@ disableNotificationsBtn.addEventListener('click', async () => {
     await render();
 });
 
+notifyOnPercentageInput.addEventListener('change', () => {
+   console.log('this.value:', this.value);
+});
+
 async function render () {
     const hasNotificationsEnabled = await hasNotificationsFeature(t);
-    console.log('hasNotificationsEnabled:', hasNotificationsEnabled);
+
     if (hasNotificationsEnabled) {
         enableNotificationsBtn.style.display = 'none';
         disableNotificationsBtn.style.display = 'block';
+        notifyOnPercentageEl.style.display = 'block';
     } else {
         enableNotificationsBtn.style.display = 'block';
         disableNotificationsBtn.style.display = 'none';
+        notifyOnPercentageEl.style.display = 'none';
     }
 
     t.sizeTo('.notifications-wrapper');

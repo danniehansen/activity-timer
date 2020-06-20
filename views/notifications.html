@@ -8,7 +8,12 @@
   <body>
     <div class="notifications-wrapper">
       <button class="mod-primary btn-enable-notifications">Enable notifications</button>
-      <button class="mod-primary btn-disable-notifications">Disable notifications</button>
+      <button class="mod-danger btn-disable-notifications">Disable notifications</button>
+
+      <div class="notify-on-percentage">
+        <input type="range" id="notify-on-percentage" min="1" max="100">
+        <label for="notify-on-percentage">Volume</label>
+      </div>
     </div>
 
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
