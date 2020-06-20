@@ -60,7 +60,7 @@ async function render () {
     t.sizeTo('.notifications-wrapper');
 }
 
-setTimeout(async () => {
+setInterval(async () => {
     if (Notification.permission === 'granted') {
         const hasNotificationsEnabled = await hasNotificationsFeature(t);
 
