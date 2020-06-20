@@ -258,6 +258,22 @@ async function setNotificationPercentage (t, percentage) {
     await t.remove('member', 'private', dataPrefix + '-notifications-percentage', parseInt(percentage, 10));
 }
 
+
+/**
+ * @param t
+ *
+ * @returns {Promise<null|number>}
+ */
+async function getNotificationPercentage (t) {
+    const percentage = await t.get('member', 'private', dataPrefix + '-notifications-percentage');
+
+    if (percentage) {
+        return parseInt(percentage, 10);
+    }
+
+    return null;
+}
+
 /**
  * Is estimate feature enabled?
  *
@@ -658,5 +674,6 @@ module.exports = {
     enableNotificationsFeature,
     disableNotificationsFeature,
     hasNotificationsFeature,
-    setNotificationPercentage
+    setNotificationPercentage,
+    getNotificationPercentage
 };

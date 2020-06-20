@@ -4,7 +4,8 @@ const {
     hasNotificationsFeature,
     enableNotificationsFeature,
     disableNotificationsFeature,
-    setNotificationPercentage
+    setNotificationPercentage,
+    getNotificationPercentage
 } = require('../shared.js');
 
 const t = window.TrelloPowerUp.iframe();
@@ -27,8 +28,16 @@ disableNotificationsBtn.addEventListener('click', async () => {
     await render();
 });
 
-notifyOnPercentageInput.addEventListener('change', () => {
-   console.log('notifyOnPercentageInput.value:', notifyOnPercentageInput.value);
+notifyOnPercentageInput.addEventListener('change', async () => {
+    await setNotificationPercentage(t, notifyOnPercentageInput.value);
+});
+
+getNotificationPercentage.then((percentage) => {
+    if (percentage) {
+        notifyOnPercentageInput.value = percentage;
+    } else {
+        notifyOnPercentageInput.value = 80;
+    }
 });
 
 async function render () {
