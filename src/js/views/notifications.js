@@ -37,10 +37,10 @@ notifyOnPercentageInput.addEventListener('change', async () => {
 getNotificationPercentage(t).then((percentage) => {
     if (percentage) {
         notifyOnPercentageInput.value = percentage;
-        notifyOnPercentageSpan.innerText = percentage;
+        notifyOnPercentageSpan.innerText = percentage + '%';
     } else {
         notifyOnPercentageInput.value = 80;
-        notifyOnPercentageSpan.innerText = 80;
+        notifyOnPercentageSpan.innerText = '80%';
     }
 });
 
