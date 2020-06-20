@@ -26,7 +26,7 @@ disableNotificationsBtn.addEventListener('click', async () => {
 
 async function render () {
     const hasNotificationsEnabled = await hasNotificationsFeature(t);
-
+    console.log('hasNotificationsEnabled:', hasNotificationsEnabled);
     if (hasNotificationsEnabled) {
         enableNotificationsBtn.style.display = 'none';
         disableNotificationsBtn.style.display = 'block';
