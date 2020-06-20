@@ -13,6 +13,7 @@ const enableNotificationsBtn = document.querySelector('.btn-enable-notifications
 const disableNotificationsBtn = document.querySelector('.btn-disable-notifications');
 const notifyOnPercentageEl = document.querySelector('.notify-on-percentage');
 const notifyOnPercentageInput = document.getElementById('notify-on-percentage');
+const notifyOnPercentageSpan = document.querySelector('.notify-on-percentage span');
 
 enableNotificationsBtn.addEventListener('click', async () => {
     if (Notification.permission === 'granted') {
@@ -36,8 +37,10 @@ getNotificationPercentage(t).then((percentage) => {
     console.log('percentage:', percentage);
     if (percentage) {
         notifyOnPercentageInput.value = percentage;
+        notifyOnPercentageSpan.innerText = percentage;
     } else {
         notifyOnPercentageInput.value = 80;
+        notifyOnPercentageSpan.innerText = 80;
     }
 });
 

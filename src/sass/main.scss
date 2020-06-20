@@ -86,3 +86,16 @@ input[type="range"] {
     border-radius: 50%;
   }
 }
+
+.notify-on-percentage {
+  input {
+    display: inline-block;
+  }
+
+  span {
+    display: inline-block;
+    margin: 0 0 0 5px;
+    position: relative;
+    top: -2px;
+  }
+}
