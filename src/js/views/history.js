@@ -89,7 +89,7 @@ async function fetchData () {
         const token = await t.getRestApi().getToken();
         const board = await t.board('id');
 
-        const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,labels,pluginData,closed&key=' + apiKey + '&token=' + token);
+        const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,labels,pluginData,closed&key=' + apiKey + '&token=' + token + '&r=' + new Date().getTime());
         const json = await data.json();
 
         const cards = json.map((item) => {
