@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [1.0.4] -
+### Added
+- Added power-up settings to toggle estimate feature.
+- Added notifications feature to get notified when you near your estimates time.
+
 ## [1.0.3] - 2020-06-18
 ### Fixed
 - Fixed issue with timer not initially showing with `0m` as time on board list when starting.

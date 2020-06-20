@@ -30,37 +30,37 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       filename: "index.html",
-      template: 'index.html',
+      template: './views/index.html',
       chunks: ['main']
     }),
     new HtmlWebpackPlugin({
       filename: "card_back_section.html",
-      template: 'card_back_section.html',
+      template: './views/card_back_section.html',
       chunks: ['card_back_section']
     }),
     new HtmlWebpackPlugin({
       filename: "change_estimate.html",
-      template: 'change_estimate.html',
+      template: './views/change_estimate.html',
       chunks: ['change_estimate']
     }),
     new HtmlWebpackPlugin({
       filename: "history.html",
-      template: 'history.html',
+      template: './views/history.html',
       chunks: ['history']
     }),
     new HtmlWebpackPlugin({
       filename: "settings.html",
-      template: 'settings.html',
+      template: './views/settings.html',
       chunks: ['settings']
     }),
     new HtmlWebpackPlugin({
       filename: "notifications.html",
-      template: 'notifications.html',
+      template: './views/notifications.html',
       chunks: ['notifications']
     }),
     new HtmlWebpackPlugin({
       filename: "enable_notifications.html",
-      template: 'enable_notifications.html',
+      template: './views/enable_notifications.html',
       chunks: ['enable_notifications']
     })
   ],

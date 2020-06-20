@@ -220,6 +220,40 @@ function formatDate (date) {
  *
  * @returns {Promise<boolean>}
  */
+async function hasNotificationsFeature (t) {
+    const hasNotificationsFeature = await t.get('board', 'shared', 'act-timer-disable-notifications');
+    return !hasNotificationsFeature && Notification.permission === 'granted';
+}
+
+/**
+ * Disable estimate feature.
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
+async function disableNotificationsFeature (t) {
+    await t.set('board', 'shared', 'act-timer-disable-notifications', 1);
+}
+
+/**
+ * Enable estimate feature
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
+async function enableNotificationsFeature (t) {
+    await t.remove('board', 'shared', 'act-timer-disable-notifications');
+}
+
+/**
+ * Is estimate feature enabled?
+ *
+ * @param t
+ *
+ * @returns {Promise<boolean>}
+ */
 async function hasEstimateFeature (t) {
     const hasEstimateFeature = await t.get('board', 'shared', 'act-timer-disable-estimate');
     return !hasEstimateFeature;
@@ -609,5 +643,8 @@ module.exports = {
     showSettings,
     hasEstimateFeature,
     disableEstimateFeature,
-    enableEstimateFeature
+    enableEstimateFeature,
+    enableNotificationsFeature,
+    disableNotificationsFeature,
+    hasNotificationsFeature
 };
