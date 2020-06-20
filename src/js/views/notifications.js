@@ -31,8 +31,8 @@ async function render () {
         enableNotificationsBtn.style.display = 'none';
         disableNotificationsBtn.style.display = 'block';
     } else {
-        enableNotificationsBtn.style.display = 'none';
-        disableNotificationsBtn.style.display = 'block';
+        enableNotificationsBtn.style.display = 'block';
+        disableNotificationsBtn.style.display = 'none';
     }
 
     t.sizeTo('.notifications-wrapper');
