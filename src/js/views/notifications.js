@@ -30,11 +30,11 @@ disableNotificationsBtn.addEventListener('click', async () => {
 });
 
 notifyOnPercentageInput.addEventListener('change', async () => {
+    notifyOnPercentageSpan.innerText = notifyOnPercentageInput.value;
     await setNotificationPercentage(t, notifyOnPercentageInput.value);
 });
 
 getNotificationPercentage(t).then((percentage) => {
-    console.log('percentage:', percentage);
     if (percentage) {
         notifyOnPercentageInput.value = percentage;
         notifyOnPercentageSpan.innerText = percentage;
