@@ -221,7 +221,7 @@ function formatDate (date) {
  * @returns {Promise<boolean>}
  */
 async function hasNotificationsFeature (t) {
-    const hasNotificationsFeature = await t.get('board', 'shared', 'act-timer-disable-notifications');
+    const hasNotificationsFeature = await t.get('member', 'private', 'act-timer-disable-notifications');
     return !hasNotificationsFeature && Notification.permission === 'granted';
 }
 
@@ -233,7 +233,7 @@ async function hasNotificationsFeature (t) {
  * @returns {Promise<void>}
  */
 async function disableNotificationsFeature (t) {
-    await t.set('board', 'shared', 'act-timer-disable-notifications', 1);
+    await t.set('member', 'private', 'act-timer-disable-notifications', 1);
 }
 
 /**
@@ -244,7 +244,7 @@ async function disableNotificationsFeature (t) {
  * @returns {Promise<void>}
  */
 async function enableNotificationsFeature (t) {
-    await t.remove('board', 'shared', 'act-timer-disable-notifications');
+    await t.remove('member', 'private', 'act-timer-disable-notifications');
 }
 
 /**
