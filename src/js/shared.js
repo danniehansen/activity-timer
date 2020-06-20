@@ -255,7 +255,7 @@ async function enableNotificationsFeature (t) {
  * @returns {Promise<void>}
  */
 async function setNotificationPercentage (t, percentage) {
-    await t.remove('member', 'private', dataPrefix + '-notifications-percentage', parseInt(percentage, 10));
+    await t.set('member', 'private', dataPrefix + '-notifications-percentage', parseInt(percentage, 10));
 }
 
 
