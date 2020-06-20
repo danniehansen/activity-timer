@@ -33,6 +33,7 @@ notifyOnPercentageInput.addEventListener('change', async () => {
 });
 
 getNotificationPercentage(t).then((percentage) => {
+    console.log('percentage:', percentage);
     if (percentage) {
         notifyOnPercentageInput.value = percentage;
     } else {
