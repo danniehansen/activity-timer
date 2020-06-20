@@ -335,31 +335,31 @@ async function triggerNotification (t) {
  */
 async function canTriggerNotification (t) {
     const isNotificationsEnabled = await hasNotificationsFeature(t);
-
+    console.log('isNotificationsEnabled:', isNotificationsEnabled);
     if (!isNotificationsEnabled) {
         return false;
     }
 
     const timeSpent = await getOwnTotalSeconds(t);
-
+    console.log('timeSpent:', timeSpent);
     if (timeSpent === 0) {
         return false;
     }
 
     const notificationsPercentage = await getNotificationPercentage(t);
-
+    console.log('notificationsPercentage:', notificationsPercentage);
     if (notificationsPercentage === 0) {
         return false;
     }
 
     const notificationTriggered = await hasTriggeredNotification(t);
-
+    console.log('notificationTriggered:', notificationTriggered);
     if (notificationTriggered) {
         return false;
     }
 
     const estimate = await getOwnEstimate(t);
-
+    console.log('estimate:', estimate);
     if (estimate === 0) {
         return false;
     }
