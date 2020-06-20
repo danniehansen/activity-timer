@@ -221,7 +221,8 @@ function formatDate (date) {
  * @returns {Promise<boolean>}
  */
 async function hasNotificationsFeature (t) {
-    const hasNotificationsFeature = await t.get('member', 'private', 'act-timer-disable-notifications');
+    const hasNotificationsFeature = await t.get('member', 'private', dataPrefix + '-disable-notifications');
+    console.log('hasNotificationsFeature:', hasNotificationsFeature);
     return !hasNotificationsFeature && Notification.permission === 'granted';
 }
 
@@ -233,7 +234,7 @@ async function hasNotificationsFeature (t) {
  * @returns {Promise<void>}
  */
 async function disableNotificationsFeature (t) {
-    await t.set('member', 'private', 'act-timer-disable-notifications', 1);
+    await t.set('member', 'private', dataPrefix + '-disable-notifications', 1);
 }
 
 /**
@@ -244,7 +245,7 @@ async function disableNotificationsFeature (t) {
  * @returns {Promise<void>}
  */
 async function enableNotificationsFeature (t) {
-    await t.remove('member', 'private', 'act-timer-disable-notifications');
+    await t.remove('member', 'private', dataPrefix + '-disable-notifications');
 }
 
 /**
@@ -255,7 +256,7 @@ async function enableNotificationsFeature (t) {
  * @returns {Promise<boolean>}
  */
 async function hasEstimateFeature (t) {
-    const hasEstimateFeature = await t.get('board', 'shared', 'act-timer-disable-estimate');
+    const hasEstimateFeature = await t.get('board', 'shared', dataPrefix + '-disable-estimate');
     return !hasEstimateFeature;
 }
 
@@ -267,7 +268,7 @@ async function hasEstimateFeature (t) {
  * @returns {Promise<void>}
  */
 async function disableEstimateFeature (t) {
-    await t.set('board', 'shared', 'act-timer-disable-estimate', 1);
+    await t.set('board', 'shared', dataPrefix + '-disable-estimate', 1);
 }
 
 /**
@@ -278,7 +279,7 @@ async function disableEstimateFeature (t) {
  * @returns {Promise<void>}
  */
 async function enableEstimateFeature (t) {
-    await t.remove('board', 'shared', 'act-timer-disable-estimate');
+    await t.remove('board', 'shared', dataPrefix + '-disable-estimate');
 }
 
 /**
@@ -286,7 +287,7 @@ async function enableEstimateFeature (t) {
  *
  * @param t
  *
- * @returns {{dynamic: (function(): {refresh: number})}[]}
+ * @returns {Promise<[{dynamic: function(): Promise<{refresh: number}>}]>}
  */
 async function cardBadges (t) {
     const items = [{
