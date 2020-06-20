@@ -13,9 +13,15 @@ const disableNotificationsBtn = document.querySelector('.btn-disable-notificatio
 enableNotificationsBtn.addEventListener('click', async () => {
     if (Notification.permission === 'granted') {
         await enableNotificationsFeature(t);
+        await render();
     } else {
         window.open('./enable_notifications.html');
     }
+});
+
+disableNotificationsBtn.addEventListener('click', async () => {
+    await disableNotificationsFeature(t);
+    await render();
 });
 
 async function render () {
