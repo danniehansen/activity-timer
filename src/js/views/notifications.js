@@ -28,7 +28,7 @@ disableNotificationsBtn.addEventListener('click', async () => {
 });
 
 notifyOnPercentageInput.addEventListener('change', () => {
-   console.log('this.value:', this.value);
+   console.log('notifyOnPercentageInput.value:', notifyOnPercentageInput.value);
 });
 
 async function render () {
