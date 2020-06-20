@@ -73,3 +73,16 @@ input[type="checkbox"] {
 .notify-on-percentage {
   display: none;
 }
+
+input[type="slider"] {
+  padding: 2px 0;
+
+  &::-webkit-slider-thumb {
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    background-color: #172B4D;
+    -webkit-appearance: none;
+    border-radius: 50%;
+  }
+}
