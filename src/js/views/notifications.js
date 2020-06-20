@@ -32,7 +32,7 @@ notifyOnPercentageInput.addEventListener('change', async () => {
     await setNotificationPercentage(t, notifyOnPercentageInput.value);
 });
 
-getNotificationPercentage().then((percentage) => {
+getNotificationPercentage(t).then((percentage) => {
     if (percentage) {
         notifyOnPercentageInput.value = percentage;
     } else {
