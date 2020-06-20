@@ -140,6 +140,33 @@ async function getTotalSeconds (t) {
 }
 
 /**
+ * Get own total seconds tracked
+ *
+ * @param t
+ *
+ * @returns {Promise<number>}
+ */
+async function getOwnTotalSeconds (t) {
+    const ranges = await getRanges(t);
+    const member = await t.member('id');
+
+    let totalSeconds = 0;
+
+    ranges.forEach((range) => {
+        if (
+            typeof range[0] !== 'undefined' &&
+            range[0] == member.id &&
+            typeof range[1] !== 'undefined' &&
+            typeof range[2] !== 'undefined'
+        ) {
+            totalSeconds += (range[2] - range[1]);
+        }
+    });
+
+    return totalSeconds;
+}
+
+/**
  * Start timer
  *
  * @param t
@@ -275,6 +302,72 @@ async function getNotificationPercentage (t) {
 }
 
 /**
+ * Check if a members notification have already been fired.
+ *
+ * @param t
+ *
+ * @returns {Promise<boolean>}
+ */
+async function hasTriggeredNotification (t) {
+    const notificationTriggered = await t.get('card', 'private', dataPrefix + '-notifications-triggered');
+    return !!notificationTriggered;
+}
+
+/**
+ * Trigger notification.
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
+async function triggerNotification (t) {
+    const notificationsPercentage = await getNotificationPercentage(t);
+    await t.set('card', 'private', dataPrefix + '-notifications-triggered', 1);
+    new Notification("You've passed " + notificationsPercentage + "% of your estimated time");
+}
+
+/**
+ * Whether or not notification can trigger.
+ *
+ * @param t
+ *
+ * @returns {Promise<boolean>}
+ */
+async function canTriggerNotification (t) {
+    const isNotificationsEnabled = await hasNotificationsFeature(t);
+
+    if (!isNotificationsEnabled) {
+        return false;
+    }
+
+    const timeSpent = await getOwnTotalSeconds(t);
+
+    if (timeSpent === 0) {
+        return false;
+    }
+
+    const notificationsPercentage = await getNotificationPercentage(t);
+
+    if (notificationsPercentage === 0) {
+        return false;
+    }
+
+    const notificationTriggered = await hasTriggeredNotification(t);
+
+    if (notificationTriggered) {
+        return false;
+    }
+
+    const estimate = await getOwnEstimate(t);
+
+    if (estimate === 0) {
+        return false;
+    }
+
+    return timeSpent >= ((estimate / 100) * notificationsPercentage);
+}
+
+/**
  * Is estimate feature enabled?
  *
  * @param t
@@ -336,6 +429,12 @@ async function cardBadges (t) {
                     if (startTime[1] !== data.idList) {
                         await stopTimer(t);
                     } else {
+                        const shouldTriggerNotification = await canTriggerNotification(t);
+
+                        if (shouldTriggerNotification) {
+                            await triggerNotification(t);
+                        }
+
                         object.color = 'red';
                     }
                 }
