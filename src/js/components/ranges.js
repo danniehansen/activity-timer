@@ -58,10 +58,12 @@ module.exports = class Ranges {
     /**
      * Serialize items into a JSON string.
      *
-     * @returns {string}
+     * @returns {*}
      */
     serialize () {
-        return this.items;
+        return this.items.map((range) => {
+            return range.serialize();
+        });
     }
 
     /**
