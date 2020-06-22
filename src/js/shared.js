@@ -483,7 +483,7 @@ function cardButtons (t) {
                                     item: range
                                 };
                             }).filter((range) => {
-                                return range.memberId === member.id;
+                                return range.item.memberId === member.id;
                             });
 
                             if (memberRanges.length > 0) {
