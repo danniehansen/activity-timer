@@ -61,7 +61,7 @@ module.exports = class Ranges {
      * @returns {string}
      */
     serialize () {
-        return JSON.stringify(this.items);
+        return this.items;
     }
 
     /**
@@ -90,11 +90,11 @@ module.exports = class Ranges {
     /**
      * Unserialize raw data into Ranges instances.
      *
-     * @param {string} data
+     * @param data
      *
      * @returns {Ranges}
      */
     static unserialize (data) {
-        return new Ranges(JSON.parse(data));
+        return new Ranges(data);
     }
 }

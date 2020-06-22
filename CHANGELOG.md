@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added power-up settings to toggle estimate feature.
 - Added notifications feature to get notified when you near your estimates time.
+### Fixed
+- Fixed issue when deleting time ranges of a specific member accidentally deleting time ranges for other members.
 
 ## [1.0.3] - 2020-06-18
 ### Fixed
