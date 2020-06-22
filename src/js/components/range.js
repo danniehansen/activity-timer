@@ -39,4 +39,12 @@ module.exports = class Range {
     set end (value) {
         this._end = value;
     }
+
+    serialize () {
+        return [
+            this._memberId,
+            this._start,
+            this._end
+        ];
+    }
 }
