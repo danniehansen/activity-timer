@@ -406,7 +406,7 @@ async function enableEstimateFeature (t) {
  *
  * @param t
  *
- * @returns {Promise<[{dynamic: function(): Promise<{refresh: number}>}]>}
+ * @returns {Promise<Array>}
  */
 async function cardBadges (t) {
     const items = [{
@@ -461,11 +461,40 @@ async function cardBadges (t) {
 }
 
 /**
+ * Update the data of a range by it's index.
+ *
+ * @param t
+ * @param rangeIndex
+ * @param rangeData
+ *
+ * @returns {Promise<void>}
+ */
+async function updateRangeByIndex (t, rangeIndex, rangeData) {
+    const ranges = await getRanges(t, true);
+    ranges[rangeIndex] = rangeData;
+    await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+}
+
+/**
+ * Remove range by it's index.
+ *
+ * @param t
+ * @param rangeIndex
+ *
+ * @returns {Promise<void>}
+ */
+async function removeRangeByIndex (t, rangeIndex) {
+    const ranges = await getRanges(t, true);
+    ranges.splice(rangeIndex, 1);
+    await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+}
+
+/**
  * Card buttons capability handler.
  *
  * @param t
  *
- * @returns {({condition: string, icon: string, callback: (function(*): *), text: string}|{icon: string, callback: (function(*): *), text: string})[]}
+ * @returns Array
  */
 function cardButtons (t) {
     const items = [
@@ -494,8 +523,16 @@ function cardButtons (t) {
 
                             return 0;
                         }).forEach((member, memberIndex) => {
-                            const memberRanges = ranges.filter((range) => {
-                                return range[0] == member.id;
+                            const memberRanges = ranges.map((range, rangeIndex) => {
+                                range.rangeIndex = rangeIndex;
+                                return {
+                                    memberId: range[0],
+                                    rangeIndex,
+                                    start: range[1],
+                                    end: range[2]
+                                };
+                            }).filter((range) => {
+                                return range.memberId == member.id;
                             });
 
                             if (memberRanges.length > 0) {
@@ -503,10 +540,10 @@ function cardButtons (t) {
                                     'text': member.fullName + (member.fullName != member.username ? ' (' + member.username + ')' : '') + ':'
                                 });
 
-                                memberRanges.forEach((range, rangeIndex) => {
-                                    const start = new Date(range[1] * 1000);
-                                    const end = new Date(range[2] * 1000);
-                                    const _rangeIndex = rangeIndex;
+                                memberRanges.forEach((range) => {
+                                    const start = new Date(range.start * 1000);
+                                    const end = new Date(range.end * 1000);
+                                    const _rangeIndex = range.rangeIndex;
                                     const _range = range;
 
                                     items.push({
@@ -515,8 +552,8 @@ function cardButtons (t) {
                                             return t.popup({
                                                 title: 'Edit time range',
                                                 items: function (t) {
-                                                    const _start = new Date(_range[1] * 1000);
-                                                    const _end = new Date(_range[2] * 1000);
+                                                    const _start = new Date(_range.start * 1000);
+                                                    const _end = new Date(_range.end * 1000);
 
                                                     return [
                                                         {
@@ -527,8 +564,7 @@ function cardButtons (t) {
                                                                     title: 'Change start from (' + formatDate(_start) + ')',
                                                                     callback: async function(t, opts) {
                                                                         _range[1] = Math.floor(new Date(opts.date).getTime() / 1000);
-                                                                        ranges[_rangeIndex] = _range;
-                                                                        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+                                                                        await updateRangeByIndex(t, _rangeIndex, _range);
                                                                         return t.closePopup();
                                                                     },
                                                                     date: _start
@@ -543,8 +579,7 @@ function cardButtons (t) {
                                                                     title: 'Change end from (' + formatDate(_end) + ')',
                                                                     callback: async function(t, opts) {
                                                                         _range[2] = Math.floor(new Date(opts.date).getTime() / 1000);
-                                                                        ranges[_rangeIndex] = _range;
-                                                                        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+                                                                        await updateRangeByIndex(t, _rangeIndex, _range);
                                                                         return t.closePopup();
                                                                     },
                                                                     date: _end
@@ -554,8 +589,7 @@ function cardButtons (t) {
                                                         {
                                                             text: 'Delete',
                                                             callback: async (t) => {
-                                                                ranges.splice(_rangeIndex, 1);
-                                                                await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+                                                                await removeRangeByIndex(t, _rangeIndex);
                                                                 return t.closePopup();
                                                             }
                                                         }
@@ -718,7 +752,7 @@ async function onBoardButtonClick (t) {
  *
  * @param t
  *
- * @returns {{condition: string, icon: {light: *, dark: *}, callback: onBoardButtonClick, text: string}[]}
+ * @returns Array
  */
 function boardButtons (t) {
     return [{
