@@ -85,7 +85,7 @@ async function createEstimate (t, seconds) {
  * @param t
  * @param noCurrent
  *
- * @returns {Promise<*>}
+ * @returns {Promise<Ranges>}
  */
 async function getRanges (t, noCurrent) {
     noCurrent = noCurrent || false;
@@ -474,8 +474,8 @@ function cardButtons (t) {
                             }
 
                             return 0;
-                        }).forEach((member, memberIndex) => {
-                            const memberRanges = ranges.map((range, rangeIndex) => {
+                        }).forEach((member) => {
+                            const memberRanges = ranges.items.map((range, rangeIndex) => {
                                 range.rangeIndex = rangeIndex;
                                 return {
                                     rangeIndex,
