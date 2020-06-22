@@ -34,6 +34,11 @@ Once an estimate have been saved it will show on the board view & also when on t
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot9.png?r=1 "Estimate")
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot8.png?r=1 "Estimates")
 
+Next up there are notifications! Notification allows you to get notified when you x percent of your estimated time. Allowing you to reach quickly to any drift in estimates.
+
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot11.png?r=1 "Estimates")
+![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot12.png?r=1 "Estimates")
+
 At last, we have our simple `Activity timer history` board button. This board button allows you to easily filter through cards (including archived) with no easy! Filter by date, member or label. Find out where you're spending your time.
 
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot6.png?r=1 "Activity timer history")
@@ -45,6 +50,8 @@ At last, we have our simple `Activity timer history` board button. This board bu
 3. When you move card from one list to another it will automatically stop the timer.
 4. All data on a card is stored in a compressed format that's easy to access through REST API.
 5. Easy access to previous recordings from our very own history view.
+6. Estimate functionality.
+7. Desktop notifications when near estimate.
 
 ## Card data (REST API)
 
