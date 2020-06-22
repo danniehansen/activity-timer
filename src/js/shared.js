@@ -91,14 +91,14 @@ async function getRanges (t, noCurrent) {
     noCurrent = noCurrent || false;
 
     const rangesData = await t.get('card', 'shared', dataPrefix + '-ranges', []);
-
+    console.log('rangesData:', rangesData);
     if (noCurrent) {
         return Ranges.unserialize(rangesData);
     }
 
     const startTime = await t.get('card', 'private', dataPrefix + '-start');
     const member = await t.member('id');
-
+    console.log('startTime:', startTime);
     if (startTime) {
         rangesData.push([
             member.id,
@@ -175,6 +175,7 @@ async function stopTimer (t) {
 
     if (data) {
         const ranges = await getRanges(t);
+        console.log('stop:', ranges);
         await t.set('card', 'shared', dataPrefix + '-ranges', ranges.serialize());
         await t.remove('card', 'private', dataPrefix + '-start');
     }
