@@ -61,7 +61,7 @@ async function render () {
 }
 
 setInterval(async () => {
-    const disabled = await t.get('member', 'private', dataPrefix + '-disable-notifications');
+    const disabled = await t.get('member', 'private', 'act-timer-disable-notifications');
 
     if (!disabled && Notification.permission === 'granted') {
         const hasNotificationsEnabled = await hasNotificationsFeature(t);
