@@ -61,7 +61,9 @@ async function render () {
 }
 
 setInterval(async () => {
-    if (Notification.permission === 'granted') {
+    const disabled = await t.get('member', 'private', dataPrefix + '-disable-notifications');
+
+    if (!disabled && Notification.permission === 'granted') {
         const hasNotificationsEnabled = await hasNotificationsFeature(t);
 
         if (!hasNotificationsEnabled) {
