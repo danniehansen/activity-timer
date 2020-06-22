@@ -1,3 +1,6 @@
+const Ranges = require('./components/ranges.js');
+const Range = require('./components/range.js');
+
 const clockImage = 'https://' + window.powerupHost + '/images/clock.svg';
 const estimateImage = 'https://' + window.powerupHost + '/images/estimate.svg';
 const clockImageWhite = 'https://' + window.powerupHost + '/images/clock.svg';
@@ -87,24 +90,24 @@ async function createEstimate (t, seconds) {
 async function getRanges (t, noCurrent) {
     noCurrent = noCurrent || false;
 
-    const ranges = await t.get('card', 'shared', dataPrefix + '-ranges', []);
+    const rangesData = await t.get('card', 'shared', dataPrefix + '-ranges', []);
 
     if (noCurrent) {
-        return ranges;
+        return Ranges.unserialize(rangesData);
     }
 
     const startTime = await t.get('card', 'private', dataPrefix + '-start');
     const member = await t.member('id');
 
     if (startTime) {
-        ranges.push([
+        rangesData.push([
             member.id,
             startTime[0],
             Math.floor((new Date().getTime() / 1000))
         ]);
     }
 
-    return ranges;
+    return Ranges.unserialize(rangesData || '[]');
 }
 
 /**
@@ -127,16 +130,7 @@ async function isRunning (t) {
  */
 async function getTotalSeconds (t) {
     const ranges = await getRanges(t);
-
-    let totalSeconds = 0;
-
-    ranges.forEach((range) => {
-        if (typeof range[1] !== 'undefined' && typeof range[2] !== 'undefined') {
-            totalSeconds += (range[2] - range[1]);
-        }
-    });
-
-    return totalSeconds;
+    return ranges.timeSpent;
 }
 
 /**
@@ -150,20 +144,7 @@ async function getOwnTotalSeconds (t) {
     const ranges = await getRanges(t);
     const member = await t.member('id');
 
-    let totalSeconds = 0;
-
-    ranges.forEach((range) => {
-        if (
-            typeof range[0] !== 'undefined' &&
-            range[0] == member.id &&
-            typeof range[1] !== 'undefined' &&
-            typeof range[2] !== 'undefined'
-        ) {
-            totalSeconds += (range[2] - range[1]);
-        }
-    });
-
-    return totalSeconds;
+    return ranges.getTimeSpentByMemberId(member.id);
 }
 
 /**
@@ -194,7 +175,7 @@ async function stopTimer (t) {
 
     if (data) {
         const ranges = await getRanges(t);
-        await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
+        await t.set('card', 'shared', dataPrefix + '-ranges', ranges.serialize());
         await t.remove('card', 'private', dataPrefix + '-start');
     }
 }
@@ -461,35 +442,6 @@ async function cardBadges (t) {
 }
 
 /**
- * Update the data of a range by it's index.
- *
- * @param t
- * @param rangeIndex
- * @param rangeData
- *
- * @returns {Promise<void>}
- */
-async function updateRangeByIndex (t, rangeIndex, rangeData) {
-    const ranges = await getRanges(t, true);
-    ranges[rangeIndex] = rangeData;
-    await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
-}
-
-/**
- * Remove range by it's index.
- *
- * @param t
- * @param rangeIndex
- *
- * @returns {Promise<void>}
- */
-async function removeRangeByIndex (t, rangeIndex) {
-    const ranges = await getRanges(t, true);
-    ranges.splice(rangeIndex, 1);
-    await t.set('card', 'shared', dataPrefix + '-ranges', ranges);
-}
-
-/**
  * Card buttons capability handler.
  *
  * @param t
@@ -526,23 +478,21 @@ function cardButtons (t) {
                             const memberRanges = ranges.map((range, rangeIndex) => {
                                 range.rangeIndex = rangeIndex;
                                 return {
-                                    memberId: range[0],
                                     rangeIndex,
-                                    start: range[1],
-                                    end: range[2]
+                                    item: range
                                 };
                             }).filter((range) => {
-                                return range.memberId == member.id;
+                                return range.memberId === member.id;
                             });
 
                             if (memberRanges.length > 0) {
                                 items.push({
-                                    'text': member.fullName + (member.fullName != member.username ? ' (' + member.username + ')' : '') + ':'
+                                    'text': member.fullName + (member.fullName !== member.username ? ' (' + member.username + ')' : '') + ':'
                                 });
 
                                 memberRanges.forEach((range) => {
-                                    const start = new Date(range.start * 1000);
-                                    const end = new Date(range.end * 1000);
+                                    const start = new Date(range.item.start * 1000);
+                                    const end = new Date(range.item.end * 1000);
                                     const _rangeIndex = range.rangeIndex;
                                     const _range = range;
 
@@ -552,8 +502,8 @@ function cardButtons (t) {
                                             return t.popup({
                                                 title: 'Edit time range',
                                                 items: function (t) {
-                                                    const _start = new Date(_range.start * 1000);
-                                                    const _end = new Date(_range.end * 1000);
+                                                    const _start = new Date(_range.item.start * 1000);
+                                                    const _end = new Date(_range.item.end * 1000);
 
                                                     return [
                                                         {
@@ -563,8 +513,9 @@ function cardButtons (t) {
                                                                     type: 'datetime',
                                                                     title: 'Change start from (' + formatDate(_start) + ')',
                                                                     callback: async function(t, opts) {
-                                                                        _range[1] = Math.floor(new Date(opts.date).getTime() / 1000);
-                                                                        await updateRangeByIndex(t, _rangeIndex, _range);
+                                                                        const ranges = await getRanges(t, true);
+                                                                        ranges.items[_rangeIndex].start = Math.floor(new Date(opts.date).getTime() / 1000);
+                                                                        await ranges.saveForContext(t);
                                                                         return t.closePopup();
                                                                     },
                                                                     date: _start
@@ -578,8 +529,9 @@ function cardButtons (t) {
                                                                     type: 'datetime',
                                                                     title: 'Change end from (' + formatDate(_end) + ')',
                                                                     callback: async function(t, opts) {
-                                                                        _range[2] = Math.floor(new Date(opts.date).getTime() / 1000);
-                                                                        await updateRangeByIndex(t, _rangeIndex, _range);
+                                                                        const ranges = await getRanges(t, true);
+                                                                        ranges.items[_rangeIndex].end = Math.floor(new Date(opts.date).getTime() / 1000);
+                                                                        await ranges.saveForContext(t);
                                                                         return t.closePopup();
                                                                     },
                                                                     date: _end
@@ -589,7 +541,9 @@ function cardButtons (t) {
                                                         {
                                                             text: 'Delete',
                                                             callback: async (t) => {
-                                                                await removeRangeByIndex(t, _rangeIndex);
+                                                                const ranges = await getRanges(t, true);
+                                                                ranges.deleteRangeByIndex(_rangeIndex);
+                                                                await ranges.saveForContext(t);
                                                                 return t.closePopup();
                                                             }
                                                         }
@@ -668,19 +622,11 @@ function cardButtons (t) {
 
                             return 0;
                         }).forEach((member, memberIndex) => {
-                            const memberRanges = ranges.filter((range) => {
-                                return range[0] == member.id;
-                            });
+                            const timeSpent = ranges.getTimeSpentByMemberId(member.id);
 
-                            if (memberRanges.length > 0) {
-                                let totalTime = 0;
-
-                                memberRanges.forEach(function (range, rangeIndex) {
-                                    totalTime += range[2] - range[1];
-                                });
-
+                            if (timeSpent !== 0) {
                                 items.push({
-                                    'text': member.fullName + (member.fullName != member.username ? ' (' + member.username + ')' : '') + ': ' +  formatTime(totalTime)
+                                    'text': member.fullName + (member.fullName !== member.username ? ' (' + member.username + ')' : '') + ': ' +  formatTime(timeSpent)
                                 });
                             }
                         });
@@ -784,13 +730,11 @@ function showSettings (t) {
 module.exports = {
     cardBadges,
     cardButtons,
-    getRanges,
     isRunning,
     getTotalSeconds,
     startTimer,
     stopTimer,
     formatTime,
-    formatDate,
     clockImage,
     cardBackSection,
     boardButtons,
