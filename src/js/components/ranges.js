@@ -40,7 +40,7 @@ module.exports = class Ranges {
         this.items.filter((range) => {
             return range.memberId === memberId;
         }).forEach((range) => {
-            time += range.time;
+            time += range.diff;
         });
 
         return time;
@@ -77,7 +77,7 @@ module.exports = class Ranges {
         let time = 0;
 
         this.items.forEach((range) => {
-            time += range.time;
+            time += range.diff;
         });
 
         return time;
