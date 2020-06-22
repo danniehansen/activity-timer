@@ -30,7 +30,7 @@ disableNotificationsBtn.addEventListener('click', async () => {
 });
 
 notifyOnPercentageInput.addEventListener('change', async () => {
-    notifyOnPercentageSpan.innerText = notifyOnPercentageInput.value;
+    notifyOnPercentageSpan.innerText = notifyOnPercentageInput.value + '%';
     await setNotificationPercentage(t, notifyOnPercentageInput.value);
 });
 
@@ -68,6 +68,8 @@ setInterval(async () => {
 
         if (!hasNotificationsEnabled) {
             await enableNotificationsFeature(t);
+            notifyOnPercentageSpan.innerText = '80%';
+            await setNotificationPercentage(t, 80);
         }
     }
 
