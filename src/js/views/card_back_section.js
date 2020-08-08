@@ -4,7 +4,8 @@ const {
     isRunning, getTotalSeconds, formatTime,
     startTimer, stopTimer, getOwnEstimate,
     getTotalEstimate, getEstimates,
-    hasEstimateFeature
+    hasEstimateFeature, clearEstimates,
+    deleteEstimate
 } = require('../shared.js');
 
 const t = window.TrelloPowerUp.iframe();
@@ -72,7 +73,39 @@ totalEstimateEl.addEventListener('click', (e) => {
 
                 if (memberEstimate > 0) {
                     items.push({
-                        'text': member.fullName + (member.fullName != member.username ? ' (' + member.username + ')' : '') + ': ' + formatTime(memberEstimate)
+                        'text': member.fullName + (member.fullName != member.username ? ' (' + member.username + ')' : '') + ': ' + formatTime(memberEstimate),
+                        callback: async (t) => {
+                            return t.popup({
+                                type: 'confirm',
+                                title: 'Delete estimate?',
+                                message: 'Are you sure you wish to delete this estimate?',
+                                confirmText: 'Yes, delete',
+                                onConfirm: async (t) => {
+                                    await deleteEstimate(t, member.id);
+                                    return t.closePopup();
+                                },
+                                confirmStyle: 'danger',
+                                cancelText: 'No, cancel'
+                            });
+                        }
+                    });
+                }
+            });
+
+            items.push({
+                text: 'Clear estimates',
+                callback: async (t) => {
+                    return t.popup({
+                        type: 'confirm',
+                        title: 'Are you sure?',
+                        message: '',
+                        confirmText: 'Yes, clear estimates',
+                        onConfirm: async (t) => {
+                            await clearEstimates(t);
+                            return t.closePopup();
+                        },
+                        confirmStyle: 'danger',
+                        cancelText: 'No, cancel'
                     });
                 }
             });

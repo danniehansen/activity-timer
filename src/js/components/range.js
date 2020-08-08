@@ -16,18 +16,30 @@ module.exports = class Range {
         this._end = end;
     }
 
+    /**
+     * @returns {string}
+     */
     get memberId () {
         return this._memberId;
     }
 
+    /**
+     * @returns {number}
+     */
     get diff () {
         return this.end - this.start;
     }
 
+    /**
+     * @returns number
+     */
     get start () {
         return parseInt(this._start, 10);
     }
 
+    /**
+     * @returns number
+     */
     get end () {
         return parseInt(this._end, 10);
     }

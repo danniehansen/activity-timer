@@ -1,5 +1,4 @@
 const Ranges = require('./components/ranges.js');
-const Range = require('./components/range.js');
 
 const clockImage = 'https://' + window.powerupHost + '/images/clock.svg';
 const estimateImage = 'https://' + window.powerupHost + '/images/estimate.svg';
@@ -17,6 +16,31 @@ const appName = 'Activity timer';
  */
 async function getEstimates (t) {
     return await t.get('card', 'shared', dataPrefix + '-estimates', []);
+}
+
+/**
+ * Clear estimates.
+ *
+ * @returns {Promise<void>}
+ */
+async function clearEstimates (t) {
+    return await t.remove('card', 'shared', dataPrefix + '-estimates');
+}
+
+/**
+ * Delete an estimate.
+ *
+ * @param {*} t 
+ * @param {string} memberId 
+ * 
+ * @returns {Promise<void>}
+ */
+async function deleteEstimate (t, memberId) {
+    const estimates = (await getEstimates(t)).filter((estimate) => {
+        return Array.isArray(estimate) && estimate[0] !== memberId;
+    });
+
+    await t.set('card', 'shared', dataPrefix + '-estimates', estimates);
 }
 
 /**
@@ -63,7 +87,7 @@ async function getTotalEstimate (t) {
  * estimates made by same user.
  *
  * @param t
- * @param seconds
+ * @param {number} seconds
  *
  * @returns {Promise<void>}
  */
@@ -83,7 +107,7 @@ async function createEstimate (t, seconds) {
  * Get all tracked ranges.
  *
  * @param t
- * @param noCurrent
+ * @param {boolean|undefined} noCurrent
  *
  * @returns {Promise<Ranges>}
  */
@@ -182,7 +206,7 @@ async function stopTimer (t) {
 }
 
 /**
- * @param secondsToFormat
+ * @param {number} secondsToFormat
  *
  * @returns {string}
  */
@@ -203,7 +227,7 @@ function formatTime (secondsToFormat) {
 }
 
 /**
- * @param date
+ * @param {Date} date
  *
  * @returns {string}
  */
@@ -230,8 +254,7 @@ function formatDate (date) {
  * @returns {Promise<boolean>}
  */
 async function hasNotificationsFeature (t) {
-    const hasNotificationsFeature = await t.get('member', 'private', dataPrefix + '-disable-notifications');
-    return !hasNotificationsFeature && Notification.permission === 'granted';
+    return !(await t.get('member', 'private', dataPrefix + '-disable-notifications')) && Notification.permission === 'granted';
 }
 
 /**
@@ -291,8 +314,7 @@ async function getNotificationPercentage (t) {
  * @returns {Promise<boolean>}
  */
 async function hasTriggeredNotification (t) {
-    const notificationTriggered = await t.get('card', 'private', dataPrefix + '-notifications-triggered');
-    return !!notificationTriggered;
+    return !!(await t.get('card', 'private', dataPrefix + '-notifications-triggered'));
 }
 
 /**
@@ -357,8 +379,7 @@ async function canTriggerNotification (t) {
  * @returns {Promise<boolean>}
  */
 async function hasEstimateFeature (t) {
-    const hasEstimateFeature = await t.get('board', 'shared', dataPrefix + '-disable-estimate');
-    return !hasEstimateFeature;
+    return !(await t.get('board', 'shared', dataPrefix + '-disable-estimate'));
 }
 
 /**
@@ -447,7 +468,7 @@ async function cardBadges (t) {
  *
  * @param t
  *
- * @returns Array
+ * @returns {Array}
  */
 function cardButtons (t) {
     const items = [
@@ -699,9 +720,9 @@ async function onBoardButtonClick (t) {
  *
  * @param t
  *
- * @returns Array
+ * @returns {Array}
  */
-function boardButtons (t) {
+function boardButtons () {
     return [{
         icon: {
             dark: clockImage,
@@ -753,5 +774,7 @@ module.exports = {
     disableNotificationsFeature,
     hasNotificationsFeature,
     setNotificationPercentage,
-    getNotificationPercentage
+    getNotificationPercentage,
+    clearEstimates,
+    deleteEstimate
 };

@@ -1,11 +1,11 @@
 {
   "name": "activity_timer",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Trello power-up for tracking time spent on cards",
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --output-public-path=/dist/  --mode development --progress --open --hot",
+    "start": "webpack-dev-server --port 8081 --https --cert private.pem --key private.key --mode development --progress --open --hot",
     "build": "webpack --mode production --progress",
     "build-develop": "webpack --mode development --progress"
   },
