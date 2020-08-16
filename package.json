@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --port 8081 --https --cert private.pem --key private.key --mode development --progress --open --hot",
+    "start": "webpack-dev-server --port 8082 --https --cert private.pem --key private.key --mode development --progress --open --hot",
     "build": "webpack --mode production --progress",
     "build-develop": "webpack --mode development --progress"
   },
