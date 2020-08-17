@@ -60,7 +60,7 @@ totalEstimateEl.addEventListener('click', (e) => {
                 }
 
                 return 0;
-            }).forEach((member, memberIndex) => {
+            }).forEach((member) => {
                 const memberEstimates = estimates.filter((estimate) => {
                     return estimate[0] == member.id;
                 });

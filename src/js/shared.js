@@ -1,4 +1,5 @@
 const Ranges = require('./components/ranges.js');
+const Timers = require('./components/timers.js');
 
 const clockImage = 'https://' + window.powerupHost + '/images/clock.svg';
 const estimateImage = 'https://' + window.powerupHost + '/images/estimate.svg';
@@ -111,27 +112,38 @@ async function createEstimate (t, seconds) {
  *
  * @returns {Promise<Ranges>}
  */
-async function getRanges (t, noCurrent) {
+async function getRanges (t, noCurrent, includeAll) {
     noCurrent = noCurrent || false;
+    includeAll = includeAll || false;
 
     const rangesData = await t.get('card', 'shared', dataPrefix + '-ranges', []);
+    const ranges = Ranges.unserialize(rangesData || []);
 
-    if (noCurrent) {
-        return Ranges.unserialize(rangesData);
+    if (!noCurrent) {
+        const timer = (await Timers.getFromContext(t)).getByMember(
+            (await t.member('id')).id
+        );
+
+        if (timer !== null) {
+            ranges.addRange(
+                timer.memberId,
+                timer.start,
+                Math.floor(new Date().getTime() / 1000)
+            );
+        }
+    } else if (includeAll) {
+        const timers = await Timers.getFromContext(t);
+
+        timers.items.forEach((timer) => {
+            ranges.addRange(
+                timer.memberId,
+                timer.start,
+                Math.floor(new Date().getTime() / 1000)
+            );
+        });
     }
 
-    const startTime = await t.get('card', 'private', dataPrefix + '-start');
-    const member = await t.member('id');
-
-    if (startTime) {
-        rangesData.push([
-            member.id,
-            startTime[0],
-            Math.floor((new Date().getTime() / 1000))
-        ]);
-    }
-
-    return Ranges.unserialize(rangesData || '[]');
+    return ranges;
 }
 
 /**
@@ -142,7 +154,9 @@ async function getRanges (t, noCurrent) {
  * @returns {Promise<boolean>}
  */
 async function isRunning (t) {
-    return !!(await t.get('card', 'private', dataPrefix + '-start'));
+    return (await Timers.getFromContext(t)).getByMember(
+        (await t.member('id')).id
+    ) !== null;
 }
 
 /**
@@ -153,8 +167,7 @@ async function isRunning (t) {
  * @returns {Promise<number>}
  */
 async function getTotalSeconds (t) {
-    const ranges = await getRanges(t);
-    return ranges.timeSpent;
+    return (await getRanges(t, true, true)).timeSpent;
 }
 
 /**
@@ -179,12 +192,13 @@ async function getOwnTotalSeconds (t) {
  * @returns {Promise<void>}
  */
 async function startTimer (t) {
-    const data = await t.card('idList');
+    const listId = (await t.card('idList')).idList;
+    const memberId = (await t.member('id')).id;
+    const timers = await Timers.getFromContext(t);
 
-    await t.set('card', 'private', dataPrefix + '-start', [
-        Math.floor((new Date().getTime() / 1000)),
-        data.idList
-    ]);
+    timers.startByMember(memberId, listId);
+
+    await timers.saveForContext(t);
 }
 
 /**
@@ -195,13 +209,21 @@ async function startTimer (t) {
  * @returns {Promise<void>}
  */
 async function stopTimer (t) {
-    const data = await t.get('card', 'private', dataPrefix + '-start');
+    const memberId = (await t.member('id')).id;
+    const timers = await Timers.getFromContext(t);
+    const timer = timers.getByMember(memberId);
+    timers.removeByMember(memberId);
+    await timers.saveForContext(t);
 
-    if (data) {
-        const ranges = await getRanges(t);
+    if (timer !== null) {
+        const ranges = await getRanges(t, true);
+        ranges.addRange(
+            timer.memberId,
+            timer.start,
+            Math.floor(new Date().getTime() / 1000)
+        );
 
-        await t.set('card', 'shared', dataPrefix + '-ranges', ranges.serialize());
-        await t.remove('card', 'private', dataPrefix + '-start');
+        await ranges.saveForContext(t);
     }
 }
 
@@ -213,6 +235,7 @@ async function stopTimer (t) {
 function formatTime (secondsToFormat) {
     const hours = Math.floor(secondsToFormat / 3600);
     const minutes = Math.floor((secondsToFormat % 3600) / 60);
+    const seconds = secondsToFormat % 60;
     const timeFormat = [];
 
     if (hours > 0) {
@@ -221,6 +244,10 @@ function formatTime (secondsToFormat) {
 
     if (minutes > 0) {
         timeFormat.push(minutes + 'm');
+    }
+
+    if (seconds > 0) {
+        timeFormat.push(seconds + 's');
     }
 
     return (timeFormat.length > 0 ? timeFormat.join(' ') : '0m');
@@ -416,7 +443,7 @@ async function cardBadges (t) {
         dynamic: async function () {
             const running = await isRunning(t);
             const time = await getTotalSeconds(t);
-
+            
             const object = {
                 refresh: 60
             };
@@ -426,10 +453,18 @@ async function cardBadges (t) {
                 object.icon = clockImage;
 
                 if (running) {
-                    const startTime = await t.get('card', 'private', dataPrefix + '-start');
-                    const data = await t.card('idList');
+                    const listId = (await t.card('idList')).idList;
+                    let didChangeList = false;
 
-                    if (startTime[1] !== data.idList) {
+                    const timers = await Timers.getFromContext(t);
+                    
+                    timers.items.forEach((timer) => {
+                        if (timer.listId !== listId) {
+                            didChangeList = true;
+                        }
+                    });
+
+                    if (didChangeList) {
                         await stopTimer(t);
                     } else {
                         const shouldTriggerNotification = await canTriggerNotification(t);
@@ -601,7 +636,7 @@ function cardButtons (t) {
                                         confirmText: 'Yes, clear tracked time',
                                         onConfirm: async (t) => {
                                             await t.remove('card', 'shared', dataPrefix + '-ranges');
-                                            await t.remove('card', 'private', dataPrefix + '-start');
+                                            await t.remove('card', 'shared', dataPrefix + '-running');
                                             await t.closePopup();
                                         },
                                         confirmStyle: 'danger',
@@ -626,7 +661,7 @@ function cardButtons (t) {
                 return t.popup({
                     title: 'Time spent',
                     items: async function (t) {
-                        const ranges = await getRanges(t, true);
+                        const ranges = await getRanges(t, true, true);
                         const items = [];
 
                         let board = await t.board('members');
