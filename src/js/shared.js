@@ -1,5 +1,5 @@
 const Ranges = require('./components/ranges.js');
-const Range = require('./components/range.js');
+const Timers = require('./components/timers.js');
 
 const clockImage = 'https://' + window.powerupHost + '/images/clock.svg';
 const estimateImage = 'https://' + window.powerupHost + '/images/estimate.svg';
@@ -17,6 +17,31 @@ const appName = 'Activity timer';
  */
 async function getEstimates (t) {
     return await t.get('card', 'shared', dataPrefix + '-estimates', []);
+}
+
+/**
+ * Clear estimates.
+ *
+ * @returns {Promise<void>}
+ */
+async function clearEstimates (t) {
+    return await t.remove('card', 'shared', dataPrefix + '-estimates');
+}
+
+/**
+ * Delete an estimate.
+ *
+ * @param {*} t 
+ * @param {string} memberId 
+ * 
+ * @returns {Promise<void>}
+ */
+async function deleteEstimate (t, memberId) {
+    const estimates = (await getEstimates(t)).filter((estimate) => {
+        return Array.isArray(estimate) && estimate[0] !== memberId;
+    });
+
+    await t.set('card', 'shared', dataPrefix + '-estimates', estimates);
 }
 
 /**
@@ -63,7 +88,7 @@ async function getTotalEstimate (t) {
  * estimates made by same user.
  *
  * @param t
- * @param seconds
+ * @param {number} seconds
  *
  * @returns {Promise<void>}
  */
@@ -83,31 +108,42 @@ async function createEstimate (t, seconds) {
  * Get all tracked ranges.
  *
  * @param t
- * @param noCurrent
+ * @param {boolean|undefined} noCurrent
  *
  * @returns {Promise<Ranges>}
  */
-async function getRanges (t, noCurrent) {
+async function getRanges (t, noCurrent, includeAll) {
     noCurrent = noCurrent || false;
+    includeAll = includeAll || false;
 
     const rangesData = await t.get('card', 'shared', dataPrefix + '-ranges', []);
+    const ranges = Ranges.unserialize(rangesData || []);
 
-    if (noCurrent) {
-        return Ranges.unserialize(rangesData);
+    if (!noCurrent) {
+        const timer = (await Timers.getFromContext(t)).getByMember(
+            (await t.member('id')).id
+        );
+
+        if (timer !== null) {
+            ranges.addRange(
+                timer.memberId,
+                timer.start,
+                Math.floor(new Date().getTime() / 1000)
+            );
+        }
+    } else if (includeAll) {
+        const timers = await Timers.getFromContext(t);
+
+        timers.items.forEach((timer) => {
+            ranges.addRange(
+                timer.memberId,
+                timer.start,
+                Math.floor(new Date().getTime() / 1000)
+            );
+        });
     }
 
-    const startTime = await t.get('card', 'private', dataPrefix + '-start');
-    const member = await t.member('id');
-
-    if (startTime) {
-        rangesData.push([
-            member.id,
-            startTime[0],
-            Math.floor((new Date().getTime() / 1000))
-        ]);
-    }
-
-    return Ranges.unserialize(rangesData || '[]');
+    return ranges;
 }
 
 /**
@@ -118,7 +154,9 @@ async function getRanges (t, noCurrent) {
  * @returns {Promise<boolean>}
  */
 async function isRunning (t) {
-    return !!(await t.get('card', 'private', dataPrefix + '-start'));
+    return (await Timers.getFromContext(t)).getByMember(
+        (await t.member('id')).id
+    ) !== null;
 }
 
 /**
@@ -129,8 +167,7 @@ async function isRunning (t) {
  * @returns {Promise<number>}
  */
 async function getTotalSeconds (t) {
-    const ranges = await getRanges(t);
-    return ranges.timeSpent;
+    return (await getRanges(t, true, true)).timeSpent;
 }
 
 /**
@@ -155,12 +192,38 @@ async function getOwnTotalSeconds (t) {
  * @returns {Promise<void>}
  */
 async function startTimer (t) {
-    const data = await t.card('idList');
+    const listId = (await t.card('idList')).idList;
+    const memberId = (await t.member('id')).id;
+    const timers = await Timers.getFromContext(t);
 
-    await t.set('card', 'private', dataPrefix + '-start', [
-        Math.floor((new Date().getTime() / 1000)),
-        data.idList
-    ]);
+    (await t.cards('all')).forEach(async (card) => {
+        const cardTimers = await Timers.getFromCardId(t, card.id);
+        const timer = cardTimers.getByMember(memberId);
+
+        if (timer !== null) {
+            const rangesData = await t.get(card.id, 'shared', dataPrefix + '-ranges', []);
+            const ranges = Ranges.unserialize(rangesData || []);
+
+            ranges.addRange(
+                timer.memberId,
+                timer.start,
+                Math.floor(new Date().getTime() / 1000)
+            );
+    
+            await ranges.saveByCardId(t, card.id)
+
+            cardTimers.removeByMember(memberId);
+            await cardTimers.saveByCardId(t, card.id);
+        }
+        
+        if (cardTimers.removeByMember(memberId)) {
+            cardTimers.saveByCardId(t, card.id);
+        }
+    });
+
+    timers.startByMember(memberId, listId);
+
+    await timers.saveForContext(t);
 }
 
 /**
@@ -171,24 +234,35 @@ async function startTimer (t) {
  * @returns {Promise<void>}
  */
 async function stopTimer (t) {
-    const data = await t.get('card', 'private', dataPrefix + '-start');
+    const memberId = (await t.member('id')).id;
+    const timers = await Timers.getFromContext(t);
+    const timer = timers.getByMember(memberId);
+    timers.removeByMember(memberId);
+    await timers.saveForContext(t);
 
-    if (data) {
-        const ranges = await getRanges(t);
+    if (timer !== null) {
+        const ranges = await getRanges(t, true);
+        ranges.addRange(
+            timer.memberId,
+            timer.start,
+            Math.floor(new Date().getTime() / 1000)
+        );
 
-        await t.set('card', 'shared', dataPrefix + '-ranges', ranges.serialize());
-        await t.remove('card', 'private', dataPrefix + '-start');
+        await ranges.saveForContext(t);
     }
 }
 
 /**
- * @param secondsToFormat
+ * @param {number} secondsToFormat
  *
  * @returns {string}
  */
-function formatTime (secondsToFormat) {
+function formatTime (secondsToFormat, allowSeconds) {
+    allowSeconds = allowSeconds || false;
+
     const hours = Math.floor(secondsToFormat / 3600);
     const minutes = Math.floor((secondsToFormat % 3600) / 60);
+    const seconds = secondsToFormat % 60;
     const timeFormat = [];
 
     if (hours > 0) {
@@ -199,11 +273,15 @@ function formatTime (secondsToFormat) {
         timeFormat.push(minutes + 'm');
     }
 
+    if (allowSeconds && seconds > 0) {
+        timeFormat.push(seconds + 's');
+    }
+
     return (timeFormat.length > 0 ? timeFormat.join(' ') : '0m');
 }
 
 /**
- * @param date
+ * @param {Date} date
  *
  * @returns {string}
  */
@@ -230,8 +308,7 @@ function formatDate (date) {
  * @returns {Promise<boolean>}
  */
 async function hasNotificationsFeature (t) {
-    const hasNotificationsFeature = await t.get('member', 'private', dataPrefix + '-disable-notifications');
-    return !hasNotificationsFeature && Notification.permission === 'granted';
+    return !(await t.get('member', 'private', dataPrefix + '-disable-notifications')) && Notification.permission === 'granted';
 }
 
 /**
@@ -291,8 +368,7 @@ async function getNotificationPercentage (t) {
  * @returns {Promise<boolean>}
  */
 async function hasTriggeredNotification (t) {
-    const notificationTriggered = await t.get('card', 'private', dataPrefix + '-notifications-triggered');
-    return !!notificationTriggered;
+    return !!(await t.get('card', 'private', dataPrefix + '-notifications-triggered'));
 }
 
 /**
@@ -357,8 +433,7 @@ async function canTriggerNotification (t) {
  * @returns {Promise<boolean>}
  */
 async function hasEstimateFeature (t) {
-    const hasEstimateFeature = await t.get('board', 'shared', dataPrefix + '-disable-estimate');
-    return !hasEstimateFeature;
+    return !(await t.get('board', 'shared', dataPrefix + '-disable-estimate'));
 }
 
 /**
@@ -391,40 +466,72 @@ async function enableEstimateFeature (t) {
  * @returns {Promise<Array>}
  */
 async function cardBadges (t) {
-    const items = [{
-        dynamic: async function () {
-            const running = await isRunning(t);
-            const time = await getTotalSeconds(t);
+    const items = [
+        // Current time tracked badge
+        {
+            dynamic: async function () {
+                const running = await isRunning(t);
+                const time = await getTotalSeconds(t);
+                
+                const object = {
+                    refresh: 60
+                };
 
-            const object = {
-                refresh: 60
-            };
+                if (time !== 0 || running) {
+                    object.text = formatTime(time);
+                    object.icon = clockImage;
 
-            if (time !== 0 || running) {
-                object.text = formatTime(time);
-                object.icon = clockImage;
+                    if (running) {
+                        const listId = (await t.card('idList')).idList;
+                        let didChangeList = false;
 
-                if (running) {
-                    const startTime = await t.get('card', 'private', dataPrefix + '-start');
-                    const data = await t.card('idList');
+                        const timers = await Timers.getFromContext(t);
+                        
+                        timers.items.forEach((timer) => {
+                            if (timer.listId !== listId) {
+                                didChangeList = true;
+                            }
+                        });
 
-                    if (startTime[1] !== data.idList) {
-                        await stopTimer(t);
-                    } else {
-                        const shouldTriggerNotification = await canTriggerNotification(t);
+                        if (didChangeList) {
+                            await stopTimer(t);
+                        } else {
+                            const shouldTriggerNotification = await canTriggerNotification(t);
 
-                        if (shouldTriggerNotification) {
-                            await triggerNotification(t);
+                            if (shouldTriggerNotification) {
+                                await triggerNotification(t);
+                            }
+
+                            object.color = 'red';
                         }
-
-                        object.color = 'red';
                     }
                 }
-            }
 
-            return object;
+                return object;
+            }
+        },
+        // Others tracking badge
+        {
+            dynamic: async function () {
+                const memberId = (await t.member('id')).id;
+                const running = (await Timers.getFromContext(t)).items.filter((item) => {
+                    return item.memberId !== memberId;
+                }).length > 0;
+
+
+                const object = {
+                    refresh: 60
+                };
+
+                if (running) {
+                    object.icon = clockImage;
+                    object.color = 'blue';
+                }
+
+                return object;
+            }
         }
-    }];
+    ];
 
     const hasEstimateVar = await hasEstimateFeature(t);
 
@@ -447,7 +554,7 @@ async function cardBadges (t) {
  *
  * @param t
  *
- * @returns Array
+ * @returns {Array}
  */
 function cardButtons (t) {
     const items = [
@@ -580,7 +687,7 @@ function cardButtons (t) {
                                         confirmText: 'Yes, clear tracked time',
                                         onConfirm: async (t) => {
                                             await t.remove('card', 'shared', dataPrefix + '-ranges');
-                                            await t.remove('card', 'private', dataPrefix + '-start');
+                                            await t.remove('card', 'shared', dataPrefix + '-running');
                                             await t.closePopup();
                                         },
                                         confirmStyle: 'danger',
@@ -605,7 +712,7 @@ function cardButtons (t) {
                 return t.popup({
                     title: 'Time spent',
                     items: async function (t) {
-                        const ranges = await getRanges(t, true);
+                        const ranges = await getRanges(t, true, true);
                         const items = [];
 
                         let board = await t.board('members');
@@ -699,9 +806,9 @@ async function onBoardButtonClick (t) {
  *
  * @param t
  *
- * @returns Array
+ * @returns {Array}
  */
-function boardButtons (t) {
+function boardButtons () {
     return [{
         icon: {
             dark: clockImage,
@@ -753,5 +860,7 @@ module.exports = {
     disableNotificationsFeature,
     hasNotificationsFeature,
     setNotificationPercentage,
-    getNotificationPercentage
+    getNotificationPercentage,
+    clearEstimates,
+    deleteEstimate
 };

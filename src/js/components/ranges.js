@@ -1,6 +1,9 @@
 const Range = require('./range.js');
 
 module.exports = class Ranges {
+    /**
+     * @var Range[]
+     */
     _items = [];
 
     /**
@@ -67,7 +70,7 @@ module.exports = class Ranges {
     }
 
     /**
-     * @param t
+     * @param {*} t
      *
      * @returns {Promise<void>}
      */
@@ -75,6 +78,19 @@ module.exports = class Ranges {
         await t.set('card', 'shared', 'act-timer-ranges', this.serialize());
     }
 
+    /**
+     * @param {*} t
+     * @param {string} cardId
+     *
+     * @returns {Promise<void>}
+     */
+    async saveByCardId (t, cardId) {
+        await t.set(cardId, 'shared', 'act-timer-ranges', this.serialize());
+    }
+
+    /**
+     * @returns {number}
+     */
     get timeSpent () {
         let time = 0;
 
@@ -85,6 +101,9 @@ module.exports = class Ranges {
         return time;
     }
 
+    /**
+     * @returns {Range[]}
+     */
     get items () {
         return this._items;
     }

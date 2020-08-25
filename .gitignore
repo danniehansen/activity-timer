@@ -1,2 +1,7 @@
 node_modules
 dist
+private.crt
+private.csr
+private.key
+private.pem
+.idea
