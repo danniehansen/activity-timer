@@ -195,7 +195,7 @@ async function exportCsv () {
                             item.card.name,
                             item.card.labels.map((label) => label.name).join(', '),
                             name,
-                            formatTime(rangesByMember[memberId]),
+                            formatTime(rangesByMember[memberId], true),
                             rangesByMember[memberId]
                         ]);
                     }
