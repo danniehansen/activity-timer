@@ -464,48 +464,73 @@ async function enableEstimateFeature (t) {
  * @returns {Promise<Array>}
  */
 async function cardBadges (t) {
-    const items = [{
-        dynamic: async function () {
-            const running = await isRunning(t);
-            const time = await getTotalSeconds(t);
-            
-            const object = {
-                refresh: 60
-            };
+    const items = [
+        // Current time tracked badge
+        {
+            dynamic: async function () {
+                const running = await isRunning(t);
+                const time = await getTotalSeconds(t);
+                
+                const object = {
+                    refresh: 60
+                };
 
-            if (time !== 0 || running) {
-                object.text = formatTime(time);
-                object.icon = clockImage;
+                if (time !== 0 || running) {
+                    object.text = formatTime(time);
+                    object.icon = clockImage;
 
-                if (running) {
-                    const listId = (await t.card('idList')).idList;
-                    let didChangeList = false;
+                    if (running) {
+                        const listId = (await t.card('idList')).idList;
+                        let didChangeList = false;
 
-                    const timers = await Timers.getFromContext(t);
-                    
-                    timers.items.forEach((timer) => {
-                        if (timer.listId !== listId) {
-                            didChangeList = true;
+                        const timers = await Timers.getFromContext(t);
+                        
+                        timers.items.forEach((timer) => {
+                            if (timer.listId !== listId) {
+                                didChangeList = true;
+                            }
+                        });
+
+                        if (didChangeList) {
+                            await stopTimer(t);
+                        } else {
+                            const shouldTriggerNotification = await canTriggerNotification(t);
+
+                            if (shouldTriggerNotification) {
+                                await triggerNotification(t);
+                            }
+
+                            object.color = 'red';
                         }
-                    });
-
-                    if (didChangeList) {
-                        await stopTimer(t);
-                    } else {
-                        const shouldTriggerNotification = await canTriggerNotification(t);
-
-                        if (shouldTriggerNotification) {
-                            await triggerNotification(t);
-                        }
-
-                        object.color = 'red';
                     }
                 }
-            }
 
-            return object;
+                return object;
+            }
+        },
+        // Others tracking badge
+        {
+            dynamic: async function () {
+                const memberId = (await t.member('id')).id;
+                const running = (await Timers.getFromContext(t)).items.filter((item) => {
+                    console.log('item:', item);
+                    return item.memberId !== memberId;
+                }).length > 0;
+
+
+                const object = {
+                    refresh: 60
+                };
+
+                if (running) {
+                    object.icon = clockImage;
+                    object.color = 'blue';
+                }
+
+                return object;
+            }
         }
-    }];
+    ];
 
     const hasEstimateVar = await hasEstimateFeature(t);
 
