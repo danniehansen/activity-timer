@@ -9,7 +9,7 @@ module.exports = class Timers {
     /**
      * Timers constructor.
      *
-     * @param timers
+     * @param {*} timers
      */
     constructor(timers) {
         if (timers) {
@@ -33,7 +33,7 @@ module.exports = class Timers {
     /**
      * Delete by index.
      *
-     * @param index
+     * @param {number} index
      */
     deleteByIndex (index) {
         this.items.splice(index, 1);
@@ -51,12 +51,22 @@ module.exports = class Timers {
     }
 
     /**
-     * @param t
+     * @param {*} t
      *
      * @returns {Promise<void>}
      */
     async saveForContext (t) {
         await t.set('card', 'shared', 'act-timer-running', this.serialize());
+    }
+
+    /**
+     * @param {*} t
+     * @param {string} cardId
+     *
+     * @returns {Promise<void>}
+     */
+    async saveByCardId (t, cardId) {
+        await t.set(cardId, 'shared', 'act-timer-running', this.serialize());
     }
 
     /**
@@ -75,13 +85,22 @@ module.exports = class Timers {
 
     /**
      * Remove timer by member id.
+     * 
+     * Returns true/false depending on if a active
+     * timer was actually removed.
      *
-     * @param {string} memberId 
+     * @param {string} memberId
+     * 
+     * @returns {boolean}
      */
     removeByMember (memberId) {
+        const lengthBefore = this._items.length;
+
         this._items = this._items.filter((item) => {
             return item.memberId !== memberId;
         });
+
+        return this._items.length !== lengthBefore;
     }
 
     /**
@@ -108,7 +127,7 @@ module.exports = class Timers {
     /**
      * Unserialize raw data into Timers instances.
      *
-     * @param data
+     * @param {*} data
      *
      * @returns {Timers}
      */
@@ -125,5 +144,17 @@ module.exports = class Timers {
      */
     static async getFromContext (t) {
         return Timers.unserialize((await t.get('card', 'shared', 'act-timer-running', [])));
+    }
+
+    /**
+     * Get Timers instance from context.
+     *
+     * @param {*} t
+     * @param {string} cardId
+     * 
+     * @returns {Promise<Timers>}
+     */
+    static async getFromCardId (t, cardId) {
+        return Timers.unserialize((await t.get(cardId, 'shared', 'act-timer-running', [])));
     }
 }
