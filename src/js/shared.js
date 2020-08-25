@@ -196,6 +196,31 @@ async function startTimer (t) {
     const memberId = (await t.member('id')).id;
     const timers = await Timers.getFromContext(t);
 
+    (await t.cards('all')).forEach(async (card) => {
+        const cardTimers = await Timers.getFromCardId(t, card.id);
+        const timer = cardTimers.getByMember(memberId);
+
+        if (timer !== null) {
+            const rangesData = await t.get(card.id, 'shared', dataPrefix + '-ranges', []);
+            const ranges = Ranges.unserialize(rangesData || []);
+
+            ranges.addRange(
+                timer.memberId,
+                timer.start,
+                Math.floor(new Date().getTime() / 1000)
+            );
+    
+            await ranges.saveByCardId(t, card.id)
+
+            cardTimers.removeByMember(memberId);
+            await cardTimers.saveByCardId(t, card.id);
+        }
+        
+        if (cardTimers.removeByMember(memberId)) {
+            cardTimers.saveByCardId(t, card.id);
+        }
+    });
+
     timers.startByMember(memberId, listId);
 
     await timers.saveForContext(t);

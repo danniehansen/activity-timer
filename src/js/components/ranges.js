@@ -70,12 +70,22 @@ module.exports = class Ranges {
     }
 
     /**
-     * @param t
+     * @param {*} t
      *
      * @returns {Promise<void>}
      */
     async saveForContext (t) {
         await t.set('card', 'shared', 'act-timer-ranges', this.serialize());
+    }
+
+    /**
+     * @param {*} t
+     * @param {string} cardId
+     *
+     * @returns {Promise<void>}
+     */
+    async saveByCardId (t, cardId) {
+        await t.set(cardId, 'shared', 'act-timer-ranges', this.serialize());
     }
 
     /**
