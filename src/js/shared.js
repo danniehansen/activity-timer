@@ -513,7 +513,6 @@ async function cardBadges (t) {
             dynamic: async function () {
                 const memberId = (await t.member('id')).id;
                 const running = (await Timers.getFromContext(t)).items.filter((item) => {
-                    console.log('item:', item);
                     return item.memberId !== memberId;
                 }).length > 0;
 

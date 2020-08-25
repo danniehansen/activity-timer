@@ -2,6 +2,7 @@ require('../../sass/main.scss');
 require('../../sass/history.scss');
 
 const { apiKey, appName, formatTime } = require('../shared.js');
+const { ExportToCsv } = require('export-to-csv');
 
 const t = window.TrelloPowerUp.iframe({
     appKey: apiKey,
@@ -38,11 +39,15 @@ class Card {
     id = null;
     ranges = null;
     labels = null;
+    name = null;
+    closed = null;
 
     constructor(data) {
         this.id = data.id;
         this.ranges = [];
         this.labels = data.labels || [];
+        this.name = data.name;
+        this.closed = data.closed;
 
         if (typeof data.pluginData !== 'undefined') {
             data.pluginData.forEach((pluginData) => {
@@ -89,7 +94,7 @@ async function fetchData () {
         const token = await t.getRestApi().getToken();
         const board = await t.board('id');
 
-        const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,labels,pluginData,closed&key=' + apiKey + '&token=' + token + '&r=' + new Date().getTime());
+        const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,name,labels,pluginData,closed&key=' + apiKey + '&token=' + token + '&r=' + new Date().getTime());
         const json = await data.json();
 
         const cards = json.map((item) => {
@@ -141,6 +146,76 @@ async function fetchData () {
     }
 
     return dataCache;
+}
+
+let lastResultRenderCards = [];
+
+function processRow (row) {
+    var finalVal = '';
+    for (var j = 0; j < row.length; j++) {
+        var innerValue = row[j] === null ? '' : row[j].toString();
+        if (row[j] instanceof Date) {
+            innerValue = row[j].toLocaleString();
+        };
+        var result = innerValue.replace(/"/g, '""');
+        if (result.search(/("|,|\n)/g) >= 0)
+            result = '"' + result + '"';
+        if (j > 0)
+            finalVal += ';';
+        finalVal += result;
+    }
+    return finalVal;
+};
+
+async function exportCsv () {
+    const rows = [
+        ['Card name', 'Card labels (comma separated)', 'Member name', 'Time (formatted)', 'Time (in seconds)'],
+    ];
+
+
+    if (lastResultRenderCards.length > 0 && typeof dataCache.membersById !== 'undefined') {
+        lastResultRenderCards.forEach((item) => {
+            const rangesByMember = {};
+
+            item.ranges.forEach((range) => {
+                rangesByMember[range.memberId] = rangesByMember[range.memberId] || 0;
+                rangesByMember[range.memberId] += range.getTimeSpend();
+            });
+
+            if (Object.keys(rangesByMember).length > 0) {
+                for (let memberId in rangesByMember) {
+                    if (typeof dataCache.membersById[memberId] !== 'undefined') {
+                        let name = dataCache.membersById[memberId].fullName || dataCache.membersById[memberId].username;
+
+                        if (name !== dataCache.membersById[memberId].username) {
+                            name += ' (' + dataCache.membersById[memberId].username + ')';
+                        }
+
+                        rows.push([
+                            item.card.name,
+                            item.card.labels.map((label) => label.name).join(', '),
+                            name,
+                            formatTime(rangesByMember[memberId]),
+                            rangesByMember[memberId]
+                        ]);
+                    }
+                }
+            }
+        });
+    }
+
+    const options = { 
+        fieldSeparator: ',',
+        quoteStrings: '"',
+        decimalSeparator: '.',
+        showLabels: true,
+        useTextFile: false,
+        filename: 'activity-timer',
+        useBom: true
+      };
+     
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(rows);
 }
 
 /**
@@ -256,9 +331,15 @@ async function analyticsRenderer () {
     labelsEl.appendChild(labelsFragment);
 
     const timeSpentByMember = {};
+    lastResultRenderCards = [];
 
     processedData.cards.forEach((card) => {
         if (selectedLabels.length === 0 || card.hasEitherLabels(selectedLabels)) {
+            const resultItem = {
+                card,
+                ranges: []
+            };
+
             card.ranges.forEach((range) => {
                 if (selectedMembers.length === 0 || selectedMembers.indexOf(range.memberId) !== -1) {
                     if (
@@ -281,6 +362,8 @@ async function analyticsRenderer () {
                         return;
                     }
 
+                    resultItem.ranges.push(range);
+
                     if (typeof timeSpentByMember[range.memberId] === 'undefined') {
                         timeSpentByMember[range.memberId] = 0;
                     }
@@ -288,6 +371,10 @@ async function analyticsRenderer () {
                     timeSpentByMember[range.memberId] += range.getTimeSpend();
                 }
             });
+
+            if (resultItem.ranges.length > 0) {
+                lastResultRenderCards.push(resultItem);
+            }
         }
     });
 
@@ -315,6 +402,14 @@ async function analyticsRenderer () {
     }
 
     resultsEl.appendChild(resultsFragment);
+
+    if (lastResultRenderCards.length > 0) {
+        const button = document.createElement('button');
+        button.className = 'mod-primary';
+        button.textContent = 'Export to CSV';
+        button.addEventListener('click', exportCsv);
+        resultsEl.appendChild(button);
+    }
 
     wrapperEl.style.display = 'block';
     loaderEl.style.display = 'none';
