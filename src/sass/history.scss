@@ -1,6 +1,7 @@
 body {
   min-height: 375px;
   position: relative;
+  overflow: auto !important;
 }
 
 .wrapper {
@@ -17,13 +18,18 @@ body {
   flex-grow: 1;
   flex-shrink: 1;
   flex-basis: 0;
+  margin-left: 8px;
+
+  &:first-child {
+    margin-left: 0;
+  }
 }
 
 .labels,
 .members {
   max-height: 190px;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   &::-webkit-scrollbar {
     width: 3px;
