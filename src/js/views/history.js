@@ -16,6 +16,8 @@ const dateFrom = document.getElementById('date-from');
 const dateTo = document.getElementById('date-to');
 const loaderEl = document.querySelector('.loader');
 const wrapperEl = document.querySelector('.wrapper');
+const authorizeEl = document.querySelector('.authorize');
+const authorizeBtnEl = document.querySelector('.authorize-btn');
 
 let dataCache = null;
 
@@ -84,6 +86,18 @@ class Card {
     }
 }
 
+async function authorizeClickHandler () {
+    await t.getRestApi().authorize({
+        scope: 'read',
+        expiration: '30days'
+    });
+
+    authorizeEl.style.display = 'none';
+    loaderEl.style.display = 'block';
+
+    await analyticsRenderer();
+}
+
 /**
  * Fetch data & process it.
  *
@@ -93,9 +107,18 @@ async function fetchData () {
     if (dataCache == null) {
         const token = await t.getRestApi().getToken();
         const board = await t.board('id');
+        let json;
 
-        const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,name,labels,pluginData,closed&key=' + apiKey + '&token=' + token + '&r=' + new Date().getTime());
-        const json = await data.json();
+        try {
+            const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,name,labels,pluginData,closed&key=' + apiKey + '&token=' + token + '&r=' + new Date().getTime());
+            json = await data.json();
+        } catch (e) {
+            loaderEl.style.display = 'none';
+            authorizeEl.style.display = 'block';
+            authorizeBtnEl.addEventListener('click', authorizeClickHandler);
+
+            return;
+        }
 
         const cards = json.map((item) => {
             return new Card(item);
@@ -419,8 +442,6 @@ async function analyticsRenderer () {
 
 ;(async () => {
     const isAuthorized = await t.getRestApi().isAuthorized();
-    const authorizeEl = document.querySelector('.authorize');
-    const authorizeBtnEl = document.querySelector('.authorize-btn');
 
     dateFrom.addEventListener('change', analyticsRenderer);
     dateTo.addEventListener('change', analyticsRenderer);
@@ -430,19 +451,7 @@ async function analyticsRenderer () {
         await analyticsRenderer();
     } else {
         authorizeEl.style.display = 'block';
-        authorizeBtnEl.addEventListener('click', async () => {
-            if (!isAuthorized) {
-                await t.getRestApi().authorize({
-                    scope: 'read',
-                    expiration: '30days'
-                });
-
-                authorizeEl.style.display = 'none';
-                loaderEl.style.display = 'block';
-
-                await analyticsRenderer();
-            }
-        });
+        authorizeBtnEl.addEventListener('click', authorizeClickHandler);
     }
 
     t.render(async () => {
