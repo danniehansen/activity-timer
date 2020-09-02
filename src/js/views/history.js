@@ -87,6 +87,12 @@ class Card {
 }
 
 async function authorizeClickHandler () {
+    try {
+        await t.getRestApi().clearToken();
+    } catch (e) {
+        // Ignore exceptions in case no token exists
+    }
+
     await t.getRestApi().authorize({
         scope: 'read',
         expiration: '30days'
@@ -249,6 +255,12 @@ async function exportCsv () {
 async function analyticsRenderer () {
     // Fetch processed trello data
     const processedData = await fetchData();
+
+    // If no data processed data was returned by fetchData - ignore rendering.
+    // This typically happens when token expires and we need to re-fetch.
+    if (!processedData) {
+        return;
+    }
 
     // Construct fragments
     const membersFragment = document.createDocumentFragment();
