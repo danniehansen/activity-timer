@@ -380,8 +380,8 @@ async function analyticsRenderer () {
                     if (
                         dateFromFilter !== null &&
                         !(
-                            dateFromFilter <= range.startTime ||
-                            dateFromFilter <= range.endTime
+                            dateFromFilter <= range.start ||
+                            dateFromFilter <= range.end
                         )
                     ) {
                         return;
@@ -390,8 +390,8 @@ async function analyticsRenderer () {
                     if (
                         dateToFilter !== null &&
                         !(
-                            dateToFilter >= range.startTime ||
-                            dateToFilter >= range.endTime
+                            dateToFilter >= range.start ||
+                            dateToFilter >= range.end
                         )
                     ) {
                         return;
