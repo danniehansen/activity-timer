@@ -3,6 +3,7 @@ require('../../sass/history.scss');
 
 const { apiKey, appName, formatTime } = require('../shared.js');
 const { ExportToCsv } = require('export-to-csv');
+const Range = require('../components/range');
 
 const t = window.TrelloPowerUp.iframe({
     appKey: apiKey,
@@ -21,27 +22,12 @@ const authorizeBtnEl = document.querySelector('.authorize-btn');
 
 let dataCache = null;
 
-class Range {
-    memberId = null;
-    startTime = null;
-    endTime = null;
-
-    constructor(data) {
-        this.memberId = data[0];
-        this.startTime = data[1];
-        this.endTime = data[2];
-    }
-
-    getTimeSpend () {
-        return this.endTime - this.startTime;
-    }
-}
-
 class Card {
     id = null;
     ranges = null;
     labels = null;
     name = null;
+    description = null;
     closed = null;
 
     constructor(data) {
@@ -50,6 +36,7 @@ class Card {
         this.labels = data.labels || [];
         this.name = data.name;
         this.closed = data.closed;
+        this.description = data.desc;
 
         if (typeof data.pluginData !== 'undefined') {
             data.pluginData.forEach((pluginData) => {
@@ -61,7 +48,7 @@ class Card {
                         pluginData.value['act-timer-ranges'].length > 0
                     ) {
                         pluginData.value['act-timer-ranges'].forEach((range) => {
-                            this.ranges.push(new Range(range));
+                            this.ranges.push(new Range(range[0], range[1], range[2]));
                         });
                     }
                 }
@@ -116,7 +103,7 @@ async function fetchData () {
         let json;
 
         try {
-            const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,name,labels,pluginData,closed&key=' + apiKey + '&token=' + token + '&r=' + new Date().getTime());
+            const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,name,desc,labels,pluginData,closed&key=' + apiKey + '&token=' + token + '&r=' + new Date().getTime());
             json = await data.json();
         } catch (e) {
             loaderEl.style.display = 'none';
@@ -208,7 +195,7 @@ async function exportCsv () {
 
             item.ranges.forEach((range) => {
                 rangesByMember[range.memberId] = rangesByMember[range.memberId] || 0;
-                rangesByMember[range.memberId] += range.getTimeSpend();
+                rangesByMember[range.memberId] += range.diff;
             });
 
             if (Object.keys(rangesByMember).length > 0) {
@@ -230,6 +217,75 @@ async function exportCsv () {
                     }
                 }
             }
+        });
+    }
+
+    const options = { 
+        fieldSeparator: ',',
+        quoteStrings: '"',
+        decimalSeparator: '.',
+        showLabels: true,
+        useTextFile: false,
+        filename: 'activity-timer',
+        useBom: true
+      };
+     
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(rows);
+}
+
+function addLeadingZeros(val) {
+    return (val < 10 ? '0' : '') + val;
+}
+
+/**
+ * 
+ * @param {Date} date
+ * 
+ * @returns {string} 
+ */
+function formatDateTime (date) {
+    return date.getFullYear() + '-' +
+        addLeadingZeros((date.getMonth() + 1)) + '-' +
+        addLeadingZeros(date.getDate()) + ' ' +
+        addLeadingZeros(date.getHours()) + ':' +
+        addLeadingZeros(date.getMinutes()) + ':' +
+        addLeadingZeros(date.getSeconds())
+    ;
+}
+
+async function exportFullCsv () {
+    const rows = [
+        ['Card name', 'Card description', 'Card labels (comma separated)', 'Member name', 'Start date and time', 'End date and time', 'Time (formatted)', 'Time (in seconds)'],
+    ];
+
+
+    if (lastResultRenderCards.length > 0 && typeof dataCache.membersById !== 'undefined') {
+        lastResultRenderCards.forEach((item) => {
+            const rangesByMember = {};
+
+            item.ranges.forEach((range) => {
+                const timeSpent = range.diff;
+
+                if (typeof dataCache.membersById[range.memberId] !== 'undefined') {
+                    let name = dataCache.membersById[range.memberId].fullName || dataCache.membersById[range.memberId].username;
+
+                    if (name !== dataCache.membersById[range.memberId].username) {
+                        name += ' (' + dataCache.membersById[range.memberId].username + ')';
+                    }
+
+                    rows.push([
+                        item.card.name,
+                        item.card.description,
+                        item.card.labels.map((label) => label.name).join(', '),
+                        name,
+                        formatDateTime(new Date(range.start * 1000)),
+                        formatDateTime(new Date(range.end * 1000)),
+                        formatTime(timeSpent, true),
+                        timeSpent
+                    ]);
+                }
+            });
         });
     }
 
@@ -403,7 +459,7 @@ async function analyticsRenderer () {
                         timeSpentByMember[range.memberId] = 0;
                     }
 
-                    timeSpentByMember[range.memberId] += range.getTimeSpend();
+                    timeSpentByMember[range.memberId] += range.diff;
                 }
             });
 
@@ -439,11 +495,17 @@ async function analyticsRenderer () {
     resultsEl.appendChild(resultsFragment);
 
     if (lastResultRenderCards.length > 0) {
-        const button = document.createElement('button');
-        button.className = 'mod-primary';
-        button.textContent = 'Export to CSV';
-        button.addEventListener('click', exportCsv);
-        resultsEl.appendChild(button);
+        const exportButton = document.createElement('button');
+        exportButton.className = 'mod-primary';
+        exportButton.textContent = 'Export to CSV';
+        exportButton.addEventListener('click', exportCsv);
+        resultsEl.appendChild(exportButton);
+
+        const exportFullButton = document.createElement('button');
+        exportFullButton.className = 'mod-primary';
+        exportFullButton.textContent = 'Export to CSV (full)';
+        exportFullButton.addEventListener('click', exportFullCsv);
+        resultsEl.appendChild(exportFullButton);
     }
 
     wrapperEl.style.display = 'block';

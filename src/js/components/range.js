@@ -31,17 +31,24 @@ module.exports = class Range {
     }
 
     /**
-     * @returns number
+     * @returns {number}
      */
     get start () {
         return parseInt(this._start, 10);
     }
 
     /**
-     * @returns number
+     * @returns {number}
      */
     get end () {
         return parseInt(this._end, 10);
+    }
+
+    /**
+     * @returns {string}
+     */
+    get memberId () {
+        return this._memberId;
     }
 
     set start (value) {
