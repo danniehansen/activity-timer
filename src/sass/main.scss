@@ -99,3 +99,19 @@ input[type="range"] {
     top: -2px;
   }
 }
+
+.checkbox {
+    padding: 0 0 0 22px;
+    position: relative;
+
+    input {
+        position: absolute;
+        left: 0;
+        top: 2px;
+        margin: 0;
+    }
+}
+
+label {
+    user-select: none;
+}

@@ -66,6 +66,25 @@ async function getOwnEstimate (t) {
 }
 
 /**
+ * Checks if user have stop on move enabled.
+ *
+ * @param t
+ * 
+ * @returns {boolean}
+ */
+async function hasSettingStopOnMove (t) {
+    return (await t.get('member', 'private', dataPrefix + '-personal-settings', 1)) === 1;
+}
+
+/**
+ * @param t
+ * @param {boolean} value 
+ */
+async function setSettingStopOnMove (t, value) {
+    await t.set('member', 'private', dataPrefix + '-personal-settings', value === true ? 1 : 0);
+}
+
+/**
  * Get total estimate time in seconds.
  *
  * @param t
@@ -482,18 +501,21 @@ async function cardBadges (t) {
                     object.icon = clockImage;
 
                     if (running) {
-                        const listId = (await t.card('idList')).idList;
                         let didChangeList = false;
+                        const hasStopOnMove = await hasSettingStopOnMove(t);
 
-                        const timers = await Timers.getFromContext(t);
-                        
-                        timers.items.forEach((timer) => {
-                            if (timer.listId !== listId) {
-                                didChangeList = true;
-                            }
-                        });
+                        if (hasStopOnMove) {
+                            const listId = (await t.card('idList')).idList;
+                            const timers = await Timers.getFromContext(t);
+                            
+                            timers.items.forEach((timer) => {
+                                if (timer.listId !== listId) {
+                                    didChangeList = true;
+                                }
+                            });
+                        }
 
-                        if (didChangeList) {
+                        if (hasStopOnMove && didChangeList) {
                             await stopTimer(t);
                         } else {
                             const shouldTriggerNotification = await canTriggerNotification(t);
@@ -779,6 +801,18 @@ function cardButtons (t) {
         });
     }
 
+    items.push({
+        icon: clockImage,
+        text: 'Settings',
+        callback: async (t) => {
+            return t.popup({
+                title: 'Settings',
+                url: t.signUrl('./personal_settings.html'),
+                height: 85
+            });
+        }
+    });
+
     return items;
 }
 
@@ -877,5 +911,7 @@ module.exports = {
     setNotificationPercentage,
     getNotificationPercentage,
     clearEstimates,
-    deleteEstimate
+    deleteEstimate,
+    hasSettingStopOnMove,
+    setSettingStopOnMove
 };
