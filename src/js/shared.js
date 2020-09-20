@@ -764,18 +764,20 @@ function cardButtons (t) {
         });
     }
 
-    items.push({
-        icon: clockImage,
-        text: 'Clear data',
-        callback: async (t) => {
-            await t.remove('card', 'shared', dataPrefix + '-estimates');
-            await t.remove('card', 'shared', dataPrefix + '-ranges');
-            await t.remove('card', 'private', dataPrefix + '-notifications-triggered');
-            await t.remove('member', 'private', dataPrefix + '-disable-notifications');
-            await t.remove('member', 'private', dataPrefix + '-notifications-percentage')
-            await t.remove('card', 'shared', dataPrefix + '-running');
-        }
-    });
+    if (window.location.href.indexOf('gitpod.io') !== -1) {
+        items.push({
+            icon: clockImage,
+            text: 'Clear data',
+            callback: async (t) => {
+                await t.remove('card', 'shared', dataPrefix + '-estimates');
+                await t.remove('card', 'shared', dataPrefix + '-ranges');
+                await t.remove('card', 'private', dataPrefix + '-notifications-triggered');
+                await t.remove('member', 'private', dataPrefix + '-disable-notifications');
+                await t.remove('member', 'private', dataPrefix + '-notifications-percentage')
+                await t.remove('card', 'shared', dataPrefix + '-running');
+            }
+        });
+    }
 
     return items;
 }
