@@ -626,12 +626,13 @@ function cardButtons (t) {
                                     const start = new Date(range.item.start * 1000);
                                     const end = new Date(range.item.end * 1000);
 									const rangeOnTheSameDay = start.toDateString() === end.toDateString();
+									const rangeLengthInSeconds = range.item.end - range.item.start;
 
                                     const _rangeIndex = range.rangeIndex;
                                     const _range = range;
 
                                     items.push({
-                                        text: formatDate(start) + ' - ' + formatDate(end, rangeOnTheSameDay),
+                                        text: formatDate(start) + ' - ' + formatDate(end, rangeOnTheSameDay) + ' <span class="text-muted">('+ formatTime(rangeLengthInSeconds, false) +')</span>',
                                         callback: function (t) {
                                             return t.popup({
                                                 title: 'Edit time range',
