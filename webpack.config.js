@@ -5,6 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
+  devtool: 'source-map',
   entry: {
     main: ['@babel/polyfill', './src/js/views/main.js'],
     card_back_section: ['@babel/polyfill', './src/js/views/card_back_section.js'],
