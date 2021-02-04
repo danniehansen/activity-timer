@@ -1,3 +1,5 @@
+require('../sentry.js');
+
 const { cardBadges, cardButtons, cardBackSection, boardButtons, showSettings } = require('../shared.js');
 
 window.TrelloPowerUp.initialize({

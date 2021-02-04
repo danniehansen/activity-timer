@@ -1,4 +1,5 @@
 require('../../sass/main.scss');
+require('../sentry.js');
 
 const { getOwnEstimate, createEstimate } = require('../shared.js');
 const t = window.TrelloPowerUp.iframe();
