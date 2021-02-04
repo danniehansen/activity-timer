@@ -1,5 +1,6 @@
 require('../../sass/main.scss');
 require('../../sass/history.scss');
+require('../sentry.js');
 
 const { apiKey, appName, formatTime } = require('../shared.js');
 const { ExportToCsv } = require('export-to-csv');
@@ -220,7 +221,7 @@ async function exportCsv () {
         });
     }
 
-    const options = { 
+    const options = {
         fieldSeparator: ',',
         quoteStrings: '"',
         decimalSeparator: '.',
@@ -229,7 +230,7 @@ async function exportCsv () {
         filename: 'activity-timer',
         useBom: true
       };
-     
+
     const csvExporter = new ExportToCsv(options);
     csvExporter.generateCsv(rows);
 }
@@ -239,10 +240,10 @@ function addLeadingZeros(val) {
 }
 
 /**
- * 
+ *
  * @param {Date} date
- * 
- * @returns {string} 
+ *
+ * @returns {string}
  */
 function formatDateTime (date) {
     return date.getFullYear() + '-' +
@@ -289,7 +290,7 @@ async function exportFullCsv () {
         });
     }
 
-    const options = { 
+    const options = {
         fieldSeparator: ',',
         quoteStrings: '"',
         decimalSeparator: '.',
@@ -298,7 +299,7 @@ async function exportFullCsv () {
         filename: 'activity-timer',
         useBom: true
       };
-     
+
     const csvExporter = new ExportToCsv(options);
     csvExporter.generateCsv(rows);
 }

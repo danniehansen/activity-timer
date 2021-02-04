@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --port 8080 --https --cert private.pem --key private.key --mode development --progress --open --hot",
+    "start": "webpack-dev-server --port 8080 --https --cert private.crt --key private.key --mode development --progress --open --hot",
     "start-pod": "webpack-dev-server --port 8080 --mode development --progress --open --hot",
     "build": "webpack --mode production --progress",
     "build-develop": "webpack --mode development --progress"
@@ -23,7 +23,9 @@
     "webpack-dev-server": "^3.1.10"
   },
   "dependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.10.1",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@sentry/browser": "^6.1.0",
+    "@sentry/tracing": "^6.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^6.0.2",
     "css-loader": "^3.6.0",
