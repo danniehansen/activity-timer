@@ -1,4 +1,5 @@
 require('../../sass/main.scss');
+require('../sentry.js');
 
 const {
     isRunning, getTotalSeconds, formatTime,

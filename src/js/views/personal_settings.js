@@ -1,4 +1,5 @@
 require('../../sass/main.scss');
+require('../sentry.js');
 
 const { setSettingStopOnMove, hasSettingStopOnMove } = require('../shared.js');
 const t = window.TrelloPowerUp.iframe();

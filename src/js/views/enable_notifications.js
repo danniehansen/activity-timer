@@ -1,3 +1,5 @@
+require('../sentry.js');
+
 Notification.requestPermission().then(() => {
     window.close();
 }).catch(() => {
