@@ -305,7 +305,7 @@ function formatTime (secondsToFormat, allowSeconds) {
  * @returns {string}
  */
 function formatDate (date, returnOnlyTimeString) {
-	returnOnlyTimeString = returnOnlyTimeString || false;
+    returnOnlyTimeString = returnOnlyTimeString || false;
 
     const dateStr = [
         date.getFullYear(),
@@ -625,14 +625,14 @@ function cardButtons (t) {
                                 memberRanges.forEach((range) => {
                                     const start = new Date(range.item.start * 1000);
                                     const end = new Date(range.item.end * 1000);
-									const rangeOnTheSameDay = start.toDateString() === end.toDateString();
-									const rangeLengthInSeconds = range.item.end - range.item.start;
+                                    const rangeOnTheSameDay = start.toDateString() === end.toDateString();
+                                    const rangeLengthInSeconds = range.item.end - range.item.start;
 
                                     const _rangeIndex = range.rangeIndex;
                                     const _range = range;
 
                                     items.push({
-                                        text: formatDate(start) + ' - ' + formatDate(end, rangeOnTheSameDay) + ' <span class="text-muted">('+ formatTime(rangeLengthInSeconds, false) +')</span>',
+                                        text: formatDate(start) + ' - ' + formatDate(end, rangeOnTheSameDay) + ' ('+ formatTime(rangeLengthInSeconds, false) +')',
                                         callback: function (t) {
                                             return t.popup({
                                                 title: 'Edit time range',
