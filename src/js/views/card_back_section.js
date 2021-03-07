@@ -150,5 +150,16 @@ t.render(async function() {
     trackedTimeEl.innerHTML = formatTime(totalTime);
     cardEl.style.display = 'block';
 
-    t.sizeTo('body');
+    try {
+        t.sizeTo('body');
+    } catch (e) {
+        // Sometimes body has a height of 0 - wait a little while and try again
+        setTimeout(() => {
+            try {
+                t.sizeTo('body');
+            } catch (e) {
+                // If error persist. Ignore it.
+            }
+        }, 500);
+    }
 });
