@@ -16,7 +16,7 @@ jobs:
       - name: Build
         run: yarn run build
       - name: Deploy
-        run: aws s3 sync dist/ s3://activity-timer --acl public-read
+        run: aws s3 sync dist/ s3://activity-timer --acl public-read --delete
       - name: Clear CF cache
         run: aws cloudfront create-invalidation --distribution-id E3PJH9TOPHL4ZJ --paths "/index.html" "/card_back_section.html" "/history.html" "/change_estimate.html" "/settings.html" "/notifications.html" "/enable_notifications.html"
     env:
