@@ -9,8 +9,14 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', 'UA-169371485-1', { 'anonymize_ip': true });
+
+        setInterval(function () {
+          gtag('event', 'heartbeat', {
+            'event_category': 'Power-up',
+            'event_label': 'Heartbeat'
+          });
+        }, 1000 * 60 * 10);
     </script>
   </head>
   <body>

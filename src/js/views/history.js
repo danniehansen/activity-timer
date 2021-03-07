@@ -475,9 +475,16 @@ async function analyticsRenderer () {
             const resultEl = document.createElement('div');
             resultEl.className = 'result-item';
 
+            const member = dataCache.membersById[memberId] || null;
+
             const usernameEl = document.createElement('div');
             usernameEl.className = 'result-item__username';
-            usernameEl.innerText = (dataCache.membersById[memberId].fullName != dataCache.membersById[memberId].username ? dataCache.membersById[memberId].fullName + ' (' + dataCache.membersById[memberId].username + ')' : dataCache.membersById[memberId].username) + ': ' + formatTime(timeSpentByMember[memberId]);
+            usernameEl.innerText = (member !== null ? (
+                member.fullName !== member.username ?
+                    member.fullName + ' (' + member.username + ')' :
+                    member.username
+            ) : 'N/A') + ': ' + formatTime(timeSpentByMember[memberId]);
+
             resultEl.appendChild(usernameEl);
 
             resultsFragment.appendChild(resultEl);

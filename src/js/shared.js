@@ -31,9 +31,9 @@ async function clearEstimates (t) {
 /**
  * Delete an estimate.
  *
- * @param {*} t 
- * @param {string} memberId 
- * 
+ * @param {*} t
+ * @param {string} memberId
+ *
  * @returns {Promise<void>}
  */
 async function deleteEstimate (t, memberId) {
@@ -69,7 +69,7 @@ async function getOwnEstimate (t) {
  * Checks if user have stop on move enabled.
  *
  * @param t
- * 
+ *
  * @returns {boolean}
  */
 async function hasSettingStopOnMove (t) {
@@ -78,7 +78,7 @@ async function hasSettingStopOnMove (t) {
 
 /**
  * @param t
- * @param {boolean} value 
+ * @param {boolean} value
  */
 async function setSettingStopOnMove (t, value) {
     await t.set('member', 'private', dataPrefix + '-personal-settings', value === true ? 1 : 0);
@@ -228,13 +228,13 @@ async function startTimer (t) {
                 timer.start,
                 Math.floor(new Date().getTime() / 1000)
             );
-    
+
             await ranges.saveByCardId(t, card.id)
 
             cardTimers.removeByMember(memberId);
             await cardTimers.saveByCardId(t, card.id);
         }
-        
+
         if (cardTimers.removeByMember(memberId)) {
             cardTimers.saveByCardId(t, card.id);
         }
@@ -493,7 +493,7 @@ async function cardBadges (t) {
             dynamic: async function () {
                 const running = await isRunning(t);
                 const time = await getTotalSeconds(t);
-                
+
                 const object = {
                     refresh: 60
                 };
@@ -509,7 +509,7 @@ async function cardBadges (t) {
                         if (hasStopOnMove) {
                             const listId = (await t.card('idList')).idList;
                             const timers = await Timers.getFromContext(t);
-                            
+
                             timers.items.forEach((timer) => {
                                 if (timer.listId !== listId) {
                                     didChangeList = true;
@@ -857,8 +857,6 @@ async function onBoardButtonClick (t) {
 
 /**
  * Board button capability handler.
- *
- * @param t
  *
  * @returns {Array}
  */
