@@ -3,6 +3,7 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   devtool: 'source-map',
@@ -21,6 +22,7 @@ module.exports = {
     filename: 'app.bundle.[name].[hash].js'
   },
   plugins: [
+    // new BundleAnalyzerPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].[hash].css',
     }),
