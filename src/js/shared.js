@@ -127,7 +127,8 @@ async function createEstimate (t, seconds) {
  * Get all tracked ranges.
  *
  * @param t
- * @param {boolean|undefined} noCurrent
+ * @param {boolean|undefined} [noCurrent]
+ * @param {boolean|undefined} [includeAll]
  *
  * @returns {Promise<Ranges>}
  */
@@ -147,7 +148,8 @@ async function getRanges (t, noCurrent, includeAll) {
             ranges.addRange(
                 timer.memberId,
                 timer.start,
-                Math.floor(new Date().getTime() / 1000)
+                Math.floor(new Date().getTime() / 1000),
+                true
             );
         }
     } else if (includeAll) {
@@ -157,7 +159,8 @@ async function getRanges (t, noCurrent, includeAll) {
             ranges.addRange(
                 timer.memberId,
                 timer.start,
-                Math.floor(new Date().getTime() / 1000)
+                Math.floor(new Date().getTime() / 1000),
+                true
             );
         });
     }
@@ -261,13 +264,43 @@ async function stopTimer (t) {
 
     if (timer !== null) {
         const ranges = await getRanges(t, true);
+
         ranges.addRange(
             timer.memberId,
             timer.start,
             Math.floor(new Date().getTime() / 1000)
         );
 
-        await ranges.saveForContext(t);
+        try {
+            await ranges.saveForContext(t);
+        } catch (e) {
+            if ((e + '').indexOf('PluginData length of 4096 characters exceeded') !== -1) {
+                const currentTrackings = await getRanges(t, true);
+
+                try {
+                    await currentTrackings.saveForContext(t);
+
+                    t.alert({
+                        message: 'Unable to save new time tracking. Too many exists on the same card.',
+                        duration: 6,
+                    });
+                } catch (e) {
+                    t.alert({
+                        message: 'Unable to save new time tracking. Too many exists on the same card.',
+                        duration: 3,
+                    });
+
+                    throw e;
+                }
+            } else {
+                t.alert({
+                    message: 'Unrecognized error occurred while trying to stop the timer. Post issue on Github for assistance.',
+                    duration: 3,
+                });
+
+                throw e;
+            }
+        }
     }
 }
 
@@ -574,6 +607,75 @@ async function cardBadges (t) {
 }
 
 /**
+ * @param t
+ * @param {Date} [_start]
+ * @param {Date} [_end]
+ */
+function openManuallyAdd(t, _start, _end) {
+    _start = _start || new Date();
+    _end = _end || new Date();
+
+    return t.popup({
+        title: 'Manually add time tracking',
+        items: function (t) {
+            return [
+                {
+                    text: 'Edit start (' + formatDate(_start) + ')',
+                    callback: (t) => {
+                        return t.popup({
+                            type: 'datetime',
+                            title: 'Change start (' + formatDate(_start) + ')',
+                            callback: async function(t, opts) {
+                                openManuallyAdd(t, new Date(opts.date), _end);
+                            },
+                            date: _start
+                        });
+                    }
+                },
+                {
+                    text: 'Edit end (' + formatDate(_end) + ')',
+                    callback: (t) => {
+                        return t.popup({
+                            type: 'datetime',
+                            title: 'Change end (' + formatDate(_start) + ')',
+                            callback: async function(t, opts) {
+                                openManuallyAdd(t, _start, new Date(opts.date));
+                            },
+                            date: _end
+                        });
+                    }
+                },
+                {
+                    text: 'Add',
+                    callback: async (t) => {
+                        // Only save new time tracking if they're different
+                        if (_start.getTime() !== _end.getTime()) {
+                            const member = await t.member('id');
+                            const ranges = await getRanges(t, true);
+
+                            ranges.addRange(
+                                member.id,
+                                Math.floor(new Date(_start).getTime() / 1000),
+                                Math.floor(new Date(_end).getTime() / 1000)
+                            );
+
+                            await ranges.saveForContext(t);
+                        } else {
+                            t.alert({
+                                message: 'Unable to add time tracking. Start & end was the same.',
+                                duration: 3,
+                            });
+                        }
+
+                        return t.closePopup();
+                    }
+                }
+            ];
+        }
+    });
+}
+
+/**
  * Card buttons capability handler.
  *
  * @param t
@@ -589,7 +691,7 @@ function cardButtons (t) {
                 return t.popup({
                     title: 'Manage time',
                     items: async function (t) {
-                        const ranges = await getRanges(t, true);
+                        const ranges = await getRanges(t, true, true);
                         const items = [];
 
                         let board = await t.board('members');
@@ -632,8 +734,12 @@ function cardButtons (t) {
                                     const _range = range;
 
                                     items.push({
-                                        text: formatDate(start) + ' - ' + formatDate(end, rangeOnTheSameDay) + ' ('+ formatTime(rangeLengthInSeconds, false) +')',
+                                        text: `${formatDate(start)} - ${formatDate(end, rangeOnTheSameDay)} (${formatTime(rangeLengthInSeconds, false)})${_range.item.isTracking ? ' (tracking)' : ''}`,
                                         callback: function (t) {
+                                            if (_range.item.isTracking) {
+                                                return;
+                                            }
+
                                             return t.popup({
                                                 title: 'Edit time range',
                                                 items: function (t) {
@@ -702,6 +808,11 @@ function cardButtons (t) {
                         if (items.length > 0) {
                             items.push({
                                 'text': '--------'
+                            });
+
+                            items.push({
+                                'text': 'Add manually',
+                                callback: (t) => openManuallyAdd(t)
                             });
 
                             items.push({

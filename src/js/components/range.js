@@ -2,6 +2,7 @@ module.exports = class Range {
     _memberId;
     _start;
     _end;
+    _tracking;
 
     /**
      * Range constructor.
@@ -9,11 +10,13 @@ module.exports = class Range {
      * @param {string} memberId
      * @param {number} start
      * @param {number} end
+     * @param {boolean|undefined} [isTracking]
      */
-    constructor(memberId, start, end) {
+    constructor(memberId, start, end, isTracking) {
         this._memberId = memberId;
         this._start = start;
         this._end = end;
+        this._tracking = isTracking;
     }
 
     /**
@@ -57,6 +60,10 @@ module.exports = class Range {
 
     set end (value) {
         this._end = value;
+    }
+
+    get isTracking () {
+        return (typeof this._tracking !== 'undefined' ? this._tracking : false);
     }
 
     serialize () {
