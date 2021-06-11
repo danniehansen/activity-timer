@@ -25,9 +25,10 @@ module.exports = class Ranges {
      * @param {string} memberId
      * @param {number} start
      * @param {number} end
+     * @param {boolean|undefined} [isTracking]
      */
-    addRange (memberId, start, end) {
-        this._items.push(new Range(memberId, start, end));
+    addRange (memberId, start, end, isTracking) {
+        this._items.push(new Range(memberId, start, end, isTracking));
     }
 
     /**
