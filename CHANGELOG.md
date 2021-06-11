@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [1.1.6] - 2021-06-11
+### Added
+- Added ability to see other peoples active trackings under 'Manage time'
+### Fixed
+- Fixed issue in Firefox where clicking 'Authorize' nothing happened.
+
 ## [1.1.5] - 2021-03-05
 ### Added
 - Merged UI optimizations for "Manage time" #30 - thanks to @jonez1 for looking into this.
