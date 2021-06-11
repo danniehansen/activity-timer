@@ -9,13 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.6] - 2021-06-11
 ### Added
-- Added ability to see other peoples active trackings under 'Manage time'
+- Added ability to see other peoples active trackings under 'Manage time'. https://github.com/danniehansen/activity-timer/issues/41
+- Added ability to manually add trackings. https://github.com/danniehansen/activity-timer/issues/38
 ### Fixed
-- Fixed issue in Firefox where clicking 'Authorize' nothing happened.
+- Fixed issue in Firefox where clicking 'Authorize' nothing happened. https://github.com/danniehansen/activity-timer/issues/40
+- Fixed issue with plugin responsiveness after exceeding the 4096 character limit. https://github.com/danniehansen/activity-timer/issues/32
 
 ## [1.1.5] - 2021-03-05
 ### Added
-- Merged UI optimizations for "Manage time" #30 - thanks to @jonez1 for looking into this.
+- Merged UI optimizations for "Manage time" https://github.com/danniehansen/activity-timer/pull/30 - thanks to @jonez1 for looking into this.
 
 ## [1.1.4] - 2021-02-04
 ### Added
