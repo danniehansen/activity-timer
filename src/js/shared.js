@@ -127,7 +127,8 @@ async function createEstimate (t, seconds) {
  * Get all tracked ranges.
  *
  * @param t
- * @param {boolean|undefined} noCurrent
+ * @param {boolean|undefined} [noCurrent]
+ * @param {boolean|undefined} [includeAll]
  *
  * @returns {Promise<Ranges>}
  */
@@ -147,7 +148,8 @@ async function getRanges (t, noCurrent, includeAll) {
             ranges.addRange(
                 timer.memberId,
                 timer.start,
-                Math.floor(new Date().getTime() / 1000)
+                Math.floor(new Date().getTime() / 1000),
+                true
             );
         }
     } else if (includeAll) {
@@ -157,7 +159,8 @@ async function getRanges (t, noCurrent, includeAll) {
             ranges.addRange(
                 timer.memberId,
                 timer.start,
-                Math.floor(new Date().getTime() / 1000)
+                Math.floor(new Date().getTime() / 1000),
+                true
             );
         });
     }
@@ -589,7 +592,7 @@ function cardButtons (t) {
                 return t.popup({
                     title: 'Manage time',
                     items: async function (t) {
-                        const ranges = await getRanges(t, true);
+                        const ranges = await getRanges(t, true, true);
                         const items = [];
 
                         let board = await t.board('members');
@@ -632,8 +635,12 @@ function cardButtons (t) {
                                     const _range = range;
 
                                     items.push({
-                                        text: formatDate(start) + ' - ' + formatDate(end, rangeOnTheSameDay) + ' ('+ formatTime(rangeLengthInSeconds, false) +')',
+                                        text: `${formatDate(start)} - ${formatDate(end, rangeOnTheSameDay)} (${formatTime(rangeLengthInSeconds, false)})${_range.item.isTracking ? ' (tracking)' : ''}`,
                                         callback: function (t) {
+                                            if (_range.item.isTracking) {
+                                                return;
+                                            }
+
                                             return t.popup({
                                                 title: 'Edit time range',
                                                 items: function (t) {
