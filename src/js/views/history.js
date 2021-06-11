@@ -75,12 +75,6 @@ class Card {
 }
 
 async function authorizeClickHandler () {
-    try {
-        await t.getRestApi().clearToken();
-    } catch (e) {
-        // Ignore exceptions in case no token exists
-    }
-
     await t.getRestApi().authorize({
         scope: 'read',
         expiration: '30days'
@@ -107,6 +101,12 @@ async function fetchData () {
             const data = await fetch('https://api.trello.com/1/boards/' + board.id + '/cards/all?pluginData=true&fields=id,name,desc,labels,pluginData,closed&key=' + apiKey + '&token=' + token + '&r=' + new Date().getTime());
             json = await data.json();
         } catch (e) {
+            try {
+                await t.getRestApi().clearToken();
+            } catch (e) {
+                // Ignore exceptions in case no token exists
+            }
+
             loaderEl.style.display = 'none';
             authorizeEl.style.display = 'block';
             authorizeBtnEl.addEventListener('click', authorizeClickHandler);
@@ -532,6 +532,12 @@ async function analyticsRenderer () {
         loaderEl.style.display = 'block';
         await analyticsRenderer();
     } else {
+        try {
+            await t.getRestApi().clearToken();
+        } catch (e) {
+            // Ignore exceptions in case no token exists
+        }
+
         authorizeEl.style.display = 'block';
         authorizeBtnEl.addEventListener('click', authorizeClickHandler);
     }
