@@ -1,14 +1,10 @@
 {
   "name": "activity_timer",
-  "version": "1.0.4",
+  "version": "1.1.5",
   "description": "Trello power-up for tracking time spent on cards",
-  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve --port 8080 --https --cert private.crt --key private.key --mode development --progress --open --hot",
-    "start-pod": "webpack serve --port 8080 --mode development --progress --open --hot",
-    "build": "webpack --mode production --progress",
-    "build-develop": "webpack --mode development --progress"
+    "serve": "webpack serve --port 8080 --https --cert private.crt --key private.key --mode development --progress --open --hot",
+    "build": "webpack --mode production --progress"
   },
   "author": "Dannie Hansen",
   "license": "MIT",
