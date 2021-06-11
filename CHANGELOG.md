@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [1.1.5] - 2021-03-05
+### Added
+- Merged UI optimizations for "Manage time" #30 - thanks to @jonez1 for looking into this.
+
+## [1.1.4] - 2021-02-04
+### Added
+- Added sentry for better bug tracking.
+### Changed
+- Updated all packages.
+
+## [1.1.3] - 2020-09-06
+### Added
+- Added new CSV export featuring a full export of all time ranges tracked and not just a total count.
+
+## [1.1.2] - 2020-09-02
+### Fixed
+- Possible fix for invalid token issue when opening 'Activity timer history' view.
+
+## [1.1.1] - 2020-09-01
+### Fixed
+- Fixed issue with 'Activity timer history' not loading when access token from authentication expires or otherwise becomes invalid. Activity timer will now fallback to re-authenticate if any exception occurs.
+
+## [1.1.0] - 2020-08-25
+### Added
+- Deletion of estimates
+- Clear estimates.
+- Shared in-progress trackings so others can see real-time tracking of others as they're tracking.
+- When starting a tracker while already having one running it will now stop the other tracker.
+- Exporting of past tracking through history view.
+- Added a icon that's shown on the card in the list view when other members are tracking on a card.
+
 ## [1.0.4] - 2020-06-22
 ### Added
 - Added power-up settings to toggle estimate feature.
