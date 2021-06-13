@@ -655,34 +655,6 @@ function requestTimerStart (cardId) {
  */
 async function cardBadges (t) {
     const items = [
-        /**
-         * This requires some explaining. Because t.set() for cards require us to have an active card context -
-         * & there being no other way of getting one through the SDK. Then i came up with this "hack" where we
-         * use an empty badge that has a refresh timer of 2 seconds. The badge in it-self doesn't display.
-         * It's just there for allowing us to detect if we need to start the timer for this card.
-         */
-        {
-            dynamic: async function () {
-                if (requestTimerStartId === t.getContext().card) {
-                    requestTimerStartId = null;
-
-                    const listId = (await t.card('idList')).idList;
-                    const autoTimerListId = await getAutoTimerListId(t);
-
-                    // Sometimes websocket events come in a bit late & card might have changed list.
-                    // So we need to validate that it still exists in the list that should auto-trigger the timer.
-                    if (listId !== autoTimerListId) {
-                        return;
-                    }
-
-                    await startTimer(t);
-                }
-
-                return {
-                    refresh: 5
-                };
-            }
-        },
         // Current time tracked badge
         {
             dynamic: async function () {
@@ -751,6 +723,42 @@ async function cardBadges (t) {
             }
         }
     ];
+
+    const hasAutoTimerFeature = await hasAutoTimer(t);
+    const autoTimerListId = await getAutoTimerListId(t);
+
+    if (hasAutoTimerFeature && autoTimerListId) {
+        items.push(
+            /**
+             * This requires some explaining. Because t.set() for cards require us to have an active card context -
+             * & there being no other way of getting one through the SDK. Then i came up with this "hack" where we
+             * use an empty badge that has a refresh timer of 2 seconds. The badge in it-self doesn't display.
+             * It's just there for allowing us to detect if we need to start the timer for this card.
+             */
+            {
+                dynamic: async function () {
+                    if (requestTimerStartId === t.getContext().card) {
+                        requestTimerStartId = null;
+
+                        const listId = (await t.card('idList')).idList;
+                        const autoTimerListId = await getAutoTimerListId(t);
+
+                        // Sometimes websocket events come in a bit late & card might have changed list.
+                        // So we need to validate that it still exists in the list that should auto-trigger the timer.
+                        if (listId !== autoTimerListId) {
+                            return;
+                        }
+
+                        await startTimer(t);
+                    }
+
+                    return {
+                        refresh: 2
+                    };
+                }
+            }
+        );
+    }
 
     const hasEstimateVar = await hasEstimateFeature(t);
 

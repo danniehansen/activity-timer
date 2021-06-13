@@ -33,9 +33,6 @@ if ($h1 !== $h2) {
 
 $client = new \GuzzleHttp\Client();
 
-fwrite($stderr, 'matches? ' . ($h1 === $h2 ? 'yes' : 'no') . "\n\n");
-fwrite($stderr, 'secret: ' . $_ENV['TRELLO_SECRET'] ?? '' . "\n\n");
-
 try {
     if (
         empty($_GET['token']) ||
