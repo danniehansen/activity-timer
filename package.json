@@ -1,6 +1,6 @@
 {
   "name": "activity_timer",
-  "version": "1.1.6",
+  "version": "1.2.0",
   "description": "Trello power-up for tracking time spent on cards",
   "scripts": {
     "serve": "webpack serve --port 8080 --https --cert private.crt --key private.key --mode development --progress --open --hot",
