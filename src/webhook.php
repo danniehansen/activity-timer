@@ -25,7 +25,7 @@ $h1 = hashIt($incomingHash);
 $stderr = fopen('php://stderr', 'wb');
 
 if ($h1 !== $h2) {
-    fwrite($stderr, '[ERROR] Failed to verify signature. Re-registering webhook for safety');
+    fwrite($stderr, '[ERROR] Failed to verify signature. De-registering webhook for safety');
     fclose($stderr);
     http_response_code(410);
     exit;
@@ -38,14 +38,14 @@ try {
         empty($_GET['token']) ||
         empty($_GET['apiKey'])
     ) {
-        fwrite($stderr, '[ERROR] Failed to verify that token was valid. Re-registering webhook for safety');
+        fwrite($stderr, '[ERROR] Failed to verify that token was valid. De-registering webhook for safety');
         fclose($stderr);
 
         http_response_code(410);
         exit;
     }
 } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-    fwrite($stderr, '[ERROR] Failed to verify that token was valid. Re-registering webhook for safety');
+    fwrite($stderr, '[ERROR] Failed to verify that token was valid. De-registering webhook for safety');
     fclose($stderr);
     http_response_code(410);
     exit;
@@ -193,13 +193,13 @@ try {
             exit;
         }
 
-        fwrite($stderr, '[ERROR] Failed to get board plugin data. Re-registering webhook for safety');
+        fwrite($stderr, '[ERROR] Failed to get board plugin data. De-registering webhook for safety');
         fclose($stderr);
         http_response_code(410);
         exit;
     }
 } catch (JsonException $e) {
-    fwrite($stderr, '[ERROR] Failed to decode JSON payload. Re-registering webhook for safety');
+    fwrite($stderr, '[ERROR] Failed to decode JSON payload. De-registering webhook for safety');
     fclose($stderr);
     http_response_code(410);
     exit;
