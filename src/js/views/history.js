@@ -76,8 +76,8 @@ class Card {
 
 async function authorizeClickHandler () {
     await t.getRestApi().authorize({
-        scope: 'read',
-        expiration: '30days'
+        scope: 'read,write,account',
+        expiration: 'never'
     });
 
     authorizeEl.style.display = 'none';
