@@ -12,7 +12,25 @@
         <span>Disable estimate feature</span>
       </label>
 
-      <button class="mod-primary btn-save-settings">Save settings</button>
+      <hr />
+
+      <div class="threshold-for-trackings">
+        <label for="threshold-for-trackings">Threshold in seconds for accepting trackings</label>
+        <input type="range" id="threshold-for-trackings" min="1" max="180" value="30" />
+        <span>30 second(s)</span>
+      </div>
+
+      <hr />
+
+      <button class="mod-primary btn-enable-auto-timer" style="display: none">Enable auto start timer</button>
+      <button class="mod-primary btn-disable-auto-timer" style="display: none">Disable auto start timer</button>
+      <span><i>(Requires browser reload after enabling)</i></span>
+
+      <label class="auto-timer-list-id" for="auto-timer-list-id" style="display: none">
+        <span>List to auto-start tracking</span>
+
+        <select id="auto-timer-list-id"></select>
+      </label>
     </div>
 
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
