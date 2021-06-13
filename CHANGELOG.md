@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [1.2.0] - 2021-06-13
+### Added
+- [BETA] Added auto-start timer feature. Automatically starts registering time when cards are moved to a specific list. This feature can be enabled on the power-up settings page. I've put a BETA label on this as it's highly subject to change due to the unknowns about added cost to hosting the power-up. 
+- Added threshold for registering trackings. If trackings added by manually starting / stopping the timer is less than x settings (default 30). Then power-up rejects the time tracking. This is to combat the 4096 character limit on power-ups for storage. You think 30 is too much or too little? Change it on the power-up settings page.
+### Optimizations
+- Optimized card badge rendering by caching the member id.
+
 ## [1.1.6] - 2021-06-11
 ### Added
 - Added ability to see other peoples active trackings under 'Manage time'. https://github.com/danniehansen/activity-timer/issues/41
