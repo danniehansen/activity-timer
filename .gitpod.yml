@@ -1,6 +1,0 @@
-tasks:
-  - init: yarn install
-    command: yarn run start-pod
-
-ports:
-  - port: 8080

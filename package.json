@@ -30,7 +30,9 @@
     "mini-css-extract-plugin": "^1.6.0",
     "sass": "^1.34.1",
     "sass-loader": "^12.1.0",
+    "serverless-dotenv-plugin": "^3.9.0",
     "style-loader": "^2.0.0",
-    "webpack": "^5.38.1"
+    "webpack": "^5.38.1",
+    "glob-parent": "^5.1.2"
   }
 }
