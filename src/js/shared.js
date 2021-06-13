@@ -7,6 +7,11 @@ const clockImageWhite = 'https://' + window.powerupHost + '/images/clock.svg';
 const dataPrefix = 'act-timer';
 const apiKey = '2de5d228d2ca7b7bc4c9decc4ee3cbac';
 const appName = 'Activity timer';
+const apiHost = '7jlqay8fc2.execute-api.eu-west-1.amazonaws.com';
+const websocket = 'wss://0afjsqn407.execute-api.eu-west-1.amazonaws.com/production';
+
+var requestTimerStartId;
+var memberIdCache = null;
 
 /**
  * Get estimates for card.
@@ -31,7 +36,7 @@ async function clearEstimates (t) {
 /**
  * Delete an estimate.
  *
- * @param {*} t
+ * @param t
  * @param {string} memberId
  *
  * @returns {Promise<void>}
@@ -53,7 +58,7 @@ async function deleteEstimate (t, memberId) {
  */
 async function getOwnEstimate (t) {
     const estimates = await getEstimates(t);
-    const member = await t.member('id');
+    const member = await getMemberId(t);
     let time = 0;
 
     estimates.forEach((estimate) => {
@@ -112,7 +117,7 @@ async function getTotalEstimate (t) {
  * @returns {Promise<void>}
  */
 async function createEstimate (t, seconds) {
-    const member = await t.member('id');
+    const member = await getMemberId(t);
 
     const estimates = (await getEstimates(t)).filter((estimate) => {
         return Array.isArray(estimate) && estimate[0] !== member.id;
@@ -141,7 +146,7 @@ async function getRanges (t, noCurrent, includeAll) {
 
     if (!noCurrent) {
         const timer = (await Timers.getFromContext(t)).getByMember(
-            (await t.member('id')).id
+            (await getMemberId(t))
         );
 
         if (timer !== null) {
@@ -169,6 +174,21 @@ async function getRanges (t, noCurrent, includeAll) {
 }
 
 /**
+ * Getter for member id. Avoid extra calls for just getting the id.
+ *
+ * @param t
+ *
+ * @returns {Promise<*>}
+ */
+async function getMemberId (t) {
+    if (memberIdCache === null) {
+        memberIdCache = (await t.member('id')).id;
+    }
+
+    return memberIdCache;
+}
+
+/**
  * Whether or not tracker is running
  *
  * @param t
@@ -177,7 +197,7 @@ async function getRanges (t, noCurrent, includeAll) {
  */
 async function isRunning (t) {
     return (await Timers.getFromContext(t)).getByMember(
-        (await t.member('id')).id
+        (await getMemberId(t))
     ) !== null;
 }
 
@@ -201,7 +221,7 @@ async function getTotalSeconds (t) {
  */
 async function getOwnTotalSeconds (t) {
     const ranges = await getRanges(t);
-    const member = await t.member('id');
+    const member = await getMemberId(t);
 
     return ranges.getTimeSpentByMemberId(member.id);
 }
@@ -215,7 +235,7 @@ async function getOwnTotalSeconds (t) {
  */
 async function startTimer (t) {
     const listId = (await t.card('idList')).idList;
-    const memberId = (await t.member('id')).id;
+    const memberId = await getMemberId(t);
     const timers = await Timers.getFromContext(t);
 
     (await t.cards('all')).forEach(async (card) => {
@@ -256,13 +276,24 @@ async function startTimer (t) {
  * @returns {Promise<void>}
  */
 async function stopTimer (t) {
-    const memberId = (await t.member('id')).id;
+    const memberId = await getMemberId(t);
     const timers = await Timers.getFromContext(t);
     const timer = timers.getByMember(memberId);
     timers.removeByMember(memberId);
     await timers.saveForContext(t);
 
     if (timer !== null) {
+        const threshold = await getThresholdForTrackings(t);
+
+        if (Math.abs(Math.floor(new Date().getTime() / 1000) - timer.start) < threshold) {
+            t.alert({
+                message: `Time tracking ignored. Threshold for registering new trackings is ${threshold} second(s).`,
+                duration: 3,
+            });
+
+            return;
+        }
+
         const ranges = await getRanges(t, true);
 
         ranges.addRange(
@@ -306,6 +337,7 @@ async function stopTimer (t) {
 
 /**
  * @param {number} secondsToFormat
+ * @param {boolean} [allowSeconds]
  *
  * @returns {string}
  */
@@ -334,6 +366,7 @@ function formatTime (secondsToFormat, allowSeconds) {
 
 /**
  * @param {Date} date
+ * @param {boolean} [returnOnlyTimeString]
  *
  * @returns {string}
  */
@@ -513,6 +546,107 @@ async function enableEstimateFeature (t) {
 }
 
 /**
+ * Is auto-timer enabled?
+ *
+ * @param t
+ *
+ * @returns {Promise<boolean>}
+ */
+async function hasAutoTimer (t) {
+    return !!(await t.get('board', 'shared', dataPrefix + '-auto-timer'));
+}
+
+/**
+ * Disable auto-timer feature.
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
+async function disableAutoTimer (t) {
+    await t.set('board', 'shared', dataPrefix + '-auto-timer', 0);
+}
+
+/**
+ * Enable auto-timer feature.
+ *
+ * @param t
+ *
+ * @returns {Promise<void>}
+ */
+async function enableAutoTimer (t) {
+    await t.set('board', 'shared', dataPrefix + '-auto-timer', 1);
+}
+
+/**
+ * Set list id of the list that should trigger auto-timer tracking.
+ *
+ * @param t
+ * @param {string} listId
+ *
+ * @returns {Promise<void>}
+ */
+async function setAutoTimerListId (t, listId) {
+    await t.set('board', 'shared', dataPrefix + '-auto-timer-list-id', listId);
+}
+
+/**
+ * Get list id of the list that should trigger auto-timer tracking.
+ *
+ * @param t
+ *
+ * @returns {Promise<*>}
+ */
+async function getAutoTimerListId (t) {
+    return await t.get('board', 'shared', dataPrefix + '-auto-timer-list-id', '');
+}
+
+function debounce(func, wait, immediate) {
+    var timeout;
+    return function() {
+        var context = this, args = arguments;
+        var later = function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
+
+/**
+ * Get list id of the list that should trigger auto-timer tracking.
+ *
+ * @param t
+ *
+ * @returns {Promise<*>}
+ */
+async function getThresholdForTrackings (t) {
+    return parseInt((await t.get('board', 'shared', dataPrefix + '-auto-timer-threshold-trackings', 30)), 10);
+}
+
+/**
+ * @param t
+ * @param {number} threshold
+ *
+ * @returns {Promise<void>}
+ */
+async function setThresholdForTrackings (t, threshold) {
+    await t.set('board', 'shared', dataPrefix + '-auto-timer-threshold-trackings', threshold);
+}
+
+/**
+ * Because we don't have the card context we need to utilize card badges with a interval to get card context.
+ *
+ * @param {string} cardId
+ */
+function requestTimerStart (cardId) {
+    requestTimerStartId = cardId;
+}
+
+/**
  * Card badges capability handler.
  *
  * @param t
@@ -570,7 +704,7 @@ async function cardBadges (t) {
         // Others tracking badge
         {
             dynamic: async function () {
-                const memberId = (await t.member('id')).id;
+                const memberId = await getMemberId(t);
                 const running = (await Timers.getFromContext(t)).items.filter((item) => {
                     return item.memberId !== memberId;
                 }).length > 0;
@@ -589,6 +723,42 @@ async function cardBadges (t) {
             }
         }
     ];
+
+    const hasAutoTimerFeature = await hasAutoTimer(t);
+    const autoTimerListId = await getAutoTimerListId(t);
+
+    if (hasAutoTimerFeature && autoTimerListId) {
+        items.push(
+            /**
+             * This requires some explaining. Because t.set() for cards require us to have an active card context -
+             * & there being no other way of getting one through the SDK. Then i came up with this "hack" where we
+             * use an empty badge that has a refresh timer of 2 seconds. The badge in it-self doesn't display.
+             * It's just there for allowing us to detect if we need to start the timer for this card.
+             */
+            {
+                dynamic: async function () {
+                    if (requestTimerStartId === t.getContext().card) {
+                        requestTimerStartId = null;
+
+                        const listId = (await t.card('idList')).idList;
+                        const autoTimerListId = await getAutoTimerListId(t);
+
+                        // Sometimes websocket events come in a bit late & card might have changed list.
+                        // So we need to validate that it still exists in the list that should auto-trigger the timer.
+                        if (listId !== autoTimerListId) {
+                            return;
+                        }
+
+                        await startTimer(t);
+                    }
+
+                    return {
+                        refresh: 2
+                    };
+                }
+            }
+        );
+    }
 
     const hasEstimateVar = await hasEstimateFeature(t);
 
@@ -650,7 +820,7 @@ function openManuallyAdd(t, _start, _end) {
                     callback: async (t) => {
                         // Only save new time tracking if they're different
                         if (_start.getTime() !== _end.getTime()) {
-                            const member = await t.member('id');
+                            const member = await getMemberId(t);
                             const ranges = await getRanges(t, true);
 
                             ranges.addRange(
@@ -1011,6 +1181,8 @@ module.exports = {
     boardButtons,
     apiKey,
     appName,
+    apiHost,
+    websocket,
     getOwnEstimate,
     getTotalEstimate,
     createEstimate,
@@ -1027,5 +1199,14 @@ module.exports = {
     clearEstimates,
     deleteEstimate,
     hasSettingStopOnMove,
-    setSettingStopOnMove
+    setSettingStopOnMove,
+    requestTimerStart,
+    hasAutoTimer,
+    enableAutoTimer,
+    disableAutoTimer,
+    setAutoTimerListId,
+    getAutoTimerListId,
+    getThresholdForTrackings,
+    setThresholdForTrackings,
+    debounce
 };

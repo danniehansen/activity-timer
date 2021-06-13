@@ -1,0 +1,78 @@
+service: activity-timer
+useDotenv: true
+provider:
+  name: aws
+  runtime: provided.al2
+  timeout: 10
+  versionFunctions: false
+  region: eu-west-1
+  environment:
+    TRELLO_SECRET: ${env:TRELLO_SECRET}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:DeleteItem
+      Resource: "*"
+plugins:
+  - ./vendor/bref/bref
+package:
+  patterns:
+    - '!src/js/**'
+    - '!src/sass/**'
+    - '!views/**'
+    - '!images/**'
+    - '!dist/**'
+    - '!node_modules/**'
+    - '!.idea/**'
+    - '!webpack.config.js'
+    - '!yarn.lock'
+    - '!package.json'
+    - '!.github/**'
+functions:
+  webhook:
+    handler: src/webhook.php
+    layers:
+      - ${bref:layer.php-80-fpm}
+    events:
+      - httpApi:
+          method: POST
+          path: '/webhook'
+      - httpApi:
+          method: HEAD
+          path: '/webhook'
+  pubsub:
+    handler: src/pubsub.php
+    layers:
+      - ${bref:layer.php-80}
+    events:
+      - websocket: $connect
+      - websocket: $disconnect
+      - websocket: $default
+
+resources:
+  Resources:
+    ActivityTimerPubSub:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "connection_id"
+            AttributeType: "S"
+          - AttributeName: "member_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "connection_id"
+            KeyType: "HASH"
+        GlobalSecondaryIndexes:
+          - IndexName: MemberIdIndex
+            KeySchema:
+              - AttributeName: member_id
+                KeyType: HASH
+            Projection:
+              ProjectionType: 'ALL'
+        TableName: ${opt:stage,'develop'}-ActivityTimerPubSub
+        BillingMode: PAY_PER_REQUEST
