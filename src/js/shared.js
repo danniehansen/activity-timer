@@ -824,7 +824,7 @@ function openManuallyAdd(t, _start, _end) {
                             const ranges = await getRanges(t, true);
 
                             ranges.addRange(
-                                member.id,
+                                member,
                                 Math.floor(new Date(_start).getTime() / 1000),
                                 Math.floor(new Date(_end).getTime() / 1000)
                             );
@@ -865,6 +865,8 @@ function cardButtons (t) {
                         const items = [];
 
                         let board = await t.board('members');
+
+                        const memberIds = board.members.map((member) => member.id);
 
                         board.members.sort((a, b) => {
                             const nameA = a.fullName.toUpperCase();
@@ -971,6 +973,93 @@ function cardButtons (t) {
                             }
                         });
 
+                        ranges.items.map((range, rangeIndex) => {
+                            range.rangeIndex = rangeIndex;
+                            return {
+                                rangeIndex,
+                                item: range
+                            };
+                        })
+                            .filter((range) => memberIds.indexOf(range.item.memberId) === -1)
+                            .forEach((range) => {
+                                const start = new Date(range.item.start * 1000);
+                                const end = new Date(range.item.end * 1000);
+                                const rangeOnTheSameDay = start.toDateString() === end.toDateString();
+                                const rangeLengthInSeconds = range.item.end - range.item.start;
+
+                                const _rangeIndex = range.rangeIndex;
+                                const _range = range;
+
+                                items.push({
+                                    'text': 'N/A:'
+                                });
+
+                                items.push({
+                                    text: `${formatDate(start)} - ${formatDate(end, rangeOnTheSameDay)} (${formatTime(rangeLengthInSeconds, false)})${_range.item.isTracking ? ' (tracking)' : ''}`,
+                                    callback: function (t) {
+                                        if (_range.item.isTracking) {
+                                            return;
+                                        }
+
+                                        return t.popup({
+                                            title: 'Edit time range',
+                                            items: function (t) {
+                                                const _start = new Date(_range.item.start * 1000);
+                                                const _end = new Date(_range.item.end * 1000);
+
+                                                return [
+                                                    {
+                                                        text: 'Edit start (' + formatDate(start) + ')',
+                                                        callback: (t) => {
+                                                            return t.popup({
+                                                                type: 'datetime',
+                                                                title: 'Change start from (' + formatDate(_start) + ')',
+                                                                callback: async function(t, opts) {
+                                                                    const ranges = await getRanges(t, true);
+                                                                    ranges.items[_rangeIndex].start = Math.floor(new Date(opts.date).getTime() / 1000);
+                                                                    await ranges.saveForContext(t);
+                                                                    return t.closePopup();
+                                                                },
+                                                                date: _start
+                                                            });
+                                                        }
+                                                    },
+                                                    {
+                                                        text: 'Edit end (' + formatDate(end) + ')',
+                                                        callback: (t) => {
+                                                            return t.popup({
+                                                                type: 'datetime',
+                                                                title: 'Change end from (' + formatDate(_end) + ')',
+                                                                callback: async function(t, opts) {
+                                                                    const ranges = await getRanges(t, true);
+                                                                    ranges.items[_rangeIndex].end = Math.floor(new Date(opts.date).getTime() / 1000);
+                                                                    await ranges.saveForContext(t);
+                                                                    return t.closePopup();
+                                                                },
+                                                                date: _end
+                                                            });
+                                                        }
+                                                    },
+                                                    {
+                                                        text: 'Delete',
+                                                        callback: async (t) => {
+                                                            const ranges = await getRanges(t, true);
+                                                            ranges.deleteRangeByIndex(_rangeIndex);
+                                                            await ranges.saveForContext(t);
+                                                            return t.closePopup();
+                                                        }
+                                                    }
+                                                ];
+                                            }
+                                        });
+                                    },
+                                });
+
+                                items.push({
+                                    'text': '--------'
+                                });
+                            })
+
                         if (items.length > 0) {
                             items.splice(items.length - 1, 1);
                         }
@@ -1025,6 +1114,8 @@ function cardButtons (t) {
 
                         let board = await t.board('members');
 
+                        const memberIds = board.members.map((member) => member.id);
+
                         board.members.sort((a, b) => {
                             const nameA = a.fullName.toUpperCase();
                             const nameB = b.fullName.toUpperCase();
@@ -1046,6 +1137,20 @@ function cardButtons (t) {
                                 });
                             }
                         });
+
+                        const timeSpentNoMember = ranges.items
+                            .filter((range) => memberIds.indexOf(range.memberId) === -1)
+                            .reduce(
+                                (time, range) => {
+                                    time += range.diff;
+                                    return time;
+                                },
+                                0
+                            );
+
+                        if (timeSpentNoMember > 0) {
+                            items.push({ 'text': 'N/A: ' + formatTime(timeSpentNoMember) });
+                        }
 
                         if (items.length === 0) {
                             items.push({ 'text': 'No activity yet' });
