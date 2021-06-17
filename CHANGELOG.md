@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [1.2.1] - 2021-06-17
+### Added
+- Made it possible to view trackings from previous users on a board. They will now appear as N/A on a card under "Manage time" or "Time spent".
+### Fixed
+- Fixed issue with manually adding time being assigned to "undefined" user - causing it to be invisible.
+
 ## [1.2.0] - 2021-06-13
 ### Added
 - [BETA] Added auto-start timer feature. Automatically starts registering time when cards are moved to a specific list. This feature can be enabled on the power-up settings page. I've put a BETA label on this as it's highly subject to change due to the unknowns about added cost to hosting the power-up. 
