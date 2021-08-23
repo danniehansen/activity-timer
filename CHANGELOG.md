@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [1.2.2] - 2021-08-23
+### Added
+- Added ability to manually add time tracking when no other time trackings have been added yet.
+### Fixed
+- Fixed issue with estimates since last release that caused estimates to not recognize the current user. The effect of this was that you could not delete estimates & couldn't see who made them. This is now resolves & you'll be able to view estimates with no user attached to it.
+
 ## [1.2.1] - 2021-06-17
 ### Added
 - Made it possible to view trackings from previous users on a board. They will now appear as N/A on a card under "Manage time" or "Time spent".
