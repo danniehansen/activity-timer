@@ -1112,6 +1112,15 @@ function cardButtons (t) {
                             });
                         } else {
                             items.push({ 'text': 'No activity yet' });
+
+                            items.push({
+                                'text': '--------'
+                            });
+
+                            items.push({
+                                'text': 'Add manually',
+                                callback: (t) => openManuallyAdd(t)
+                            });
                         }
 
                         return items;
