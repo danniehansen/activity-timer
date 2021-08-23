@@ -50,6 +50,22 @@ async function deleteEstimate (t, memberId) {
 }
 
 /**
+ * Delete an estimate.
+ *
+ * @param t
+ * @param {number} index
+ *
+ * @returns {Promise<void>}
+ */
+async function deleteEstimateByIndex (t, index) {
+    const estimates = (await getEstimates(t)).filter((estimate, estimateIndex) => {
+        return index !== estimateIndex;
+    });
+
+    await t.set('card', 'shared', dataPrefix + '-estimates', estimates);
+}
+
+/**
  * Get own estimate in seconds.
  *
  * @param t
@@ -58,11 +74,11 @@ async function deleteEstimate (t, memberId) {
  */
 async function getOwnEstimate (t) {
     const estimates = await getEstimates(t);
-    const member = await getMemberId(t);
+    const memberId = await getMemberId(t);
     let time = 0;
 
     estimates.forEach((estimate) => {
-        if (estimate[0] === member.id) {
+        if (estimate[0] === memberId) {
             time += estimate[1];
         }
     });
@@ -117,13 +133,13 @@ async function getTotalEstimate (t) {
  * @returns {Promise<void>}
  */
 async function createEstimate (t, seconds) {
-    const member = await getMemberId(t);
+    const memberId = await getMemberId(t);
 
     const estimates = (await getEstimates(t)).filter((estimate) => {
-        return Array.isArray(estimate) && estimate[0] !== member.id;
+        return Array.isArray(estimate) && estimate[0] !== memberId;
     });
 
-    estimates.push([member.id, seconds]);
+    estimates.push([memberId, seconds]);
 
     await t.set('card', 'shared', dataPrefix + '-estimates', estimates);
 }
@@ -178,7 +194,7 @@ async function getRanges (t, noCurrent, includeAll) {
  *
  * @param t
  *
- * @returns {Promise<*>}
+ * @returns {Promise<string | undefined>}
  */
 async function getMemberId (t) {
     if (memberIdCache === null) {
@@ -221,9 +237,9 @@ async function getTotalSeconds (t) {
  */
 async function getOwnTotalSeconds (t) {
     const ranges = await getRanges(t);
-    const member = await getMemberId(t);
+    const memberId = await getMemberId(t);
 
-    return ranges.getTimeSpentByMemberId(member.id);
+    return ranges.getTimeSpentByMemberId(memberId);
 }
 
 /**
@@ -238,7 +254,9 @@ async function startTimer (t) {
     const memberId = await getMemberId(t);
     const timers = await Timers.getFromContext(t);
 
-    (await t.cards('all')).forEach(async (card) => {
+    const cards = await t.cards('all');
+
+    for (const card of cards) {
         const cardTimers = await Timers.getFromCardId(t, card.id);
         const timer = cardTimers.getByMember(memberId);
 
@@ -261,7 +279,7 @@ async function startTimer (t) {
         if (cardTimers.removeByMember(memberId)) {
             cardTimers.saveByCardId(t, card.id);
         }
-    });
+    }
 
     timers.startByMember(memberId, listId);
 
@@ -820,11 +838,11 @@ function openManuallyAdd(t, _start, _end) {
                     callback: async (t) => {
                         // Only save new time tracking if they're different
                         if (_start.getTime() !== _end.getTime()) {
-                            const member = await getMemberId(t);
+                            const memberId = await getMemberId(t);
                             const ranges = await getRanges(t, true);
 
                             ranges.addRange(
-                                member,
+                                memberId,
                                 Math.floor(new Date(_start).getTime() / 1000),
                                 Math.floor(new Date(_end).getTime() / 1000)
                             );
@@ -1313,5 +1331,6 @@ module.exports = {
     getAutoTimerListId,
     getThresholdForTrackings,
     setThresholdForTrackings,
-    debounce
+    debounce,
+    deleteEstimateByIndex
 };
