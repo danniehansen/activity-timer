@@ -6,7 +6,7 @@ const {
     startTimer, stopTimer, getOwnEstimate,
     getTotalEstimate, getEstimates,
     hasEstimateFeature, clearEstimates,
-    deleteEstimate
+    deleteEstimate, deleteEstimateByIndex
 } = require('../shared.js');
 
 const t = window.TrelloPowerUp.iframe();
@@ -49,6 +49,8 @@ totalEstimateEl.addEventListener('click', (e) => {
             const estimates = await getEstimates(t);
             let board = await t.board('members');
 
+            const membersFound = board.members.map((member) => member.id);
+
             board.members.sort((a, b) => {
                 const nameA = a.fullName.toUpperCase();
                 const nameB = b.fullName.toUpperCase();
@@ -83,6 +85,28 @@ totalEstimateEl.addEventListener('click', (e) => {
                                 confirmText: 'Yes, delete',
                                 onConfirm: async (t) => {
                                     await deleteEstimate(t, member.id);
+                                    return t.closePopup();
+                                },
+                                confirmStyle: 'danger',
+                                cancelText: 'No, cancel'
+                            });
+                        }
+                    });
+                }
+            });
+
+            estimates.forEach((estimate, estimateIndex) => {
+                if (!membersFound.includes(estimate[0])) {
+                    items.push({
+                        'text': 'N/A: ' + formatTime(estimate[1]),
+                        callback: async (t) => {
+                            return t.popup({
+                                type: 'confirm',
+                                title: 'Delete estimate?',
+                                message: 'Are you sure you wish to delete this estimate?',
+                                confirmText: 'Yes, delete',
+                                onConfirm: async (t) => {
+                                    await deleteEstimateByIndex(t, estimateIndex);
                                     return t.closePopup();
                                 },
                                 confirmStyle: 'danger',
