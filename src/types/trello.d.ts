@@ -417,7 +417,7 @@ export namespace Trello {
     interface AnonymousHostHandlers {
       requestWithContext(command: string, options: any): PromiseLike<any>;
       getAll(): PromiseLike<any>;
-      get(scope: Scope | string, visibility: Visibility, key?: string, defaultValue?: any): PromiseLike<any>;
+      get<T>(scope: Scope | string, visibility: Visibility, key?: string, defaultValue?: T): PromiseLike<T>;
       set(scope: Scope | string, visibility: Visibility, key: string, defaultValue?: any): PromiseLike<void>;
       set(scope: Scope | string, visibility: Visibility, entries: {
         [ key: string]: any;

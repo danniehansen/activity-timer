@@ -22,12 +22,13 @@ module.exports = {
     semi: [2, 'always'],
     indent: ['error', 2],
     'editorconfig/charset': 'error',
-    'editorconfig/eol-last': 'error',
+    'editorconfig/eol-last': 'off',
     'editorconfig/indent': 'error',
     'editorconfig/linebreak-style': 'error',
     'editorconfig/no-trailing-spaces': 'error',
     'no-unused-vars': 'off',
     'no-use-before-define': 'off',
-    'vue/no-multiple-template-root': 'off'
+    'vue/no-multiple-template-root': 'off',
+    'eol-last': 'off'
   }
 };
