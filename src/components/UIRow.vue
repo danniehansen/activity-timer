@@ -8,5 +8,6 @@
   .row {
     display: flex;
     flex-flow: row nowrap;
+    justify-content: space-between;
   }
 </style>

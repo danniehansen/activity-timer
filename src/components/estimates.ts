@@ -26,6 +26,10 @@ export class Estimates {
     this._items.push(item);
   }
 
+  clear () {
+    this._items = [];
+  }
+
   getByMemberId (memberId: string): Estimate | undefined {
     return this._items.reduce<Estimate | undefined>((carry, item) => {
       if (item.memberId === memberId) {

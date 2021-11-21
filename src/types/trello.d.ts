@@ -307,7 +307,7 @@ export namespace Trello {
 
     interface PopupOptions {
       title: string;
-      items: PopupOptionsItem[];
+      items: PopupOptionsItem[] | ((t: PowerUp.IFrame) => PromiseLike<PopupOptionsItem[]>);
       mouseEvent?: MouseEvent;
     }
 
