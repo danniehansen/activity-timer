@@ -1,10 +1,13 @@
 import { Timer, TimerData } from './timer';
-import { Trello } from './types/trello';
+import { getTrelloInstance } from '../trello';
 
 export class Timers {
+  private _cardId: string;
   private _items: Timer[] = [];
 
-  constructor (timers?: Timer[]) {
+  constructor (cardId: string, timers?: Timer[]) {
+    this._cardId = cardId;
+
     if (timers) {
       this._items = timers;
     }
@@ -12,6 +15,10 @@ export class Timers {
 
   get items () {
     return this._items;
+  }
+
+  get timeSpent (): number {
+    return this._items.reduce((a, b) => a + b.timeInSecond, 0);
   }
 
   add (timer: Timer) {
@@ -57,49 +64,7 @@ export class Timers {
     );
   }
 
-  async saveByContext (t: Trello.PowerUp.IFrame) {
-    await t.set('card', 'shared', 'act-timer-running', this.serialize());
-  }
-
-  async saveByCardId (t: Trello.PowerUp.IFrame, cardId: string) {
-    await t.set(cardId, 'shared', 'act-timer-running', this.serialize());
-  }
-
-  static async getFromContext (t: Trello.PowerUp.IFrame) {
-    const data = await t.get<TimerData[]>('card', 'shared', 'act-timer-running', []);
-
-    return new Timers(
-      data.map((timerData) => {
-        return new Timer(
-          // Member id
-          timerData[0],
-
-          // List id
-          timerData[1],
-
-          // Start
-          timerData[2]
-        );
-      })
-    );
-  }
-
-  static async getFromCardId (t: Trello.PowerUp.IFrame, cardId: string) {
-    const data = await t.get(cardId, 'shared', 'act-timer-running', []);
-
-    return new Timers(
-      data.map((timerData) => {
-        return new Timer(
-          // Member id
-          timerData[0],
-
-          // List id
-          timerData[1],
-
-          // Start
-          timerData[2]
-        );
-      })
-    );
+  async save () {
+    await getTrelloInstance().set(this._cardId, 'shared', 'act-timer-running', this.serialize());
   }
 }
