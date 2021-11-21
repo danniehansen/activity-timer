@@ -1,16 +1,16 @@
 <template>
   <UIRow>
-    <UIColumn>
+    <div>
       <UIButton v-if="!isTracking" @click="startTracking">Start timer</UIButton>
       <UIButton v-else @click="stopTracking" :danger="true">Stop timer</UIButton>
 
       <UIInfo icon="clock">{{ timeSpentDisplay }}</UIInfo>
-    </UIColumn>
+    </div>
 
-    <UIColumn v-if="hasEstimates" align-items="right">
+    <div v-if="hasEstimates">
       <UIInfo style="cursor: pointer;" @click="changeEstimate">Estimate: {{ ownEstimateDisplay }}</UIInfo>
-      <UIInfo style="cursor: pointer;" v-if="ownEstimate != totalEstimate">Total estimate: {{ totalEstimateDisplay }}</UIInfo>
-    </UIColumn>
+      <UIInfo style="cursor: pointer;" v-if="ownEstimate != totalEstimate" @click="viewEstimates">Total estimate: {{ totalEstimateDisplay }}</UIInfo>
+    </div>
   </UIRow>
 </template>
 
@@ -24,6 +24,7 @@ import { getMemberId, getTrelloCard } from '../../trello';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/time';
 import { hasEstimateFeature } from '../../components/settings';
+import { Trello } from '../../types/trello';
 
 const isTracking = ref(false);
 const trackedTime = ref(0);
@@ -99,6 +100,112 @@ const changeEstimate = async (e: MouseEvent) => {
     url: './index.html?page=change-estimate',
     height: 120,
     mouseEvent: e
+  });
+};
+
+const viewEstimates = async (e: MouseEvent) => {
+  const trelloInstance = getTrelloCard();
+
+  trelloInstance.popup({
+    mouseEvent: e,
+    title: 'Estimates',
+    items: async function (t) {
+      const cardModel = await getCardModel();
+      const items: Trello.PowerUp.PopupOptionsItem[] = [];
+      const estimates = await cardModel.getEstimates();
+      const board = await t.board('members');
+
+      const membersFound = board.members.map((member) => member.id);
+
+      board.members.sort((a, b) => {
+        const nameA = (a.fullName ?? '').toUpperCase();
+        const nameB = (b.fullName ?? '').toUpperCase();
+
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        return 0;
+      }).forEach((member) => {
+        const memberEstimates = estimates.items.filter((estimate) => {
+          return estimate.memberId === member.id;
+        });
+
+        let memberEstimate = 0;
+
+        memberEstimates.forEach((estimate) => {
+          memberEstimate += estimate.time;
+        });
+
+        if (memberEstimate > 0) {
+          items.push({
+            text: member.fullName + (member.fullName !== member.username ? ' (' + member.username + ')' : '') + ': ' + formatTime(memberEstimate),
+            callback: async (t: Trello.PowerUp.IFrame) => {
+              return t.popup({
+                type: 'confirm',
+                title: 'Delete estimate?',
+                message: 'Are you sure you wish to delete this estimate?',
+                confirmText: 'Yes, delete',
+                onConfirm: async (t) => {
+                  // await deleteEstimate(t, member.id);
+                  estimates.removeByMemberId(member.id);
+                  await estimates.save();
+                  return t.closePopup();
+                },
+                confirmStyle: 'danger',
+                cancelText: 'No, cancel'
+              });
+            }
+          });
+        }
+      });
+
+      estimates.items.forEach((estimate, estimateIndex) => {
+        if (!membersFound.includes(estimate.memberId)) {
+          items.push({
+            text: 'N/A: ' + formatTime(estimate.time),
+            callback: async (t) => {
+              return t.popup({
+                type: 'confirm',
+                title: 'Delete estimate?',
+                message: 'Are you sure you wish to delete this estimate?',
+                confirmText: 'Yes, delete',
+                onConfirm: async (t) => {
+                  // await deleteEstimateByIndex(t, estimateIndex);
+                  return t.closePopup();
+                },
+                confirmStyle: 'danger',
+                cancelText: 'No, cancel'
+              });
+            }
+          });
+        }
+      });
+
+      items.push({
+        text: 'Clear estimates',
+        callback: async (t: Trello.PowerUp.IFrame) => {
+          return t.popup({
+            type: 'confirm',
+            title: 'Are you sure?',
+            message: '',
+            confirmText: 'Yes, clear estimates',
+            onConfirm: async (t) => {
+              estimates.clear();
+              await estimates.save();
+              return t.closePopup();
+            },
+            confirmStyle: 'danger',
+            cancelText: 'No, cancel'
+          });
+        }
+      });
+
+      return items;
+    }
   });
 };
 
