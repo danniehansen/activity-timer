@@ -1,9 +1,4 @@
-import { Ranges } from './components/ranges';
-import { Range } from './components/range';
-import { Timers } from './components/timers';
 import { Trello } from './types/trello';
-import { getThresholdForTrackings } from './components/settings';
-import { Card } from './components/card';
 
 type TrelloInstance = Trello.PowerUp.Plugin | Trello.PowerUp.IFrame;
 
@@ -24,7 +19,9 @@ export function getTrelloCard (): Trello.PowerUp.IFrame {
 
 export function resizeTrelloFrame (): void {
   if (trelloInstance && 'sizeTo' in trelloInstance) {
-    trelloInstance.sizeTo('body');
+    trelloInstance.sizeTo(
+      document.documentElement.offsetHeight
+    );
   }
 }
 

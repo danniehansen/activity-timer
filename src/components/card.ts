@@ -1,4 +1,6 @@
 import { getMemberId, getTrelloCard, getTrelloInstance } from '../trello';
+import { Estimate, EstimateData } from './estimate';
+import { Estimates } from './estimates';
 import { RangeData, Range } from './range';
 import { Ranges } from './ranges';
 import { getThresholdForTrackings } from './settings';
@@ -52,9 +54,27 @@ export class Card {
     );
   }
 
+  async getEstimates (): Promise<Estimates> {
+    const data = await getTrelloInstance().get<EstimateData[]>(this._cardId, 'shared', 'act-timer-estimates', []);
+
+    return new Estimates(
+      this._cardId,
+      data.map((estimateData) => {
+        return new Estimate(
+          // Member id
+          estimateData[0],
+
+          // Time
+          estimateData[1]
+        );
+      })
+    );
+  }
+
   async getTimeSpent (): Promise<number> {
     const timers = await this.getTimers();
-    return timers.timeSpent;
+    const ranges = await this.getRanges();
+    return timers.timeSpent + ranges.timeSpent;
   }
 
   async isRunning (): Promise<boolean> {

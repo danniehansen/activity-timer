@@ -10,7 +10,7 @@ export async function getCardBackSection (t: Trello.PowerUp.IFrame): Promise<Tre
       url: t.signUrl('./index.html', {
         page: 'card-back-section'
       }),
-      height: 50
+      height: 40
     }
   };
 }

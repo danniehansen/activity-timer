@@ -1,21 +1,28 @@
 <template>
-  <capabilityCardBackSection v-if="page === 'card-back-section'" />
+  <CapabilityCardBackSection v-if="page === 'card-back-section'" />
+  <ChangeEstimate v-else-if="page === 'change-estimate'" />
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from '@vue/runtime-core';
+import { defineAsyncComponent } from 'vue';
 import { getTrelloInstance } from './trello';
 
-const capabilityCardBackSection = defineAsyncComponent({
+const CapabilityCardBackSection = defineAsyncComponent({
   loader: () => import('./capabilities/card-back-section/view.vue')
 });
 
+const ChangeEstimate = defineAsyncComponent({
+  loader: () => import('./capabilities/card-back-section/change_estimate.vue')
+});
+
 const t = getTrelloInstance();
-let page: string | null = null;
+const urlSearchParams = new URLSearchParams(window.location.search);
+
+let page: string | null = urlSearchParams.get('page');
 
 if ('args' in t) {
   t.args.forEach((arg) => {
-    if (typeof arg.page === 'string') {
+    if (arg && typeof arg.page === 'string') {
       page = arg.page;
     }
   });

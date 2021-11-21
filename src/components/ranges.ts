@@ -17,6 +17,10 @@ export class Ranges {
     return this._items ?? [];
   }
 
+  get timeSpent () {
+    return this._items.reduce((a, b) => a + b.diff, 0);
+  }
+
   add (range: Range) {
     this._items.push(range);
   }
