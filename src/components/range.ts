@@ -1,16 +1,21 @@
 export type RangeData = [string, number, number];
 
+let rangeId = 0;
+
 export class Range {
   private _memberId: string;
   private _start: number;
   private _end: number;
-  private _isTracking?: boolean;
+  private _rangeId: number;
 
-  constructor (memberId: string, start: number, end: number, isTracking?: boolean) {
+  constructor (memberId: string, start: number, end: number) {
     this._memberId = memberId;
     this._start = start;
     this._end = end;
-    this._isTracking = isTracking;
+
+    rangeId++;
+
+    this._rangeId = rangeId;
   }
 
   get memberId () {
@@ -21,16 +26,24 @@ export class Range {
     return this._start;
   }
 
+  set start (value: number) {
+    this._start = value;
+  }
+
   get end () {
     return this._end;
   }
 
-  get isTracking () {
-    return this._isTracking ?? false;
+  set end (value: number) {
+    this._end = value;
   }
 
   get diff () {
     return this._end - this._start;
+  }
+
+  get rangeId () {
+    return this._rangeId;
   }
 
   serialize (): RangeData {

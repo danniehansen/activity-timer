@@ -22,7 +22,7 @@ import UIButton from '../../components/UIButton.vue';
 import UIColumn from '../../components/UIColumn.vue';
 import { getMemberId, getTrelloCard } from '../../trello';
 import { Card } from '../../components/card';
-import { formatTime } from '../../utils/time';
+import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature } from '../../components/settings';
 import { Trello } from '../../types/trello';
 
@@ -89,7 +89,7 @@ const startTracking = async () => {
 
 const stopTracking = async () => {
   const cardModel = await getCardModel();
-  await cardModel.stopTracking();
+  await cardModel.stopTracking(getTrelloCard());
 };
 
 const changeEstimate = async (e: MouseEvent) => {

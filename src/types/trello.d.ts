@@ -237,7 +237,7 @@ export namespace Trello {
     }
 
     interface CardBadgeDynamic {
-      dynamic(): CardBadge;
+      dynamic(): PromiseLike<CardBadge>;
     }
 
     interface CardButton {
@@ -302,7 +302,7 @@ export namespace Trello {
 
     interface PopupOptionsItem {
       text: string;
-      callback?(t: any, options: any): PromiseLike<void>;
+      callback?(t: IFrame, options: any): PromiseLike<void>;
     }
 
     interface PopupOptions {

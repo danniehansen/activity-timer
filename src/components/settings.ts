@@ -15,3 +15,11 @@ export async function disableEstimateFeature () {
 export async function enableEstimateFeature () {
   await getTrelloInstance().remove('board', 'shared', 'act-timer-disable-estimate');
 }
+
+export async function hasSettingStopOnMove () {
+  return (await getTrelloInstance().get('member', 'private', 'act-timer-personal-settings', 1)) === 1;
+}
+
+export async function setSettingStopOnMove (value: boolean) {
+  await getTrelloInstance().set('member', 'private', 'act-timer-personal-settings', value ? 1 : 0);
+}
