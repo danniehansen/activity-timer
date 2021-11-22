@@ -1,4 +1,5 @@
 import { getMemberId, getTrelloCard, getTrelloInstance } from '../trello';
+import { Trello } from '../types/trello';
 import { Estimate, EstimateData } from './estimate';
 import { Estimates } from './estimates';
 import { RangeData, Range } from './range';
@@ -12,6 +13,10 @@ export class Card {
 
   constructor (cardId: string) {
     this._cardId = cardId;
+  }
+
+  get id () {
+    return this._cardId;
   }
 
   async getRanges (): Promise<Ranges> {
@@ -117,7 +122,7 @@ export class Card {
     await timers.save();
   }
 
-  async stopTracking () {
+  async stopTracking (t: Trello.PowerUp.IFrame) {
     const memberId = await getMemberId();
     const timers = await this.getTimers();
     const timer = timers.getByMemberId(memberId);
@@ -168,7 +173,7 @@ export class Card {
           throw e;
         }
       } else { */
-        getTrelloCard().alert({
+        t.alert({
           message: 'Unrecognized error occurred while trying to stop the timer.',
           duration: 3
         });
@@ -179,8 +184,8 @@ export class Card {
     }
   }
 
-  static async getFromContext () {
-    const card = await getTrelloCard().card('id');
+  static async getFromContext (t?: Trello.PowerUp.IFrame) {
+    const card = await (t ?? getTrelloCard()).card('id');
     return new Card(card.id);
   }
 }
