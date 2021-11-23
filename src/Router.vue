@@ -1,6 +1,8 @@
 <template>
   <CapabilityCardBackSection v-if="page === 'card-back-section'" />
   <ChangeEstimate v-else-if="page === 'change-estimate'" />
+  <MemberSettings v-else-if="page === 'member-settings'" />
+  <NotificationSettings v-else-if="page === 'notification-settings'" />
 </template>
 
 <script setup lang="ts">
@@ -15,6 +17,14 @@ const ChangeEstimate = defineAsyncComponent({
   loader: () => import('./capabilities/card-back-section/change_estimate.vue')
 });
 
+const MemberSettings = defineAsyncComponent({
+  loader: () => import('./pages/MemberSettings.vue')
+});
+
+const NotificationSettings = defineAsyncComponent({
+  loader: () => import('./pages/NotificationSettings.vue')
+});
+
 const t = getTrelloInstance();
 const urlSearchParams = new URLSearchParams(window.location.search);
 
@@ -25,6 +35,14 @@ if ('args' in t) {
     if (arg && typeof arg.page === 'string') {
       page = arg.page;
     }
+  });
+}
+
+if (page === 'enable-notifications') {
+  Notification.requestPermission().then(() => {
+    window.close();
+  }).catch(() => {
+    window.close();
   });
 }
 </script>

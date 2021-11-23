@@ -5,6 +5,7 @@ import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature, hasSettingStopOnMove } from '../../components/settings';
 import { getMemberId } from '../../trello';
+import { canTriggerNotification, triggerNotification } from '../../utils/notifications';
 
 const clockIcon = `${window.location.origin}${ClockImage}`;
 const estimateImage = `${window.location.origin}${EstimateImage}`;
@@ -45,6 +46,12 @@ export async function getCardBadges (t: Trello.PowerUp.IFrame): Promise<(Trello.
 
         if (isRunning) {
           badge.color = 'red';
+
+          const shouldTriggerNotification = await canTriggerNotification(t);
+
+          if (shouldTriggerNotification) {
+            await triggerNotification(t);
+          }
         }
       }
 
