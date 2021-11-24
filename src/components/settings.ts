@@ -4,6 +4,10 @@ export async function getThresholdForTrackings () {
   return (await getTrelloInstance().get('board', 'shared', 'act-timer-auto-timer-threshold-trackings', 30));
 }
 
+export async function setThresholdForTrackings (threshold: number) {
+  await getTrelloInstance().set('board', 'shared', 'act-timer-auto-timer-threshold-trackings', threshold);
+}
+
 export async function hasEstimateFeature () {
   return !(await getTrelloInstance().get('board', 'shared', 'act-timer-disable-estimate'));
 }

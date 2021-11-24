@@ -12,6 +12,7 @@ let t: Trello.PowerUp.Plugin | Trello.PowerUp.IFrame | null = null;
 
 if (window.location.hash) {
   t = window.TrelloPowerUp.iframe();
+  setInterval(resizeTrelloFrame, 500);
 } else {
   t = window.TrelloPowerUp.initialize({
     'card-badges': getCardBadges,
@@ -27,5 +28,3 @@ if (t) {
 }
 
 createApp(Router).mount('#app');
-
-setInterval(resizeTrelloFrame, 500);
