@@ -1,0 +1,20 @@
+on:
+  push:
+    branches: [ develop ]
+name: Deploy v2 - develop
+jobs:
+  aws_cdk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: cdk deploy
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'deploy'
+          cdk_args: '--require-approval never'
+          actions_comment: false
+          working_dir: 'infrastructure'
+        env:
+          ACT_ENV: 'dev'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'eu-west-1'
