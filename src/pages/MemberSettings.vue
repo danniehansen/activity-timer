@@ -1,8 +1,5 @@
 <template>
-  <div class="checkbox">
-    <input v-model="stopOnMove" type="checkbox" id="stop-on-move" />
-    <label for="stop-on-move">Stop active tracking when card moves</label>
-  </div>
+  <UICheckbox v-model="stopOnMove" id="stop-on-move" label="Stop active tracking when card moves" />
 
   <i>Other power-up settings exists for administrators on the power-up settings page</i>
 </template>
@@ -10,6 +7,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { hasSettingStopOnMove, setSettingStopOnMove } from '../components/settings';
+import UICheckbox from '../components/UICheckbox.vue';
 
 const stopOnMove = ref(false);
 

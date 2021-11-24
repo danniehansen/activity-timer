@@ -3,6 +3,7 @@
   <ChangeEstimate v-else-if="page === 'change-estimate'" />
   <MemberSettings v-else-if="page === 'member-settings'" />
   <NotificationSettings v-else-if="page === 'notification-settings'" />
+  <Settings v-else-if="page === 'settings'" />
 </template>
 
 <script setup lang="ts">
@@ -23,6 +24,10 @@ const MemberSettings = defineAsyncComponent({
 
 const NotificationSettings = defineAsyncComponent({
   loader: () => import('./pages/NotificationSettings.vue')
+});
+
+const Settings = defineAsyncComponent({
+  loader: () => import('./pages/Settings.vue')
 });
 
 const t = getTrelloInstance();
