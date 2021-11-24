@@ -29,6 +29,7 @@ module.exports = {
     'no-unused-vars': 'off',
     'no-use-before-define': 'off',
     'vue/no-multiple-template-root': 'off',
-    'eol-last': 'off'
+    'eol-last': 'off',
+    'no-new': 'off'
   }
 };
