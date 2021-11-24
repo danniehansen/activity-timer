@@ -20,4 +20,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.V2_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.V2_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: 'eu-west-1'
-        run: cd infrastructure && yarn install && yarn cdk deploy --require-approval never
+        run: cd infrastructure && yarn install && && yarn cdk bootstrap && yarn cdk deploy --require-approval never
