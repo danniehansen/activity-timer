@@ -15,14 +15,14 @@ if (!['dev', 'prod'].includes(process.env.ACT_ENV)) {
 
 switch (process.env.ACT_ENV) {
 case 'dev':
-  new InfrastructureStack(app, 'InfrastructureStack', {
+  new InfrastructureStack(app, 'dev-activity-timer', {
     env: { account: '265358888522', region: 'eu-west-1' },
     environment: 'dev'
   });
   break;
 
 case 'prod':
-  new InfrastructureStack(app, 'InfrastructureStack', {
+  new InfrastructureStack(app, 'prod-activity-timer', {
     env: { account: '265358888522', region: 'eu-west-1' },
     environment: 'prod'
   });
