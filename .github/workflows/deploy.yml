@@ -20,4 +20,4 @@ jobs:
       - name: Build
         run: yarn build
       - name: cdk deploy
-        run: cd infrastructure && yarn install && yarn cdk deploy --require-approval never
+        run: cd infrastructure && yarn install && ACT_ENV=dev yarn cdk deploy --require-approval never
