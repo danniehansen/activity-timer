@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ develop ]
+    branches: [ feature/v2 ]
 name: Deploy v2 - develop
 jobs:
   aws_cdk:
