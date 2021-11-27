@@ -1,4 +1,4 @@
-import { Trello } from './types/trello';
+import { Trello } from '../types/trello';
 
 type TrelloInstance = Trello.PowerUp.Plugin | Trello.PowerUp.IFrame;
 

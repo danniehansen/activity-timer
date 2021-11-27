@@ -1,5 +1,5 @@
 import { Timer, TimerData } from './timer';
-import { getTrelloInstance } from '../trello';
+import { getTrelloInstance } from './trello';
 
 export class Timers {
   private _cardId: string;

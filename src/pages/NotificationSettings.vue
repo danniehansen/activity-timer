@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { getTrelloCard } from '../trello';
+import { getTrelloCard } from '../components/trello';
 import { debounce } from '../utils/debounce';
 import { disableNotificationsFeature, enableNotificationsFeature, getNotificationPercentage, hasNotificationsFeature, setNotificationPercentage } from '../utils/notifications';
 import UISlider from '../components/UISlider.vue';

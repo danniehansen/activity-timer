@@ -18,19 +18,19 @@ if (!['dev', 'prod'].includes(process.env.ACT_ENV)) {
 }
 
 switch (process.env.ACT_ENV) {
-case 'dev':
-  new InfrastructureStack(app, 'dev-activity-timer', {
-    env: { account: '265358888522', region: 'eu-west-1' },
-    environment: 'dev',
-    trelloSecret: process.env.TRELLO_SECRET
-  });
-  break;
+  case 'dev':
+    new InfrastructureStack(app, 'dev-activity-timer', {
+      env: { account: '265358888522', region: 'eu-west-1' },
+      environment: 'dev',
+      trelloSecret: process.env.TRELLO_SECRET
+    });
+    break;
 
-case 'prod':
-  new InfrastructureStack(app, 'prod-activity-timer', {
-    env: { account: '265358888522', region: 'eu-west-1' },
-    environment: 'prod',
-    trelloSecret: process.env.TRELLO_SECRET
-  });
-  break;
+  case 'prod':
+    new InfrastructureStack(app, 'prod-activity-timer', {
+      env: { account: '265358888522', region: 'eu-west-1' },
+      environment: 'prod',
+      trelloSecret: process.env.TRELLO_SECRET
+    });
+    break;
 }

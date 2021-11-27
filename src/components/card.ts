@@ -1,4 +1,4 @@
-import { getMemberId, getTrelloCard, getTrelloInstance } from '../trello';
+import { getMemberId, getTrelloCard, getTrelloInstance } from './trello';
 import { Trello } from '../types/trello';
 import { Estimate, EstimateData } from './estimate';
 import { Estimates } from './estimates';

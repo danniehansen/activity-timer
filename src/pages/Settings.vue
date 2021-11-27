@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { getTrelloCard, getTrelloInstance } from '../trello';
+import { getTrelloCard, getTrelloInstance } from '../components/trello';
 import UISlider from '../components/UISlider.vue';
 import UICheckbox from '../components/UICheckbox.vue';
 import UIButton from '../components/UIButton.vue';

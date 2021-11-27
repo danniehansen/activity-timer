@@ -19,8 +19,7 @@ import { ref, computed } from 'vue';
 import UIInfo from '../../components/UIInfo/UIInfo.vue';
 import UIRow from '../../components/UIRow.vue';
 import UIButton from '../../components/UIButton.vue';
-import UIColumn from '../../components/UIColumn.vue';
-import { getMemberId, getTrelloCard } from '../../trello';
+import { getMemberId, getTrelloCard } from '../../components/trello';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature } from '../../components/settings';
@@ -150,7 +149,6 @@ const viewEstimates = async (e: MouseEvent) => {
                 message: 'Are you sure you wish to delete this estimate?',
                 confirmText: 'Yes, delete',
                 onConfirm: async (t) => {
-                  // await deleteEstimate(t, member.id);
                   estimates.removeByMemberId(member.id);
                   await estimates.save();
                   return t.closePopup();
@@ -174,7 +172,8 @@ const viewEstimates = async (e: MouseEvent) => {
                 message: 'Are you sure you wish to delete this estimate?',
                 confirmText: 'Yes, delete',
                 onConfirm: async (t) => {
-                  // await deleteEstimateByIndex(t, estimateIndex);
+                  estimates.removeByMemberId(estimate.memberId);
+                  await estimates.save();
                   return t.closePopup();
                 },
                 confirmStyle: 'danger',

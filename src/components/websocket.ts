@@ -1,6 +1,6 @@
-import { getWebsocket } from './components/settings';
-import { getMemberId, getTrelloCard, getTrelloInstance } from './trello';
-import { getAutoTimerListId, hasAutoTimer } from './utils/auto-timer';
+import { getWebsocket } from './settings';
+import { getMemberId } from './trello';
+import { getAutoTimerListId, hasAutoTimer } from '../utils/auto-timer';
 
 let lastWebsocketConnection: number | null = null;
 let requestedTimerStart: string | null = null;

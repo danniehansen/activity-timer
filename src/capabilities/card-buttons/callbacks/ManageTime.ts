@@ -3,7 +3,7 @@ import { Ranges } from '../../../components/ranges';
 import { Range } from '../../../components/range';
 import { Trello } from '../../../types/trello';
 import { formatDate, formatMemberName, formatTime } from '../../../utils/formatting';
-import { getMemberId } from '../../../trello';
+import { getMemberId } from '../../../components/trello';
 
 function getManageRow (card: Card, ranges: Ranges, range: Range): Trello.PowerUp.PopupOptionsItem {
   const start = new Date(range.start * 1000);

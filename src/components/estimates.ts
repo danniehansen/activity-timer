@@ -1,5 +1,4 @@
-import { Timer, TimerData } from './timer';
-import { getTrelloInstance } from '../trello';
+import { getTrelloInstance } from './trello';
 import { Estimate, EstimateData } from './estimate';
 
 export class Estimates {

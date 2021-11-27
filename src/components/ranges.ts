@@ -1,5 +1,5 @@
 import { Range, RangeData } from './range';
-import { getTrelloInstance } from '../trello';
+import { getTrelloInstance } from './trello';
 
 export class Ranges {
   private _cardId: string;
