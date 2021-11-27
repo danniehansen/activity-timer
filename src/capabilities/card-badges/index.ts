@@ -6,6 +6,7 @@ import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature, hasSettingStopOnMove } from '../../components/settings';
 import { getMemberId } from '../../trello';
 import { canTriggerNotification, triggerNotification } from '../../utils/notifications';
+import { clearRequestedTimerStart, getRequestedTimerStart } from '../../websocket';
 
 const clockIcon = `${window.location.origin}${ClockImage}`;
 const estimateImage = `${window.location.origin}${EstimateImage}`;
@@ -91,6 +92,25 @@ export async function getCardBadges (t: Trello.PowerUp.IFrame): Promise<(Trello.
       });
     }
   }
+
+  // Auto-start request detection. Here we utilize refreshing to get the card context
+  // & check up against if card is requested to be started.
+  badges.push({
+    dynamic: async function () {
+      if (card.id === getRequestedTimerStart()) {
+        clearRequestedTimerStart();
+
+        await cardModel.startTracking(
+          (await t.card('idList')).idList,
+          t
+        );
+      }
+
+      return {
+        refresh: 1
+      };
+    }
+  });
 
   return badges;
 }

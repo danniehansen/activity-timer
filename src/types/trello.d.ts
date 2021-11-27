@@ -536,6 +536,18 @@ export namespace Trello {
       context?: string;
       secret?: string;
       helpfulStacks?: boolean;
+      appKey: string;
+      appName: string;
+    }
+
+    interface RestApiAuthorizeOptions {
+      scope: string;
+      expiration: string;
+    }
+
+    interface RestApi {
+      getToken(): Promise<string | undefined>;
+      authorize(options: RestApiAuthorizeOptions): Promise<void>;
     }
 
     interface IFrame extends HostHandlers {
@@ -549,7 +561,7 @@ export namespace Trello {
       request(command: string, options: any): PromiseLike<any>;
       render(fxRender: () => void): any;
       initApi(): void;
-      getRestApi(): unknown;
+      getRestApi(): RestApi;
       initSentry(): void;
     }
 
