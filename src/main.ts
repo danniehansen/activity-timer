@@ -7,24 +7,30 @@ import { getCardBadges } from './capabilities/card-badges';
 import { getCardButtons } from './capabilities/card-buttons';
 import { getShowSettings } from './capabilities/show-settings';
 import { resizeTrelloFrame, setTrelloInstance } from './trello';
-
-let t: Trello.PowerUp.Plugin | Trello.PowerUp.IFrame | null = null;
+import { getAppKey, getAppName } from './components/settings';
+import { initializeWebsocket } from './websocket';
 
 if (window.location.hash) {
-  t = window.TrelloPowerUp.iframe();
+  const t = window.TrelloPowerUp.iframe({
+    appKey: getAppKey(),
+    appName: getAppName()
+  });
+
+  setTrelloInstance(t);
+
   setInterval(resizeTrelloFrame, 500);
 } else {
-  t = window.TrelloPowerUp.initialize({
+  const t = window.TrelloPowerUp.initialize({
     'card-badges': getCardBadges,
     'card-buttons': getCardButtons,
     'card-back-section': getCardBackSection,
     'board-buttons': getBoardButtons,
     'show-settings': getShowSettings
   });
-}
 
-if (t) {
   setTrelloInstance(t);
+
+  initializeWebsocket();
 }
 
 createApp(Router).mount('#app');

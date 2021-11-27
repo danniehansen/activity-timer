@@ -34,12 +34,12 @@ Once an estimate have been saved it will show on the board view & also when on t
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot9.png?r=1 "Estimate")
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot8.png?r=1 "Estimates")
 
-Next up there are notifications! Notification allows you to get notified after spent x percent of your estimated time. Allowing you to reach quickly to any drift in estimates.
+Next up there are notifications! Notification allows you to get notified after spent x percent of your estimated time. Allowing you to react quickly to any drift in estimates.
 
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot11.png?r=1 "Estimates")
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot12.png?r=1 "Estimates")
 
-At last, we have our simple `Activity timer history` board button. This board button allows you to easily filter through cards (including archived) with no easy! Filter by date, member or label. Find out where you're spending your time.
+At last, we have our simple `Activity timer history` board button. This board button allows you to easily filter through cards (including archived) with ease! Filter by date, member or label. Find out where you're spending your time.
 
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot6.png?r=1 "Activity timer history")
 

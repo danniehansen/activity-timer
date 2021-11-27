@@ -27,3 +27,35 @@ export async function hasSettingStopOnMove () {
 export async function setSettingStopOnMove (value: boolean) {
   await getTrelloInstance().set('member', 'private', 'act-timer-personal-settings', value ? 1 : 0);
 }
+
+export function getAppName () {
+  if (typeof import.meta.env.VITE_APP_NAME !== 'string') {
+    throw new Error('VITE_APP_NAME unavailable');
+  }
+
+  return import.meta.env.VITE_APP_NAME;
+}
+
+export function getAppKey () {
+  if (typeof import.meta.env.VITE_APP_KEY !== 'string') {
+    throw new Error('VITE_APP_KEY unavailable');
+  }
+
+  return import.meta.env.VITE_APP_KEY;
+}
+
+export function getApiHost () {
+  if (typeof import.meta.env.VITE_API_HOST !== 'string') {
+    return undefined;
+  }
+
+  return import.meta.env.VITE_API_HOST;
+}
+
+export function getWebsocket () {
+  if (typeof import.meta.env.VITE_WEBSOCKET !== 'string') {
+    return undefined;
+  }
+
+  return import.meta.env.VITE_WEBSOCKET;
+}

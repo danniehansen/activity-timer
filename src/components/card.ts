@@ -88,8 +88,7 @@ export class Card {
     return timers.getByMemberId(memberId) !== undefined;
   }
 
-  async startTracking (listId: string) {
-    const trelloInstance = getTrelloCard();
+  async startTracking (listId: string, trelloInstance: Trello.PowerUp.IFrame = getTrelloCard()) {
     const currentCard = new Card(this._cardId);
     const memberId = await getMemberId();
     const timers = await currentCard.getTimers();
@@ -133,7 +132,7 @@ export class Card {
       const threshold = await getThresholdForTrackings();
 
       if (Math.abs(Math.floor(new Date().getTime() / 1000) - timer.start) < threshold) {
-        getTrelloCard().alert({
+        t.alert({
           message: `Time tracking ignored. Threshold for registering new trackings is ${threshold} second(s).`,
           duration: 3
         });

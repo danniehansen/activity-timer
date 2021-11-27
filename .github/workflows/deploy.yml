@@ -11,9 +11,14 @@ jobs:
         with:
           node-version: 14.x
       - name: Install dependencies
-        run: yarn install
+        run: yarn install && cd src/api/http && yarn install && cd .. && cd websocket && yarn install
       - name: Build
         run: yarn build
+        env:
+          VITE_APP_NAME: 'Activity timer'
+          VITE_APP_KEY: ${{ secrets.ACT_APP_KEY }}
+          VITE_API_HOST: ${{ secrets.ACT_API_HOST }}
+          VITE_WEBSOCKET: ${{ secrets.ACT_WEBSOCKET }}
       - name: cdk deploy
         env:
           ACT_ENV: 'dev'

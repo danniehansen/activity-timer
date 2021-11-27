@@ -3,11 +3,11 @@
   <hr />
   <UISlider v-model="threshold" label="Threshold in seconds for accepting trackings" :min="1" :max="180" />
   <hr />
-  <UIButton v-if="!enableAutoStartTimer" @click="enableAutoStartTimer = true;">Enable auto start timer</UIButton>
-  <UIButton v-if="enableAutoStartTimer" :danger="true" @click="enableAutoStartTimer = false;">Disable auto start timer</UIButton>
-  <div><i v-if="enableAutoStartTimer">(Requires browser reload after enabling)</i></div>
+  <UIButton v-if="!autoStartTimerEnabled" @click="enableAutoStartTimer()">Enable auto start timer</UIButton>
+  <UIButton v-if="autoStartTimerEnabled" :danger="true" @click="disableAutoStartTimer()">Disable auto start timer</UIButton>
+  <div><i v-if="autoStartTimerEnabled">(Requires browser reload after enabling)</i></div>
 
-  <UIDropdown v-if="enableAutoStartTimer" v-model="autoListId" id="list" label="List to auto-start tracking" :options="listOptions" />
+  <UIDropdown v-if="autoStartTimerEnabled" v-model="autoListId" id="list" label="List to auto-start tracking" :options="listOptions" />
 </template>
 
 <script setup lang="ts">
@@ -17,10 +17,16 @@ import UISlider from '../components/UISlider.vue';
 import UICheckbox from '../components/UICheckbox.vue';
 import UIButton from '../components/UIButton.vue';
 import UIDropdown, { Option } from '../components/UIDropdown.vue';
-import { disableEstimateFeature, enableEstimateFeature, getThresholdForTrackings, hasEstimateFeature, setThresholdForTrackings } from '../components/settings';
+import { disableEstimateFeature, enableEstimateFeature, getApiHost, getAppKey, getThresholdForTrackings, hasEstimateFeature, setThresholdForTrackings } from '../components/settings';
 import { disableAutoTimer, enableAutoTimer, getAutoTimerListId, hasAutoTimer, setAutoTimerListId } from '../utils/auto-timer';
 
-const enableAutoStartTimer = ref(false);
+interface WebookResponseItem {
+  webhooks: {
+    id: string;
+  }[]
+}
+
+const autoStartTimerEnabled = ref(false);
 const disableEstimate = ref(false);
 const threshold = ref(1);
 const autoListId = ref('');
@@ -31,8 +37,65 @@ const listOptions = ref<Option[]>([
   }
 ]);
 
+const enableAutoStartTimer = async () => {
+  await getTrelloCard().getRestApi().authorize({
+    scope: 'read,write,account',
+    expiration: 'never'
+  });
+
+  const token = await getTrelloCard().getRestApi().getToken();
+
+  if (token) {
+    const board = await getTrelloCard().board('id');
+
+    const formData = new FormData();
+    formData.append('description', 'Activity timer - auto timer');
+    formData.append('callbackURL', `https://${getApiHost()}/webhook?token=${token}&apiKey=${getAppKey()}`);
+    formData.append('idModel', board.id);
+
+    const response = await fetch(`https://api.trello.com/1/tokens/${token}/webhooks/?key=${getAppKey()}`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.status === 200) {
+      autoStartTimerEnabled.value = true;
+    }
+  }
+};
+
+const disableAutoStartTimer = async () => {
+  const token = await getTrelloCard().getRestApi().getToken();
+
+  if (token) {
+    fetch(`https://api.trello.com/1/members/me/tokens?webhooks=true&key=${getAppKey()}&token=${token}`)
+      .then<WebookResponseItem[]>(response => response.json())
+      .then(async data => {
+        if (data && data.length > 0) {
+          const promises: Promise<Response>[] = [];
+
+          data.forEach((item) => {
+            if (item.webhooks && item.webhooks.length > 0) {
+              item.webhooks.forEach((webhook) => {
+                promises.push(
+                  fetch(`https://api.trello.com/1/webhooks/${webhook.id}?key=${getAppKey()}&token=${token}`, {
+                    method: 'DELETE'
+                  })
+                );
+              });
+            }
+          });
+
+          await Promise.all(promises);
+        }
+      });
+  }
+
+  autoStartTimerEnabled.value = false;
+};
+
 const trelloTick = async () => {
-  enableAutoStartTimer.value = await hasAutoTimer();
+  autoStartTimerEnabled.value = await hasAutoTimer();
   disableEstimate.value = !(await hasEstimateFeature());
   threshold.value = await getThresholdForTrackings();
   autoListId.value = await getAutoTimerListId();
@@ -65,8 +128,8 @@ watch(threshold, () => {
   setThresholdForTrackings(threshold.value);
 });
 
-watch(enableAutoStartTimer, () => {
-  if (enableAutoStartTimer.value) {
+watch(autoStartTimerEnabled, () => {
+  if (autoStartTimerEnabled.value) {
     enableAutoTimer();
   } else {
     disableAutoTimer();
