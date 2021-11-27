@@ -2,6 +2,7 @@ import { Template } from '@aws-cdk/assertions';
 import * as cdk from '@aws-cdk/core';
 import * as Infrastructure from '../lib/infrastructure-stack';
 
+// eslint-disable-next-line no-undef
 test('Deployment', () => {
   const app = new cdk.App();
   const stack = new Infrastructure.InfrastructureStack(app, 'MyTestStack', {
