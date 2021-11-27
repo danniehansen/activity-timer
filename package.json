@@ -8,25 +8,32 @@
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
     "lint": "eslint --ext .js --ext .ts .",
-    "lint:fix": "eslint --ext .js --ext .ts . --fix"
+    "lint:fix": "eslint --ext .js --ext .ts . --fix",
+    "analyze": "vue-tsc --noEmit",
+    "test": "jest src --passWithNoTests"
   },
   "dependencies": {
-    "eslint-plugin-editorconfig": "^3.2.0",
+    "@types/jest": "^27.0.3",
+    "@vitejs/plugin-vue": "^1.9.3",
+    "@vue/test-utils": "^2.0.0-rc.17",
+    "jest": "^27.3.1",
     "sass": "^1.43.4",
-    "vue": "^3.2.16"
+    "ts-jest": "^27.0.7",
+    "typescript": "^4.4.3",
+    "vite": "^2.6.4",
+    "vue": "^3.2.16",
+    "vue-jest": "^5.0.0-alpha.10"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
-    "@vitejs/plugin-vue": "^1.9.3",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-editorconfig": "^3.2.0",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.1",
     "eslint-plugin-vue": "^8.1.1",
-    "typescript": "^4.4.3",
-    "vite": "^2.6.4",
-    "vue-tsc": "^0.3.0"
+    "vue-tsc": "^0.29.6"
   }
 }

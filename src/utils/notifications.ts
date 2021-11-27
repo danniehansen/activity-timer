@@ -1,5 +1,5 @@
 import { Card } from '../components/card';
-import { getMemberId, getTrelloInstance } from '../trello';
+import { getMemberId, getTrelloInstance } from '../components/trello';
 import { Trello } from '../types/trello';
 
 export async function hasNotificationsFeature () {

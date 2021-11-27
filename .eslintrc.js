@@ -20,7 +20,7 @@ module.exports = {
   ],
   rules: {
     semi: [2, 'always'],
-    indent: ['error', 2],
+    indent: ['off', 2],
     'editorconfig/charset': 'error',
     'editorconfig/eol-last': 'off',
     'editorconfig/indent': 'error',

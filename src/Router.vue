@@ -7,28 +7,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue';
-import { getTrelloInstance } from './trello';
-
-const CapabilityCardBackSection = defineAsyncComponent({
-  loader: () => import('./capabilities/card-back-section/view.vue')
-});
-
-const ChangeEstimate = defineAsyncComponent({
-  loader: () => import('./capabilities/card-back-section/change_estimate.vue')
-});
-
-const MemberSettings = defineAsyncComponent({
-  loader: () => import('./pages/MemberSettings.vue')
-});
-
-const NotificationSettings = defineAsyncComponent({
-  loader: () => import('./pages/NotificationSettings.vue')
-});
-
-const Settings = defineAsyncComponent({
-  loader: () => import('./pages/Settings.vue')
-});
+import { getTrelloInstance } from './components/trello';
+import CapabilityCardBackSection from './capabilities/card-back-section/view.vue';
+import ChangeEstimate from './capabilities/card-back-section/change_estimate.vue';
+import MemberSettings from './pages/MemberSettings.vue';
+import NotificationSettings from './pages/NotificationSettings.vue';
+import Settings from './pages/Settings.vue';
 
 const t = getTrelloInstance();
 const urlSearchParams = new URLSearchParams(window.location.search);

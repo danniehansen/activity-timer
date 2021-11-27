@@ -4,9 +4,9 @@ import ClockImage from '../../assets/images/clock.svg';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature, hasSettingStopOnMove } from '../../components/settings';
-import { getMemberId } from '../../trello';
+import { getMemberId } from '../../components/trello';
 import { canTriggerNotification, triggerNotification } from '../../utils/notifications';
-import { clearRequestedTimerStart, getRequestedTimerStart } from '../../websocket';
+import { clearRequestedTimerStart, getRequestedTimerStart } from '../../components/websocket';
 
 const clockIcon = `${window.location.origin}${ClockImage}`;
 const estimateImage = `${window.location.origin}${EstimateImage}`;

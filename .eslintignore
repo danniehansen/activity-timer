@@ -1,0 +1,4 @@
+infrastructure/cdk.out
+node_modules
+infrastructure/node_modules
+dist

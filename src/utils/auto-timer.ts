@@ -1,4 +1,4 @@
-import { getTrelloInstance } from '../trello';
+import { getTrelloInstance } from '../components/trello';
 
 export async function hasAutoTimer () {
   return !!(await getTrelloInstance().get('board', 'shared', 'act-timer-auto-timer'));
