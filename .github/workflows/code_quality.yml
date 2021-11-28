@@ -1,7 +1,7 @@
 on:
   push:
-    branches: [ feature/v2 ]
-name: Deploy v2 - develop
+    branches: [ '*' ]
+name: Code quality
 jobs:
   vue-tsc:
     runs-on: ubuntu-latest
