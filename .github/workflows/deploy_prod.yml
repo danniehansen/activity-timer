@@ -1,7 +1,7 @@
 on:
   workflow_run:
     workflows: ["Code quality"]
-    branches: [ feature/v2 ]
+    branches: [ "feature/v2" ]
     types: 
       - completed
 name: Release - production
