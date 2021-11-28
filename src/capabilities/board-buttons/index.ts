@@ -10,9 +10,13 @@ export async function getBoardButtons (t: Trello.PowerUp.IFrame): Promise<Trello
         light: icon,
         dark: icon
       },
-      text: 'Activity timer history',
-      callback: async () => {
-        console.log('Activity timer history');
+      text: 'Activity timer',
+      callback: async (t) => {
+        await t.modal({
+          url: t.signUrl('./index.html?page=history'),
+          title: 'Activity timer',
+          fullscreen: true
+        });
       }
     }
   ];
