@@ -11,6 +11,3 @@ const props = defineProps({
   danger: Boolean
 });
 </script>
-
-<style lang="scss">
-</style>

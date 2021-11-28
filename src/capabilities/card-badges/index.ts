@@ -27,6 +27,7 @@ export async function getCardBadges (t: Trello.PowerUp.IFrame): Promise<(Trello.
       const timeSpent = timers.timeSpent + ranges.timeSpent;
 
       const badge: Trello.PowerUp.CardBadge = {
+        // Refresh once a minute so we can see the timer increment
         refresh: 60
       };
 
