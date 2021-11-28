@@ -1,0 +1,32 @@
+on:
+  workflow_run:
+    workflows: ["Code quality"]
+    branches: [ feature/v2 ]
+    types: 
+      - completed
+name: Release - production
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Install dependencies
+        run: yarn install && cd src/api/http && yarn install && cd .. && cd websocket && yarn install
+      - name: Build
+        run: yarn build
+        env:
+          VITE_APP_NAME: 'Activity timer'
+          VITE_APP_KEY: ${{ secrets.ACT_APP_KEY_PROD }}
+          VITE_API_HOST: ${{ secrets.ACT_API_HOST_PROD }}
+          VITE_WEBSOCKET: ${{ secrets.ACT_WEBSOCKET_PROD }}
+      - name: cdk deploy
+        env:
+          ACT_ENV: 'prod'
+          AWS_ACCESS_KEY_ID: ${{ secrets.V2_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.V2_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'eu-west-1'
+          TRELLO_SECRET: ${{ secrets.ACT_TRELLO_SECRET_PROD }}
+        run: cd infrastructure && yarn install && yarn cdk bootstrap && yarn cdk deploy --require-approval never
