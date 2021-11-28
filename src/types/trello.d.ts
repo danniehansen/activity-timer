@@ -163,6 +163,16 @@ export namespace Trello {
       memberships: Membership[];
     }
 
+    interface PluginData {
+      access: Visibility;
+      dateLastUpdated: string;
+      id: string;
+      idModel: string;
+      idPlugin: string;
+      scope: Scope;
+      value: string;
+    }
+
     interface Card {
       address: string | null;
       attachments: Attachment[];
@@ -184,6 +194,7 @@ export namespace Trello {
       name: string;
       pos: number;
       shortLink: string;
+      pluginData: PluginData[];
       url: string; // https://trello.com/c/I5nAdteE/9-test
     }
 
@@ -548,6 +559,8 @@ export namespace Trello {
     interface RestApi {
       getToken(): Promise<string | undefined>;
       authorize(options: RestApiAuthorizeOptions): Promise<void>;
+      isAuthorized(): Promise<boolean>;
+      clearToken(): Promise<void>;
     }
 
     interface IFrame extends HostHandlers {

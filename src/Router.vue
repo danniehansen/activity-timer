@@ -14,7 +14,7 @@ import ChangeEstimate from './capabilities/card-back-section/change_estimate.vue
 import MemberSettings from './pages/MemberSettings.vue';
 import NotificationSettings from './pages/NotificationSettings.vue';
 import Settings from './pages/Settings.vue';
-import History from './pages/History.vue';
+import History from './pages/History/History.vue';
 
 const t = getTrelloInstance();
 const urlSearchParams = new URLSearchParams(window.location.search);
@@ -37,3 +37,9 @@ if (page === 'enable-notifications') {
   });
 }
 </script>
+
+<style lang="scss">
+* {
+  box-sizing: border-box;
+}
+</style>

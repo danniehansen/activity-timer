@@ -45,4 +45,8 @@ const props = defineProps({
 .icon-clock:before {
   content: "\e900";
 }
+
+.icon-clear:before {
+  content: "\e901";
+}
 </style>

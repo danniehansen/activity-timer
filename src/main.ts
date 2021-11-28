@@ -32,4 +32,5 @@ if (window.location.hash) {
   initializeWebsocket();
 }
 
-createApp(Router).mount('#app');
+createApp(Router)
+  .mount('#app');

@@ -1,12 +1,15 @@
 <template>
-  <div class="checkbox">
-    <input type="checkbox" v-model="modelValue" :id="id" @input="onChange" />
-    <label :for="id">{{ label }}</label>
-  </div>
+  <UIFormElement>
+    <div class="checkbox">
+      <input type="checkbox" v-model="modelValue" :id="id" @input="onChange" />
+      <label :for="id">{{ label }}</label>
+    </div>
+  </UIFormElement>
 </template>
 
 <script setup lang="ts">
 import { defineProps, getCurrentInstance } from 'vue';
+import UIFormElement from './UIFormElement.vue';
 
 const props = defineProps({
   modelValue: {

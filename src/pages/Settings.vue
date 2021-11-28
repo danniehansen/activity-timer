@@ -7,7 +7,7 @@
   <UIButton v-if="autoStartTimerEnabled" :danger="true" @click="disableAutoStartTimer()">Disable auto start timer</UIButton>
   <div><i v-if="autoStartTimerEnabled">(Requires browser reload after enabling)</i></div>
 
-  <UIDropdown v-if="autoStartTimerEnabled" v-model="autoListId" id="list" label="List to auto-start tracking" :options="listOptions" />
+  <UIDropdown v-if="autoStartTimerEnabled" v-model="autoListId" label="List to auto-start tracking" :options="listOptions" />
 </template>
 
 <script setup lang="ts">
