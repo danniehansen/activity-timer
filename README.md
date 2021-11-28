@@ -1,4 +1,9 @@
 # Activity timer
+
+[![Code quality](https://github.com/danniehansen/activity-timer/actions/workflows/code_quality.yml/badge.svg?branch=master)](https://github.com/danniehansen/activity-timer/actions/workflows/code_quality.yml)
+
+[![Deployment](https://github.com/danniehansen/activity-timer/actions/workflows/deploy_prod.yml/badge.svg?branch=master)](https://github.com/danniehansen/activity-timer/actions/workflows/deploy_prod.yml)
+
 Time is precious, this we know. Keeping track of this precious time is hard. Activity timer solves just that! With Activity timer you can now keep track on your time spent working with cards.
 
 
