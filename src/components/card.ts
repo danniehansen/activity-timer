@@ -24,16 +24,16 @@ export class Card {
 
     return new Ranges(
       this._cardId,
-      data.map((item) => {
+      data.map((rangeData) => {
         return new Range(
           // Member id
-          item[0],
+          rangeData[0],
 
           // Start
-          item[1],
+          rangeData[1],
 
           // End
-          item[2]
+          rangeData[2]
         );
       })
     );
@@ -153,32 +153,19 @@ export class Card {
       try {
         await ranges.save();
       } catch (e) {
-        /* if ((e + '').indexOf('PluginData length of 4096 characters exceeded') !== -1) {
-        const currentTrackings = await Ranges.getFromContext(t);
-
-        try {
-          await currentTrackings.saveByContext(t);
-
+        if ((e + '').indexOf('PluginData length of 4096 characters exceeded') !== -1) {
           t.alert({
             message: 'Unable to save new time tracking. Too many exists on the same card.',
             duration: 6
           });
-        } catch (e) {
+        } else {
           t.alert({
-            message: 'Unable to save new time tracking. Too many exists on the same card.',
+            message: 'Unrecognized error occurred while trying to stop the timer.',
             duration: 3
           });
 
           throw e;
         }
-      } else { */
-        t.alert({
-          message: 'Unrecognized error occurred while trying to stop the timer.',
-          duration: 3
-        });
-
-        throw e;
-      // }
       }
     }
   }

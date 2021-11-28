@@ -16,6 +16,7 @@ async function initiateWebsocket () {
 
   // Security measures to avoid spamming new connections
   if (lastWebsocketConnection !== null && Math.abs(new Date().getTime() - lastWebsocketConnection) < 5000) {
+    // TODO: Investigate other ways of showing an alert. Doesn't look like .alert() is available through the capability initializer.
     /* getTrelloCard().alert({
       message: 'Attempted to establish too many connections. Auto-timer will be de-activated for this session.',
       duration: 6

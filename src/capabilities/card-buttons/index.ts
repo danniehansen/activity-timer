@@ -1,9 +1,5 @@
 import { Trello } from '../../types/trello';
 import ClockImage from '../../assets/images/clock.svg';
-import { Card } from '../../components/card';
-import { formatDate, formatMemberName, formatTime } from '../../utils/formatting';
-import { Ranges } from '../../components/ranges';
-import { Range } from '../../components/range';
 import { manageTimeCallback } from './callbacks/ManageTime';
 import { notificationsCallback } from './callbacks/Notifications';
 import { settingsCallback } from './callbacks/Settings';

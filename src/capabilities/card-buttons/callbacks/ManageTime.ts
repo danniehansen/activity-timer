@@ -17,22 +17,19 @@ function getManageRow (card: Card, ranges: Ranges, range: Range): Trello.PowerUp
       return t.popup({
         title: 'Edit time range',
         items: async function () {
-          const _start = new Date(range.start * 1000);
-          const _end = new Date(range.end * 1000);
-
           return [
             {
               text: 'Edit start (' + formatDate(start) + ')',
               callback: (t) => {
                 return t.popup({
                   type: 'datetime',
-                  title: 'Change start from (' + formatDate(_start) + ')',
+                  title: 'Change start from (' + formatDate(start) + ')',
                   callback: async function (t, opts) {
                     range.start = Math.floor(new Date(opts.date).getTime() / 1000);
                     await ranges.save();
                     return t.closePopup();
                   },
-                  date: _start
+                  date: start
                 });
               }
             },
@@ -41,13 +38,13 @@ function getManageRow (card: Card, ranges: Ranges, range: Range): Trello.PowerUp
               callback: (t) => {
                 return t.popup({
                   type: 'datetime',
-                  title: 'Change end from (' + formatDate(_end) + ')',
+                  title: 'Change end from (' + formatDate(end) + ')',
                   callback: async function (t, opts) {
                     range.end = Math.floor(new Date(opts.date).getTime() / 1000);
                     await ranges.save();
                     return t.closePopup();
                   },
-                  date: _end
+                  date: end
                 });
               }
             },
