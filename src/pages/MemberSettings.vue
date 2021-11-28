@@ -7,12 +7,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { hasSettingStopOnMove, setSettingStopOnMove } from '../components/settings';
+import { resizeTrelloFrame } from '../components/trello';
 import UICheckbox from '../components/UICheckbox.vue';
 
 const stopOnMove = ref(false);
 
 const trelloTick = async () => {
   stopOnMove.value = await hasSettingStopOnMove();
+  setTimeout(resizeTrelloFrame);
 };
 
 watch(stopOnMove, () => {

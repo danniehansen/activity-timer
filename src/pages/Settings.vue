@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { getTrelloCard, getTrelloInstance } from '../components/trello';
+import { getTrelloCard, getTrelloInstance, resizeTrelloFrame } from '../components/trello';
 import UISlider from '../components/UISlider.vue';
 import UICheckbox from '../components/UICheckbox.vue';
 import UIButton from '../components/UIButton.vue';
@@ -114,6 +114,8 @@ const trelloTick = async () => {
       };
     })
   ];
+
+  setTimeout(resizeTrelloFrame);
 };
 
 watch(disableEstimate, () => {
@@ -143,6 +145,3 @@ watch(autoListId, () => {
 getTrelloCard().render(trelloTick);
 trelloTick();
 </script>
-
-<style lang="scss" scoped>
-</style>
