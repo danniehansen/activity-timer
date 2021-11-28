@@ -1,1 +1,1 @@
-export type Icon = 'clock';
+export type Icon = 'clock' | 'clear';

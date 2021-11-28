@@ -1,15 +1,18 @@
 <template>
-  <label>{{ label }}</label>
+  <UIFormElement>
+    <label>{{ label }}</label>
 
-  <UIRow>
-    <input v-model="modelValue" type="range" :min="min" :max="max" @change="onChange" />
-    <input v-model="modelValue" type="number"  @input="onChange" />
-  </UIRow>
+    <UIRow>
+      <input v-model="modelValue" type="range" :min="min" :max="max" @change="onChange" />
+      <input v-model="modelValue" type="number"  @input="onChange" />
+    </UIRow>
+  </UIFormElement>
 </template>
 
 <script setup lang="ts">
 import UIRow from '../components/UIRow.vue';
 import { defineProps, getCurrentInstance } from 'vue';
+import UIFormElement from './UIFormElement.vue';
 
 const props = defineProps({
   modelValue: {
