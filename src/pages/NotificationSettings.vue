@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { getTrelloCard } from '../components/trello';
+import { getTrelloCard, resizeTrelloFrame } from '../components/trello';
 import { debounce } from '../utils/debounce';
 import { disableNotificationsFeature, enableNotificationsFeature, getNotificationPercentage, hasNotificationsFeature, setNotificationPercentage } from '../utils/notifications';
 import UISlider from '../components/UISlider.vue';
@@ -34,6 +34,7 @@ const disable = async () => {
 
 const trelloTick = async () => {
   enabled.value = await hasNotificationsFeature();
+  setTimeout(resizeTrelloFrame);
 };
 
 setInterval(async () => {

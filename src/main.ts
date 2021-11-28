@@ -5,7 +5,7 @@ import { getCardBackSection } from './capabilities/card-back-section';
 import { getCardBadges } from './capabilities/card-badges';
 import { getCardButtons } from './capabilities/card-buttons';
 import { getShowSettings } from './capabilities/show-settings';
-import { resizeTrelloFrame, setTrelloInstance } from './components/trello';
+import { setTrelloInstance } from './components/trello';
 import { getAppKey, getAppName } from './components/settings';
 import { initializeWebsocket } from './components/websocket';
 
@@ -17,7 +17,7 @@ if (window.location.hash) {
 
   setTrelloInstance(t);
 
-  setInterval(resizeTrelloFrame, 500);
+  // setInterval(resizeTrelloFrame, 500);
 } else {
   const t = window.TrelloPowerUp.initialize({
     'card-badges': getCardBadges,

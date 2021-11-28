@@ -10,7 +10,7 @@ import { ref } from 'vue';
 import { Card } from '../../components/card';
 import { Estimate } from '../../components/estimate';
 import UIButton from '../../components/UIButton.vue';
-import { getMemberId, getTrelloCard } from '../../components/trello';
+import { getMemberId, getTrelloCard, resizeTrelloFrame } from '../../components/trello';
 
 const estimate = ref<number | null>(null);
 
@@ -48,4 +48,6 @@ const save = async () => {
 };
 
 fetchEstimate();
+
+setTimeout(resizeTrelloFrame);
 </script>

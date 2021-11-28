@@ -39,28 +39,23 @@ Next up there are notifications! Notification allows you to get notified after s
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot11.png?r=1 "Estimates")
 ![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot12.png?r=1 "Estimates")
 
-At last, we have our simple `Activity timer history` board button. This board button allows you to easily filter through cards (including archived) with ease! Filter by date, member or label. Find out where you're spending your time.
-
-![alt text](https://d3eyxhmqemauky.cloudfront.net/images/screenshot6.png?r=1 "Activity timer history")
-
 ## Highlights
 
 1. Easy access to start / stop of timer.
 2. Powerful time management editor to edit previous recordings.
 3. When you move card from one list to another it will automatically stop the timer.
 4. All data on a card is stored in a compressed format that's easy to access through REST API.
-5. Easy access to previous recordings from our very own history view.
-6. Estimate functionality.
-7. Desktop notifications when near estimate.
+5. Estimation functionality.
+6. Desktop notifications when nearing estimate.
+7. **(Premium)** Exporting tool for exporting powerup data into CSV. This powerful tool allows you to filter Activity timer trackings and control which columns to include in the CSV.
 
 ## Card data (REST API)
 
-Want to extract logged time and process it in another system? No problem! Activity timer keeps recordings in the shared data of the card. This means you can query the logged time for a card using Trello's own REST API. All the time ranges saved by Activity timer is saved within key 'act-timer-ranges' in shared card data. 'act-timer-ranges' consists of an array where each item's index equals to:
+Want to extract logged time and process it in another system? No problem! Activity timer keeps recordings in the shared data of the card. This means you can query the logged time for a card using Trello's own REST API. All the time ranges saved by Activity timer is saved within key `act-timer-ranges` in shared card data. `act-timer-ranges` consists of an array where each item's index equals to:
 
 - 0: Member id
 - 1: Start time (unix timestamp)
 - 2: End time (unix timestamp)
 
-## Open Source
-
-Activity timer is open source! Yes you heard it. Head over to https://github.com/danniehansen/activity-timer and submit your issues, ideas or even your very own PR with new and exciting features.
+## Docs
+You can read more about the internals of Activity timer in [our docs](docs/README.md). This will walk you through the infrastructure as well as how to setup the local development workspace.
