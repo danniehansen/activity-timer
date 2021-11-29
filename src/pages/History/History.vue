@@ -6,29 +6,33 @@
 
   <div class="authorized" v-else>
     <div class="header">
-      <UIDropdown
-        v-model="members"
-        label="Members"
-        placeholder="All"
-        :multiple="true"
-        :options="memberOptions"
-      />
+      <div class="header__filters">
+        <UIDropdown
+          v-model="members"
+          label="Members"
+          placeholder="All"
+          :multiple="true"
+          :options="memberOptions"
+        />
 
-      <UIDropdown
-        v-model="labels"
-        label="Labels"
-        placeholder="All"
-        :multiple="true"
-        :options="labelOptions"
-      />
+        <UIDropdown
+          v-model="labels"
+          label="Labels"
+          placeholder="All"
+          :multiple="true"
+          :options="labelOptions"
+        />
 
-      <UIDropdown
-        v-model="columns"
-        label="Columns"
-        placeholder="Default"
-        :multiple="true"
-        :options="columnOptions"
-      />
+        <UIDropdown
+          v-model="columns"
+          label="Columns"
+          placeholder="Default"
+          :multiple="true"
+          :options="columnOptions"
+        />
+      </div>
+
+      <UICheckbox v-model="groupByMember" id="group_by_member" label="Group by member" />
     </div>
 
     <table>
@@ -39,8 +43,10 @@
       </thead>
 
       <tbody>
-        <tr v-for="tableRow in tableBody" :key="tableRow.data.id">
-          <td v-for="columnItem in tableHead" :key="columnItem.value">{{ tableRow.rowData[columnItem.value] ?? '' }}</td>
+        <tr v-for="tableRow in tableBody" :key="tableRow['card.id']">
+          <td v-for="columnItem in tableHead" :key="columnItem.value" :style="columnStyle[columnItem.value] ?? {}">
+            {{ tableRow[columnItem.value] ?? '' }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -54,22 +60,44 @@ import { getTrelloCard } from '../../components/trello';
 import UIButton from '../../components/UIButton.vue';
 import UIDropdown, { Option } from '../../components/UIDropdown.vue';
 import { Trello } from '../../types/trello';
-import { formatMemberName } from '../../utils/formatting';
-import { ApiCard } from './ApiCard';
+import { formatMemberName, formatTime } from '../../utils/formatting';
+import { ApiCard, ApiCardRowData } from './ApiCard';
+import UICheckbox from '../../components/UICheckbox.vue';
 
 const isAuthorized = ref(false);
 const memberOptions = ref<Option[]>();
 const members = ref<string[]>([]);
 const labels = ref<string[]>([]);
 const columns = ref<string[]>([]);
+const groupByMember = ref(false);
 const uniqueLabels = ref<Trello.PowerUp.Label[]>([]);
 const defaultColumns = [
   'card.title',
   'card.labels',
   'member.name',
-  'time_spent',
+  'time_spent_seconds',
   'time_spent_formatted'
 ];
+
+const memberById: {
+  [key: string]: Trello.PowerUp.Member;
+} = {};
+
+// TODO: Find CSS.Properties types package
+const columnStyle: { [key: keyof ApiCardRowData]: any } = {
+  'card.description': {
+    maxWidth: '200px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+  time_spent_seconds: {
+    width: '175px'
+  },
+  time_spent_formatted: {
+    width: '175px'
+  }
+};
 
 const columnOptions = ref<Option[]>([
   {
@@ -97,8 +125,8 @@ const columnOptions = ref<Option[]>([
     value: 'member.name'
   },
   {
-    text: 'Time spent',
-    value: 'time_spent'
+    text: 'Time spent - seconds',
+    value: 'time_spent_seconds'
   },
   {
     text: 'Time spent - formatted',
@@ -110,14 +138,9 @@ let cards: ApiCard[] = [];
 const cardsLength = ref(0);
 
 const tableHead = computed<Option[]>(() => {
-  return (columns.value.length > 0 ? columns.value : defaultColumns).map<Option>((column) => {
-    const columnItem = columnOptions.value.find((col) => col.value === column);
-
-    if (!columnItem) {
-      throw new Error('Unrecognized column');
-    }
-
-    return columnItem;
+  const selectedColumns = (columns.value.length > 0 ? columns.value : defaultColumns);
+  return columnOptions.value.filter((column) => {
+    return selectedColumns.includes(column.value);
   });
 });
 
@@ -127,26 +150,60 @@ const filteredCards = computed<ApiCard[]>(() => {
   }
 
   return cards.filter((card) => {
-    if (members.value.length > 0) {
-      let memberFound = false;
+    if (labels.value.length > 0) {
+      let labelFound = false;
 
-      members.value.forEach((selectedMember) => {
-        if (card.rowData['member.id'].includes(selectedMember)) {
-          memberFound = true;
+      labels.value.forEach((selectedLabel) => {
+        if (card.data.labels.find((label) => label.id === selectedLabel)) {
+          labelFound = true;
         }
       });
 
-      if (!memberFound) {
+      if (!labelFound) {
         return false;
       }
     }
 
-    return true;
+    return card.rowData.value.time_spent_seconds > 0;
   });
 });
 
-const tableBody = computed<ApiCard[]>(() => {
-  return filteredCards.value.slice(0, 100);
+const rowDataList = computed<ApiCardRowData[]>(() => {
+  const rowData: ApiCardRowData[] = [];
+
+  filteredCards.value.forEach((card) => {
+    const rowDataItem = card.rowData.value;
+
+    if (groupByMember.value) {
+      rowData.push(rowDataItem);
+    } else {
+      card.ranges.items.filter((item) => {
+        if (members.value.length > 0) {
+          return members.value.includes(item.memberId);
+        }
+
+        return true;
+      }).map((range) => range.memberId).filter((value, index, self) => {
+        return self.indexOf(value) === index;
+      }).forEach((memberId) => {
+        const timeSpent = card.ranges.items.filter((item) => item.memberId === memberId).reduce((a, b) => a + b.diff, 0);
+
+        rowData.push({
+          ...rowDataItem,
+          'member.id': memberId,
+          'member.name': formatMemberName(memberById[memberId]),
+          time_spent_seconds: timeSpent,
+          time_spent_formatted: formatTime(timeSpent, true)
+        });
+      });
+    }
+  });
+
+  return rowData;
+});
+
+const tableBody = computed<ApiCardRowData[]>(() => {
+  return rowDataList.value.slice(0, 100);
 });
 
 async function trelloTick () {
@@ -178,14 +235,13 @@ async function getData () {
       .then<Trello.PowerUp.Card[]>((res) => res.json());
 
     cards = data.map<ApiCard>((card) => {
-      return new ApiCard(card);
+      return new ApiCard(card, memberById, members);
     });
 
     cardsLength.value = cards.length;
 
     getUniqueLabels();
   } catch (e) {
-    console.log('e:', e);
     try {
       await clearToken();
     } catch (e) {
@@ -198,6 +254,10 @@ async function getData () {
 
 const initialize = async () => {
   const board = await getTrelloCard().board('members');
+
+  board.members.forEach((member) => {
+    memberById[member.id] = member;
+  });
 
   memberOptions.value = board.members.sort((a, b) => {
     const nameA = (a.fullName ?? '').toUpperCase();
@@ -273,8 +333,24 @@ trelloTick().then(() => {
 }
 
 .header {
-  label:first-child {
-    margin-top: 0;
+  &__filters {
+    display: flex;
+    flex-direction: row;
+
+    .form-element {
+      width: 200px;
+      flex-grow: 0;
+      flex-shrink: 1;
+      margin: 0 0 0 15px;
+
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+
+    label:first-child {
+      margin-top: 0;
+    }
   }
 }
 </style>

@@ -10,14 +10,21 @@ import { getAppKey, getAppName } from './components/settings';
 import { initializeWebsocket } from './components/websocket';
 
 if (window.location.hash) {
-  const t = window.TrelloPowerUp.iframe({
-    appKey: getAppKey(),
-    appName: getAppName()
-  });
+  try {
+    const t = window.TrelloPowerUp.iframe({
+      appKey: getAppKey(),
+      appName: getAppName()
+    });
 
-  setTrelloInstance(t);
+    setTrelloInstance(t);
+  } catch (e) {
+    // When app key / app name is provided.
+    // Then it requires access to localStorage which
+    // isn't available in incognito.
+    const t = window.TrelloPowerUp.iframe();
 
-  // setInterval(resizeTrelloFrame, 500);
+    setTrelloInstance(t);
+  }
 } else {
   const t = window.TrelloPowerUp.initialize({
     'card-badges': getCardBadges,
