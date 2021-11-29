@@ -121,6 +121,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+label {
+  user-select: none;
+}
+
 .dropdown {
   position: relative;
   width: 100%;
@@ -173,6 +177,8 @@ onBeforeUnmount(() => {
     border-bottom-right-radius: 4px;
     z-index: 10;
     background-color: #fff;
+    max-height: 175px;
+    overflow: auto;
   }
 
   &__option {

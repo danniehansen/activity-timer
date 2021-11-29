@@ -1,3 +1,4 @@
+import { computed, ComputedRef, Ref } from 'vue';
 import { Range } from '../../components/range';
 import { Ranges } from '../../components/ranges';
 import { Trello } from '../../types/trello';
@@ -7,23 +8,29 @@ interface PluginRawData {
   'act-timer-ranges': [string, number, number][];
 }
 
-interface RowData {
+interface MemberById {
+  [key: string]: Trello.PowerUp.Member;
+}
+
+export interface ApiCardRowData {
   [key: string]: string | string[] | number;
   'card.id': string;
   'card.title': string;
   'card.description': string;
-  'member.id': string | string[];
-  'member.name': string | string[];
-  'time_spent': number;
+  'card.labels': string;
+  'member.id': string;
+  'member.name': string;
+  'time_spent_seconds': number;
   'time_spent_formatted': string;
 }
 
 export class ApiCard {
   private _data: Trello.PowerUp.Card;
   private _ranges: Ranges;
-  private _rowData: RowData;
+  private _rowData: ComputedRef<ApiCardRowData>;
+  private _memberById: MemberById;
 
-  constructor (data: Trello.PowerUp.Card) {
+  constructor (data: Trello.PowerUp.Card, memberById: MemberById, selectedMembers: Ref<string[]>) {
     this._data = data;
 
     const pluginData = data.pluginData.find((pluginData) => {
@@ -56,19 +63,36 @@ export class ApiCard {
       this._ranges = new Ranges(this._data.id);
     }
 
-    const timeSpent = this._ranges.timeSpent;
+    this._memberById = memberById;
+    this._rowData = computed<ApiCardRowData>(() => {
+      const ranges = (selectedMembers.value.length > 0
+        ? new Ranges(
+          this._data.id,
+          this._ranges.items.filter((item) => selectedMembers.value.includes(item.memberId))
+        )
+        : this._ranges);
 
-    this._rowData = {
-      'card.id': this._data.id,
-      'card.title': this._data.name,
-      'card.description': this._data.desc,
-      'member.id': this._ranges.items.map((item) => item.memberId).filter((value, index, self) => {
+      const timeSpent = ranges.timeSpent;
+
+      const members = ranges.items.map((item) => item.memberId).filter((value, index, self) => {
         return self.indexOf(value) === index;
-      }),
-      'member.name': 'name',
-      time_spent: timeSpent,
-      time_spent_formatted: formatTime(timeSpent, true)
-    };
+      });
+
+      return {
+        'card.id': this._data.id,
+        'card.title': this._data.name,
+        'card.description': this._data.desc,
+        'card.labels': this._data.labels.map((label) => label.name).join(', '),
+        'member.id': members.join(', '),
+        'member.name': members.filter((member) => {
+          return this._memberById[member] !== undefined;
+        }).map((member) => {
+          return formatMemberName(this._memberById[member]);
+        }).join(', '),
+        time_spent_seconds: timeSpent,
+        time_spent_formatted: formatTime(timeSpent, true)
+      };
+    });
   }
 
   get data () {
