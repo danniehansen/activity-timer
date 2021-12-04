@@ -36,11 +36,11 @@ Now the local developer environment is ready. Next up is creation of the local d
 
 First up is [creating a Trello team](https://help.trello.com/article/705-creating-a-new-team). This is required, as a powerup needs to be connected to a team.
 
-Once the team is setup, then youe ready to [create your powerup](https://trello.com/power-ups/admin).
+Once the team is setup, then you're ready to [create your powerup](https://trello.com/power-ups/admin).
 
 Under basic information you need to fill in the iframe connector URL with: `https://localhost:3001/` - this is for local development.
 
-After this you need to enable the capabilities that the powerup uses.
+After this you need to enable the capabilities that the powerup uses:
 
 1. Board buttons
 2. Card back section
@@ -48,27 +48,61 @@ After this you need to enable the capabilities that the powerup uses.
 4. Card buttons
 5. Show settings
 
-When this is done you can create a new Trello board under your new Trello team. Here you should be able to when adding a powerup to select your newly created powerup.
+When this is done you can create a new Trello board under your new Trello team. Here you should be able to, when adding a powerup, to select your newly created powerup.
 
 ## Commands
 
-**yarn dev**: This will startup the local development environment. Before you can view your powerup locally you need to open up `https://localhost:3001/` & allow the self signed certificate. Once allowed you can refresh the Trello board & see your local powerup in action!
+```
+yarn dev
+```
+This will startup the local development environment. Before you can view your powerup locally you need to open up `https://localhost:3001/` & allow the self signed certificate. Once allowed you can refresh the Trello board & see your local powerup in action!
+<hr />
 
-**yarn lint**: This will run ESlint on all of your .js / .ts files & ensure that you're compatible with Activity timers code style.
+```
+yarn lint
+```
+This will run ESlint on all of your .js / .ts files & ensure that you're compatible with Activity timers code style.
+<hr />
 
-**yarn analyze**: This will run `vue-tsc` & analyze the TypeScript files for issues.
+```
+yarn analyze
+```
+This will run `vue-tsc` & analyze the TypeScript files for issues.
+<hr />
 
-**yarn test**: This will run `jest` to perform unit testing on our application.
+```
+yarn test
+```
+This will run `jest` to perform unit testing on our application.
+<hr />
 
-**yarn build**: This will run vite & create a production build. Command outputs to the `dist` folder.
+```
+yarn build
+```
+This will run vite & create a production build. Command outputs to the `dist` folder.
 
 ## Environment variables
 
-**VITE_APP_NAME**: The app name that appears when user attempts to authorize to the Trello REST API.
+```
+VITE_APP_NAME
+```
+The app name that appears when user attempts to authorize to the Trello REST API.
+<hr />
 
-**VITE_APP_KEY**: The app API key used when communicating with the Trello REST API. You can generate an app key over at: https://trello.com/app-key
+```
+VITE_APP_KEY
+```
+The app API key used when communicating with the Trello REST API. You can generate an app key over at: https://trello.com/app-key
+<hr />
 
-**VITE_WEBSOCKET**: The websocket to be used for communicating from the webhook that controls the auto-starting of the timer. Webhook will communicate with this websocket for notifying the client on when to start timers for specific cards.
+```
+VITE_WEBSOCKET
+```
+The websocket to be used for communicating from the webhook that controls the auto-starting of the timer. Webhook will communicate with this websocket for notifying the client on when to start timers for specific cards.
+<hr />
 
-**VITE_API_HOST**: The webhook HTTP API. This is used when setting up webhooks for controlling the auto-starting of timers.
+```
+VITE_API_HOST
+```
+The webhook HTTP API. This is used when setting up webhooks for controlling the auto-starting of timers.
 
