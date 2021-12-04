@@ -11,5 +11,10 @@
   &:first-child {
     margin-top: 0;
   }
+
+  label {
+    user-select: none;
+    cursor: pointer;
+  }
 }
 </style>

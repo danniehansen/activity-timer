@@ -2,20 +2,21 @@
   <UIFormElement>
     <label @click="showOptions = !showOptions;">{{ label }}</label>
 
-    <div class="dropdown" :class="{ 'dropdown--active': showOptions }">
-      <div class="dropdown__selected" @click.stop="showOptions = !showOptions;" :title="selected">
+    <div class="dropdown" :class="{ 'dropdown--active': showOptions }" ref="container">
+      <div class="dropdown__selected" @click="showOptions = !showOptions;" :title="selected">
         {{ selected || placeholder }}
         <div class="dropdown__selected-clear" @click.stop="clear()" v-if="hasValue">
           <UIIcon icon="clear" />
         </div>
       </div>
 
-      <div class="dropdown__options" v-if="showOptions">
+      <div class="dropdown__options" v-if="showOptions" ref="optionsContainer">
         <div
           class="dropdown__option"
           v-for="option in options"
           :key="option.value"
           :class="{ 'dropdown__option--selected': value.includes(option.value) }"
+          :title="option.text"
           @click="toggleOption(option)"
         >
           {{ option.text }}
@@ -57,6 +58,9 @@ const props = defineProps({
   }
 });
 
+const container = ref<HTMLDivElement | null>(null);
+const optionsContainer = ref<HTMLDivElement | null>(null);
+
 const showOptions = ref(false);
 
 const selected = computed(() => {
@@ -78,6 +82,20 @@ const value = computed(() => {
 
   return (props.modelValue ? [props.modelValue] : []);
 });
+
+const isInElement = (el: HTMLElement, inElement: HTMLElement) => {
+  let elToCheck: HTMLElement = el;
+
+  while (elToCheck.parentElement) {
+    if (elToCheck === inElement) {
+      return true;
+    }
+
+    elToCheck = elToCheck.parentElement;
+  }
+
+  return false;
+};
 
 const hasValue = computed(() => {
   return (Array.isArray(props.modelValue) ? props.modelValue.length > 0 : !!props.modelValue);
@@ -108,7 +126,36 @@ const clear = () => {
 };
 
 const clickAwayDetection = (e: MouseEvent) => {
-  if (showOptions.value && !(e.target instanceof HTMLDivElement && e.target.classList.contains('dropdown__option'))) {
+  if (
+    showOptions.value &&
+    e.target instanceof HTMLElement &&
+    container.value &&
+    isInElement(e.target, container.value) &&
+    (
+      e.target.classList.contains('dropdown__selected') ||
+      e.target.nodeName.toLowerCase() === 'label'
+    )
+  ) {
+    return;
+  }
+
+  if (
+    showOptions.value &&
+    optionsContainer.value &&
+    e.target instanceof HTMLElement &&
+    !isInElement(e.target, optionsContainer.value)
+  ) {
+    showOptions.value = false;
+    return;
+  }
+
+  if (
+    showOptions.value &&
+    optionsContainer.value &&
+    e.target instanceof HTMLElement &&
+    isInElement(e.target, optionsContainer.value) &&
+    !e.target.classList.contains('dropdown__option')
+  ) {
     showOptions.value = false;
   }
 };
@@ -136,24 +183,15 @@ label {
     height: 38px;
     line-height: 38px;
     padding: 0 30px 0 14px;
-    border: 1px solid #96c8da;
+    box-shadow: inset 0 0 0 2px #dfe1e6;
     border-radius: 4px;
     cursor: pointer;
     position: relative;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #5E6C84;
-
-    &:hover {
-      background-color: #96c8da;
-      color: #fff;
-    }
-
-    .dropdown--active & {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-    }
+    color: #172B4D;
+    background-color: #FAFBFC;
 
     &-clear {
       position: absolute;

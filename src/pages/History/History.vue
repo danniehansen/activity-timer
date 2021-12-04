@@ -1,4 +1,8 @@
 <template>
+  <transition name="fade">
+    <UILoader v-if="loading" />
+  </transition>
+
   <div class="unauthorized" v-if="!isAuthorized">
     <p>To access history data you need to allow Activity timer to read this data. Click the button below to allow this.</p>
     <UIButton @click="authorize()">Authorize</UIButton>
@@ -30,12 +34,22 @@
           :multiple="true"
           :options="columnOptions"
         />
+
+        <UIDateInput
+          v-model="dateFrom"
+          label="Date from"
+        />
+
+        <UIDateInput
+          v-model="dateTo"
+          label="Date to"
+        />
       </div>
 
       <UICheckbox v-model="groupByMember" id="group_by_member" label="Group by member" />
     </div>
 
-    <table>
+    <table class="body">
       <thead>
         <tr>
           <th v-for="headItem in tableHead" :key="headItem.value">{{ headItem.text }}</th>
@@ -50,6 +64,10 @@
         </tr>
       </tbody>
     </table>
+
+    <div class="footer">
+      <UIButton @click="exportData()">Export to CSV</UIButton>
+    </div>
   </div>
 </template>
 
@@ -63,13 +81,20 @@ import { Trello } from '../../types/trello';
 import { formatMemberName, formatTime } from '../../utils/formatting';
 import { ApiCard, ApiCardRowData } from './ApiCard';
 import UICheckbox from '../../components/UICheckbox.vue';
+import UIDateInput from '../../components/UIDateInput.vue';
+import { Ranges } from '../../components/ranges';
+import { ExportToCsv } from 'export-to-csv';
+import UILoader from '../../components/UILoader.vue';
 
 const isAuthorized = ref(false);
 const memberOptions = ref<Option[]>();
 const members = ref<string[]>([]);
 const labels = ref<string[]>([]);
 const columns = ref<string[]>([]);
+const dateFrom = ref('');
+const dateTo = ref('');
 const groupByMember = ref(false);
+const loading = ref(true);
 const uniqueLabels = ref<Trello.PowerUp.Label[]>([]);
 const defaultColumns = [
   'card.title',
@@ -137,6 +162,13 @@ const columnOptions = ref<Option[]>([
 let cards: ApiCard[] = [];
 const cardsLength = ref(0);
 
+function setTimeMidnight (date: Date) {
+  date.setHours(23);
+  date.setMinutes(59);
+  date.setSeconds(59);
+  return date;
+}
+
 const tableHead = computed<Option[]>(() => {
   const selectedColumns = (columns.value.length > 0 ? columns.value : defaultColumns);
   return columnOptions.value.filter((column) => {
@@ -149,7 +181,26 @@ const filteredCards = computed<ApiCard[]>(() => {
     return [];
   }
 
+  const dateFromUnix = (dateFrom.value ? Math.floor(new Date(dateFrom.value).getTime() / 1000) : 0);
+  const dateToUnix = (dateTo.value ? Math.floor(setTimeMidnight(new Date(dateTo.value)).getTime() / 1000) : 0);
+
   return cards.filter((card) => {
+    let ranges = card.ranges;
+
+    if (dateFromUnix) {
+      ranges = new Ranges(
+        card.data.id,
+        card.ranges.items.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix)
+      );
+    }
+
+    if (dateToUnix) {
+      ranges = new Ranges(
+        card.data.id,
+        card.ranges.items.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix)
+      );
+    }
+
     if (labels.value.length > 0) {
       let labelFound = false;
 
@@ -164,7 +215,7 @@ const filteredCards = computed<ApiCard[]>(() => {
       }
     }
 
-    return card.rowData.value.time_spent_seconds > 0;
+    return ranges.timeSpent > 0;
   });
 });
 
@@ -173,6 +224,9 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
 
   filteredCards.value.forEach((card) => {
     const rowDataItem = card.rowData.value;
+
+    const dateFromUnix = (dateFrom.value ? Math.floor(new Date(dateFrom.value).getTime() / 1000) : 0);
+    const dateToUnix = (dateTo.value ? Math.floor(setTimeMidnight(new Date(dateTo.value)).getTime() / 1000) : 0);
 
     if (groupByMember.value) {
       rowData.push(rowDataItem);
@@ -186,15 +240,33 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
       }).map((range) => range.memberId).filter((value, index, self) => {
         return self.indexOf(value) === index;
       }).forEach((memberId) => {
-        const timeSpent = card.ranges.items.filter((item) => item.memberId === memberId).reduce((a, b) => a + b.diff, 0);
+        let ranges = card.ranges;
 
-        rowData.push({
-          ...rowDataItem,
-          'member.id': memberId,
-          'member.name': formatMemberName(memberById[memberId]),
-          time_spent_seconds: timeSpent,
-          time_spent_formatted: formatTime(timeSpent, true)
-        });
+        if (dateFromUnix) {
+          ranges = new Ranges(
+            card.data.id,
+            card.ranges.items.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix)
+          );
+        }
+
+        if (dateToUnix) {
+          ranges = new Ranges(
+            card.data.id,
+            card.ranges.items.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix)
+          );
+        }
+
+        const timeSpent = ranges.items.filter((item) => item.memberId === memberId).reduce((a, b) => a + b.diff, 0);
+
+        if (timeSpent > 0) {
+          rowData.push({
+            ...rowDataItem,
+            'member.id': memberId,
+            'member.name': formatMemberName(memberById[memberId]),
+            time_spent_seconds: timeSpent,
+            time_spent_formatted: formatTime(timeSpent, true)
+          });
+        }
       });
     }
   });
@@ -227,6 +299,10 @@ function getUniqueLabels () {
 }
 
 async function getData () {
+  const getDataStart = Date.now();
+
+  loading.value = true;
+
   const token = await getTrelloCard().getRestApi().getToken();
   const board = await getTrelloCard().board('id');
 
@@ -250,6 +326,10 @@ async function getData () {
 
     await trelloTick();
   }
+
+  await new Promise((resolve) => setTimeout(resolve, Math.min(1500, Date.now() - getDataStart)));
+
+  loading.value = false;
 };
 
 const initialize = async () => {
@@ -280,6 +360,8 @@ const initialize = async () => {
 
   if (isAuthorized.value) {
     await getData();
+  } else {
+    loading.value = false;
   }
 };
 
@@ -313,13 +395,45 @@ const labelOptions = computed<Option[]>(() => {
   });
 });
 
+const exportData = () => {
+  const data: Array<Array<string>> = [];
+
+  const csvExporter = new ExportToCsv({
+    fieldSeparator: ',',
+    quoteStrings: '"',
+    decimalSeparator: '.',
+    showLabels: true,
+    useTextFile: false,
+    filename: 'activity-timer',
+    useBom: true
+  });
+
+  data.push(
+    tableHead.value.map((headItem) => {
+      return headItem.text;
+    })
+  );
+
+  rowDataList.value.forEach((rowData) => {
+    const row: Array<string> = [];
+
+    tableHead.value.forEach((headItem) => {
+      row.push((rowData[headItem.value] ?? '').toString());
+    });
+
+    data.push(row);
+  });
+
+  csvExporter.generateCsv(data);
+};
+
 trelloTick().then(() => {
   initialize();
   getTrelloCard().render(trelloTick);
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .unauthorized {
   position: absolute;
   left: 50%;
@@ -330,6 +444,7 @@ trelloTick().then(() => {
 
 .authorized {
   padding: 25px;
+  padding-bottom: 62px;
 }
 
 .header {
@@ -337,26 +452,52 @@ trelloTick().then(() => {
     display: flex;
     flex-direction: row;
 
+    label:first-child {
+      margin-top: 0;
+    }
+
     .form-element {
-      width: 200px;
-      flex-grow: 0;
-      flex-shrink: 1;
       margin: 0 0 0 15px;
 
       &:first-child {
         margin-left: 0;
       }
     }
+  }
 
-    label:first-child {
-      margin-top: 0;
-    }
+  .form-element {
+    width: 200px;
+    flex-grow: 0;
+    flex-shrink: 1;
   }
 }
-</style>
 
-<style lang="scss" scoped>
 table {
   margin-top: 25px;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border-top: 2px solid #dfe1e6;
+  padding: 14px;
+  background-color: #fff;
+  z-index: 10;
+
+  button {
+    margin: 0;
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -40,10 +40,6 @@ const onChange = (e: Event) => {
   padding: 0 0 0 22px;
   position: relative;
 
-  label {
-    user-select: none;
-  }
-
   input {
     position: absolute;
     left: 0;
