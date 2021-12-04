@@ -30,6 +30,13 @@ ACT_ENV=dev TRELLO_SECRET=... yarn cdk deploy
 After this HTTP API for the webhook, Websocket API for communicating live events, dynamoDB for persistent storage, CloudFront distribution & S3 for vite build.
 
 ## Environment variables
-**ACT_ENV**: Activity timer environment. Can be either `dev` or `prod`.
+```
+ACT_ENV
+```
+Activity timer environment. Can be either `dev` or `prod`.
+<hr />
 
-**TRELLO_SECRET**: OAuth 1 secret from https://trello.com/app-key
+```
+TRELLO_SECRET
+```
+OAuth 1 secret from https://trello.com/app-key
