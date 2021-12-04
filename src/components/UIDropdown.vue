@@ -209,7 +209,7 @@ label {
     left: 0;
     top: 100%;
     width: 100%;
-    border: 1px solid #96c8da;
+    border: 1px solid #dfe1e6;
     border-top: none;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
@@ -217,6 +217,18 @@ label {
     background-color: #fff;
     max-height: 175px;
     overflow: auto;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.15);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #6c6c6c;
+    }
   }
 
   &__option {
@@ -229,13 +241,12 @@ label {
     color: #5E6C84;
 
     &:hover {
-      background-color: #96c8da;
-      color: #fff;
+      background-color: #dfe1e6;
     }
 
     &--selected {
-      background-color: #38a4cb;
-      color: #fff;
+      background-color: #a1a3a7 !important;
+      color: #fff !important;
     }
   }
 }
