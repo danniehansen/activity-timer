@@ -13,6 +13,7 @@
     "test": "jest src --passWithNoTests"
   },
   "dependencies": {
+    "@optro/api-client": "^1.0.5",
     "@types/jest": "^27.0.3",
     "@vitejs/plugin-vue": "^1.9.3",
     "@vue/test-utils": "^2.0.0-rc.17",

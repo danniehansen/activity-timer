@@ -8,6 +8,7 @@ import { getShowSettings } from './capabilities/show-settings';
 import { setTrelloInstance } from './components/trello';
 import { getAppKey, getAppName } from './components/settings';
 import { initializeWebsocket } from './components/websocket';
+import { initializeOptro } from './components/optro';
 
 if (window.location.hash) {
   try {
@@ -38,6 +39,8 @@ if (window.location.hash) {
 
   initializeWebsocket();
 }
+
+initializeOptro();
 
 createApp(Router)
   .mount('#app');

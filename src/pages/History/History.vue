@@ -3,12 +3,16 @@
     <UILoader v-if="loading" />
   </transition>
 
-  <div class="unauthorized" v-if="!isAuthorized">
+  <div class="unauthorized" v-if="!loading && !hasSubscription">
+    <p>This feature is restricted to Pro users only. <a :href="proListingUrl" target="_blank">Read more about the Pro plan here.</a></p>
+  </div>
+
+  <div class="unauthorized" v-else-if="!loading && !isAuthorized && hasSubscription">
     <p>To access history data you need to allow Activity timer to read this data. Click the button below to allow this.</p>
     <UIButton @click="authorize()">Authorize</UIButton>
   </div>
 
-  <div class="authorized" v-else>
+  <div class="authorized" v-else-if="!loading && isAuthorized && hasSubscription">
     <div class="header">
       <div class="header__filters">
         <UIDropdown
@@ -49,7 +53,7 @@
       <UICheckbox v-model="groupByMember" id="group_by_member" label="Group by member" />
     </div>
 
-    <table class="body">
+    <table class="body" v-if="tableBody.length > 0">
       <thead>
         <tr>
           <th v-for="headItem in tableHead" :key="headItem.value">{{ headItem.text }}</th>
@@ -64,6 +68,8 @@
         </tr>
       </tbody>
     </table>
+
+    <p v-else>No cards found with trackings matching your filter</p>
 
     <div class="footer">
       <UIButton @click="exportData()">Export to CSV</UIButton>
@@ -85,6 +91,7 @@ import UIDateInput from '../../components/UIDateInput.vue';
 import { Ranges } from '../../components/ranges';
 import { ExportToCsv } from 'export-to-csv';
 import UILoader from '../../components/UILoader.vue';
+import { getOptroListingUrl, getSubscriptionStatus } from '../../components/optro';
 
 const isAuthorized = ref(false);
 const memberOptions = ref<Option[]>();
@@ -95,6 +102,8 @@ const dateFrom = ref('');
 const dateTo = ref('');
 const groupByMember = ref(false);
 const loading = ref(true);
+const hasSubscription = ref(false);
+const proListingUrl = getOptroListingUrl();
 const uniqueLabels = ref<Trello.PowerUp.Label[]>([]);
 const defaultColumns = [
   'card.title',
@@ -229,7 +238,37 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
     const dateToUnix = (dateTo.value ? Math.floor(setTimeMidnight(new Date(dateTo.value)).getTime() / 1000) : 0);
 
     if (groupByMember.value) {
-      rowData.push(rowDataItem);
+      let ranges = card.ranges;
+
+      if (dateFromUnix) {
+        ranges = new Ranges(
+          card.data.id,
+          card.ranges.items.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix)
+        );
+      }
+
+      if (dateToUnix) {
+        ranges = new Ranges(
+          card.data.id,
+          card.ranges.items.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix)
+        );
+      }
+
+      const members = ranges.items.map((range) => range.memberId).filter((value, index, self) => {
+        return self.indexOf(value) === index;
+      });
+
+      const timeSpent = ranges.items.reduce((a, b) => a + b.diff, 0);
+
+      if (timeSpent > 0) {
+        rowData.push({
+          ...rowDataItem,
+          'member.id': members.join(', '),
+          'member.name': members.map((memberId) => formatMemberName(memberById[memberId])).join(', '),
+          time_spent_seconds: timeSpent,
+          time_spent_formatted: formatTime(timeSpent, true)
+        });
+      }
     } else {
       card.ranges.items.filter((item) => {
         if (members.value.length > 0) {
@@ -276,6 +315,15 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
 
 const tableBody = computed<ApiCardRowData[]>(() => {
   return rowDataList.value.slice(0, 100);
+});
+
+const labelOptions = computed<Option[]>(() => {
+  return uniqueLabels.value.map<Option>((label) => {
+    return {
+      text: label.name,
+      value: label.id
+    };
+  });
 });
 
 async function trelloTick () {
@@ -332,8 +380,16 @@ async function getData () {
   loading.value = false;
 };
 
-const initialize = async () => {
+async function initialize () {
   const board = await getTrelloCard().board('members');
+
+  // Get the initial subscription status
+  hasSubscription.value = await getSubscriptionStatus();
+
+  // Re-fresh subscription status every 5 minute
+  setInterval(async () => {
+    hasSubscription.value = await getSubscriptionStatus();
+  }, 60 * 1000 * 5);
 
   board.members.forEach((member) => {
     memberById[member.id] = member;
@@ -365,7 +421,7 @@ const initialize = async () => {
   }
 };
 
-const clearToken = async () => {
+async function clearToken () {
   try {
     await getTrelloCard().getRestApi().clearToken();
   } catch (e) {
@@ -385,15 +441,6 @@ const authorize = async () => {
 
   await getData();
 };
-
-const labelOptions = computed<Option[]>(() => {
-  return uniqueLabels.value.map<Option>((label) => {
-    return {
-      text: label.name,
-      value: label.id
-    };
-  });
-});
 
 const exportData = () => {
   const data: Array<Array<string>> = [];
@@ -489,6 +536,10 @@ table {
   button {
     margin: 0;
   }
+}
+
+p {
+  margin: 25px 0;
 }
 
 .fade-enter-active,
