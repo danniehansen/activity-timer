@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.0.0] - 2021-12-05
+### Changed
+- Exchanged webpack with vite for bundling.
+- 'Activity timer history' board button has been re-done & now only available to Pro subscriptions.
+### Added
+- Vue3
+- TypeScript
+- ESLint - For code style linting.
+- vue-tsc - For static code analysis.
+- CDK - Infrastructure as code. Makes it easy to re-deploy at various environments.
+
 ## [1.2.2] - 2021-08-23
 ### Added
 - Added ability to manually add time tracking when no other time trackings have been added yet.
