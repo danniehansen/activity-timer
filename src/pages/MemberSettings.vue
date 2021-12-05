@@ -2,6 +2,8 @@
   <UICheckbox v-model="stopOnMove" id="stop-on-move" label="Stop active tracking when card moves" />
 
   <i>Other power-up settings exists for administrators on the power-up settings page</i>
+
+  <a v-if="subscribeForNews" :href="subscribeForNews" target="_blank">Subscribe to updates about Activity timer</a>
 </template>
 
 <script setup lang="ts">
@@ -10,10 +12,16 @@ import { hasSettingStopOnMove, setSettingStopOnMove } from '../components/settin
 import { resizeTrelloFrame } from '../components/trello';
 import UICheckbox from '../components/UICheckbox.vue';
 
+const subscribeForNews = ref('');
 const stopOnMove = ref(false);
 
 const trelloTick = async () => {
   stopOnMove.value = await hasSettingStopOnMove();
+
+  if (typeof import.meta.env.VITE_MAILCHIMP_LINK === 'string') {
+    subscribeForNews.value = import.meta.env.VITE_MAILCHIMP_LINK;
+  }
+
   setTimeout(resizeTrelloFrame);
 };
 
@@ -40,5 +48,17 @@ trelloTick();
       box-shadow: inset 0 0 0 2px #172b4d !important;
     }
   }
+}
+</style>
+
+<style lang="scss" scoped>
+a {
+  display: inline-block;
+  font-size: 12px;
+  padding: 3px 6px;
+  background-color: rgba(9, 30, 66, 0.04);
+  text-decoration: none;
+  border-radius: 3px;
+  margin-top: 15px;
 }
 </style>

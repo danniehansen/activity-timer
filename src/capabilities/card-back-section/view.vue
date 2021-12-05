@@ -19,7 +19,7 @@ import { ref, computed } from 'vue';
 import UIInfo from '../../components/UIInfo/UIInfo.vue';
 import UIRow from '../../components/UIRow.vue';
 import UIButton from '../../components/UIButton.vue';
-import { getMemberId, getTrelloCard } from '../../components/trello';
+import { getMemberId, getTrelloCard, resizeTrelloFrame } from '../../components/trello';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature } from '../../components/settings';

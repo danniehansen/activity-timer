@@ -26,6 +26,9 @@ jobs:
           VITE_OPTRO_API_KEY: ${{ secrets.ACT_OPTRO_API_KEY }}
           VITE_OPTRO_LISTING_URL: ${{ secrets.ACT_OPTRO_LISTING_URL }}
           VITE_POWERUP_ID: ${{ secrets.ACT_POWERUP_ID }}
+          VITE_SENTRY_DSN: ${{ secrets.ACT_SENTRY_DSN }}
+          VITE_APP_ORIGIN: ${{ secrets.ACT_APP_ORIGIN }}
+          VITE_MAILCHIMP_LINK: ${{ secrets.ACT_MAILCHIMP_LINK }}
       - name: cdk deploy
         env:
           ACT_ENV: 'prod'
