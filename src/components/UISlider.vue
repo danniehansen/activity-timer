@@ -4,7 +4,7 @@
 
     <UIRow>
       <input v-model="modelValue" type="range" :min="min" :max="max" @change="onChange" />
-      <input v-model="modelValue" type="number"  @input="onChange" />
+      <input v-model="modelValue" type="number" @input="onChange" />
     </UIRow>
   </UIFormElement>
 </template>

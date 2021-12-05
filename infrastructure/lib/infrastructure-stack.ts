@@ -1,4 +1,4 @@
-import { CloudFrontAllowedMethods, CloudFrontWebDistribution, OriginAccessIdentity, OriginProtocolPolicy, SecurityPolicyProtocol } from '@aws-cdk/aws-cloudfront';
+import { CloudFrontAllowedMethods, CloudFrontWebDistribution, OriginAccessIdentity, Function, FunctionCode, FunctionEventType } from '@aws-cdk/aws-cloudfront';
 import { BlockPublicAccess, Bucket, BucketAccessControl } from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
 import { Duration, RemovalPolicy } from '@aws-cdk/core';
@@ -117,6 +117,25 @@ export class InfrastructureStack extends cdk.Stack {
       principals: [new iam.CanonicalUserPrincipal(cloudfrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
     }));
 
+    const responseFunction = new Function(this, 'website-cloudfront-viewer-response', {
+      code: FunctionCode.fromInline(`
+        function handler(event) {
+          var response = event.response;
+          var headers = response.headers;
+
+          // Set HTTP security headers
+          headers['strict-transport-security'] = { value: 'max-age=63072000; includeSubdomains; preload'};
+          headers['content-security-policy'] = { value: "default-src 'none'; font-src 'self' data:; img-src 'self'; script-src 'self' 'unsafe-inline' https://p.trellocdn.com/; style-src 'self' https://p.trellocdn.com/; object-src 'none'; connect-src 'self' ${webSocketApi.apiEndpoint} *.ingest.sentry.io https://api.trello.com/"};
+          headers['x-content-type-options'] = { value: 'nosniff'};
+
+          // Return the response to viewers
+          return response;
+        }
+      `),
+      comment: 'Adds security headers',
+      functionName: `${props.environment}-activity-timer-viewer-response-func`
+    });
+
     const distribution = new CloudFrontWebDistribution(this, 'website-cloudfront', {
       originConfigs: [
         {
@@ -128,7 +147,11 @@ export class InfrastructureStack extends cdk.Stack {
             {
               isDefaultBehavior: true,
               compress: true,
-              allowedMethods: CloudFrontAllowedMethods.GET_HEAD_OPTIONS
+              allowedMethods: CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
+              functionAssociations: [{
+                function: responseFunction,
+                eventType: FunctionEventType.VIEWER_RESPONSE
+              }]
             }
           ]
         }
