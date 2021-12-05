@@ -47,7 +47,6 @@ initializeOptro();
 const app = createApp(Router);
 
 if (typeof import.meta.env.VITE_SENTRY_DSN === 'string' && typeof import.meta.env.VITE_APP_ORIGIN === 'string') {
-  console.log('import.meta.env.VITE_SENTRY_DSN:', import.meta.env.VITE_SENTRY_DSN);
   Sentry.init({
     app,
     dsn: import.meta.env.VITE_SENTRY_DSN,
