@@ -1,5 +1,5 @@
 import OptroLicenseApi from '@optro/api-client/dist/OproLicenseApi';
-import { getTrelloInstance } from './trello';
+import { getPowerupId, getTrelloInstance } from './trello';
 
 let optroClient: OptroLicenseApi | undefined;
 
@@ -13,26 +13,20 @@ async function getOptroBoardLicense () {
   return optroClient.getBoardLicenseStatus(board.id);
 }
 
-export function getOptroListingUrl () {
-  if (typeof import.meta.env.VITE_OPTRO_LISTING_URL !== 'string') {
-    return '';
-  }
-
-  return import.meta.env.VITE_OPTRO_LISTING_URL;
-}
-
 export function initializeOptro () {
   if (typeof import.meta.env.VITE_OPTRO_API_KEY !== 'string') {
     return;
   }
 
-  if (typeof import.meta.env.VITE_POWERUP_ID !== 'string') {
+  const powerupId = getPowerupId();
+
+  if (!powerupId) {
     return;
   }
 
   optroClient = new OptroLicenseApi(
     import.meta.env.VITE_OPTRO_API_KEY,
-    import.meta.env.VITE_POWERUP_ID
+    powerupId
   );
 }
 
@@ -43,7 +37,7 @@ export function hasOptroClient () {
 export async function getSubscriptionStatus () {
   if (hasOptroClient()) {
     const optroBoardLicense = await getOptroBoardLicense();
-    return optroBoardLicense.isLicensed && optroBoardLicense.isRegistered;
+    return optroBoardLicense.isLicensed;
   }
 
   return true;

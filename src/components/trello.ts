@@ -32,3 +32,11 @@ export async function getMemberId () {
 
   return memberIdCache;
 }
+
+export function getPowerupId () {
+  if (typeof import.meta.env.VITE_POWERUP_ID !== 'string') {
+    return '';
+  }
+
+  return import.meta.env.VITE_POWERUP_ID;
+}

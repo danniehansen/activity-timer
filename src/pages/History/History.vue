@@ -3,8 +3,10 @@
     <UILoader v-if="loading" />
   </transition>
 
+  <UIOptroStatus v-if="!loading" style="border-radius: 0;" />
+
   <div class="unauthorized" v-if="!loading && !hasSubscription">
-    <p>This feature is restricted to Pro users only. <a :href="proListingUrl" target="_blank">Read more about the Pro plan here.</a></p>
+    <p>This feature is restricted to Pro users only. <a :href="`https://www.optro.cloud/app/${powerupId}`" target="_blank" rel="noreferrer">Read more about the Pro plan here.</a></p>
   </div>
 
   <div class="unauthorized" v-else-if="!loading && !isAuthorized && hasSubscription">
@@ -80,7 +82,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { getAppKey } from '../../components/settings';
-import { getTrelloCard } from '../../components/trello';
+import { getPowerupId, getTrelloCard } from '../../components/trello';
 import UIButton from '../../components/UIButton.vue';
 import UIDropdown, { Option } from '../../components/UIDropdown.vue';
 import { Trello } from '../../types/trello';
@@ -92,6 +94,7 @@ import { Ranges } from '../../components/ranges';
 import { ExportToCsv } from 'export-to-csv';
 import UILoader from '../../components/UILoader.vue';
 import { getOptroListingUrl, getSubscriptionStatus } from '../../components/optro';
+import UIOptroStatus from '../../components/UIOptroStatus.vue';
 
 const isAuthorized = ref(false);
 const memberOptions = ref<Option[]>();
@@ -103,7 +106,6 @@ const dateTo = ref('');
 const groupByMember = ref(false);
 const loading = ref(true);
 const hasSubscription = ref(false);
-const proListingUrl = getOptroListingUrl();
 const uniqueLabels = ref<Trello.PowerUp.Label[]>([]);
 const defaultColumns = [
   'card.title',
@@ -112,6 +114,8 @@ const defaultColumns = [
   'time_spent_seconds',
   'time_spent_formatted'
 ];
+
+const powerupId = getPowerupId();
 
 const memberById: {
   [key: string]: Trello.PowerUp.Member;
