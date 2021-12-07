@@ -1,4 +1,6 @@
 <template>
+  <UIOptroStatus />
+
   <UICheckbox v-model="stopOnMove" id="stop-on-move" label="Stop active tracking when card moves" />
 
   <i>Other power-up settings exists for administrators on the power-up settings page</i>
@@ -11,6 +13,7 @@ import { ref, watch } from 'vue';
 import { hasSettingStopOnMove, setSettingStopOnMove } from '../components/settings';
 import { resizeTrelloFrame } from '../components/trello';
 import UICheckbox from '../components/UICheckbox.vue';
+import UIOptroStatus from '../components/UIOptroStatus.vue';
 
 const subscribeForNews = ref('');
 const stopOnMove = ref(false);

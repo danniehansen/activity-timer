@@ -1,4 +1,6 @@
 <template>
+  <UIOptroStatus />
+
   <UICheckbox v-model="disableEstimate" id="disable-estimate" label="Disable estimate feature" />
   <hr />
   <UISlider v-model="threshold" label="Threshold in seconds for accepting trackings" :min="1" :max="180" />
@@ -19,6 +21,7 @@ import UIButton from '../components/UIButton.vue';
 import UIDropdown, { Option } from '../components/UIDropdown.vue';
 import { disableEstimateFeature, enableEstimateFeature, getApiHost, getAppKey, getThresholdForTrackings, hasEstimateFeature, setThresholdForTrackings } from '../components/settings';
 import { disableAutoTimer, enableAutoTimer, getAutoTimerListId, hasAutoTimer, setAutoTimerListId } from '../utils/auto-timer';
+import UIOptroStatus from '../components/UIOptroStatus.vue';
 
 interface WebookResponseItem {
   webhooks: {
