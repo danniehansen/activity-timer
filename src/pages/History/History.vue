@@ -93,7 +93,7 @@ import UIDateInput from '../../components/UIDateInput.vue';
 import { Ranges } from '../../components/ranges';
 import { ExportToCsv } from 'export-to-csv';
 import UILoader from '../../components/UILoader.vue';
-import { getOptroListingUrl, getSubscriptionStatus } from '../../components/optro';
+import { getSubscriptionStatus } from '../../components/optro';
 import UIOptroStatus from '../../components/UIOptroStatus.vue';
 
 const isAuthorized = ref(false);
