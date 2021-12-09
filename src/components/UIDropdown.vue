@@ -172,7 +172,9 @@ export default defineComponent({
       clear,
       hasValue,
       value,
-      toggleOption
+      toggleOption,
+      container,
+      optionsContainer
     };
   }
 });
