@@ -2,32 +2,42 @@
   <UIFormElement>
     <label>{{ label }}</label>
 
-    <input v-model="modelValue" type="date"  @input="onChange" />
+    <input v-model="fieldValue" type="date"  @input="onChange" />
   </UIFormElement>
 </template>
 
-<script setup lang="ts">
-import { defineProps, PropType, getCurrentInstance } from 'vue';
+<script lang="ts">
+import { defineComponent, watch, ref } from 'vue';
 import UIFormElement from './UIFormElement.vue';
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-    required: true
+export default defineComponent({
+  components: { UIFormElement },
+  props: {
+    modelValue: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    }
   },
-  label: {
-    type: String,
-    required: true
+  setup (props, context) {
+    const fieldValue = ref(props.modelValue);
+
+    watch(props, () => {
+      fieldValue.value = props.modelValue;
+    });
+
+    const onChange = (e: Event) => {
+      if (e.target instanceof HTMLInputElement) {
+        context.emit('update:modelValue', e.target.value);
+      }
+    };
+
+    return { onChange, fieldValue };
   }
 });
-
-const instance = getCurrentInstance();
-
-const onChange = (e: Event) => {
-  if (e.target instanceof HTMLInputElement) {
-    instance?.emit('update:modelValue', e.target.value);
-  }
-};
 </script>
 
 <style lang="scss" scoped>

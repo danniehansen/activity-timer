@@ -26,8 +26,8 @@
   </UIFormElement>
 </template>
 
-<script setup lang="ts">
-import { computed, defineProps, getCurrentInstance, onBeforeUnmount, PropType, ref } from 'vue';
+<script lang="ts">
+import { computed, onBeforeUnmount, PropType, ref, defineComponent } from 'vue';
 import UIIcon from './UIIcon/UIIcon.vue';
 import UIFormElement from './UIFormElement.vue';
 
@@ -36,134 +36,145 @@ export interface Option {
   text: string;
 }
 
-const props = defineProps({
-  modelValue: {
-    value: [String, Array as PropType<string[]>],
-    required: true
-  },
-  label: {
-    type: String,
-    required: true
-  },
-  options: {
-    type: Array as PropType<Option[]>
-  },
-  multiple: {
-    type: Boolean,
-    default: false
-  },
-  placeholder: {
-    type: String,
-    required: false
-  }
-});
-
-const container = ref<HTMLDivElement | null>(null);
-const optionsContainer = ref<HTMLDivElement | null>(null);
-
-const showOptions = ref(false);
-
-const selected = computed(() => {
-  if (Array.isArray(props.modelValue)) {
-    return props.modelValue.map((optionValue) => {
-      return props.options?.find((opt) => opt.value === optionValue)?.text ?? '';
-    }).join(', ');
-  } else if (props.modelValue) {
-    return props.options?.find((opt) => opt.value === props.modelValue)?.text ?? '';
-  }
-
-  return '';
-});
-
-const value = computed(() => {
-  if (Array.isArray(props.modelValue)) {
-    return props.modelValue;
-  }
-
-  return (props.modelValue ? [props.modelValue] : []);
-});
-
-const isInElement = (el: HTMLElement, inElement: HTMLElement) => {
-  let elToCheck: HTMLElement = el;
-
-  while (elToCheck.parentElement) {
-    if (elToCheck === inElement) {
-      return true;
+export default defineComponent({
+  components: { UIFormElement, UIIcon },
+  props: {
+    modelValue: {
+      value: [String, Array as PropType<string[]>],
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    options: {
+      type: Array as PropType<Option[]>
+    },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    placeholder: {
+      type: String,
+      required: false
     }
+  },
+  setup (props, context) {
+    const container = ref<HTMLDivElement | null>(null);
+    const optionsContainer = ref<HTMLDivElement | null>(null);
 
-    elToCheck = elToCheck.parentElement;
+    const showOptions = ref(false);
+
+    const selected = computed(() => {
+      if (Array.isArray(props.modelValue)) {
+        return props.modelValue.map((optionValue) => {
+          return props.options?.find((opt) => opt.value === optionValue)?.text ?? '';
+        }).join(', ');
+      } else if (props.modelValue) {
+        return props.options?.find((opt) => opt.value === props.modelValue)?.text ?? '';
+      }
+
+      return '';
+    });
+
+    const value = computed(() => {
+      if (Array.isArray(props.modelValue)) {
+        return props.modelValue;
+      }
+
+      return (props.modelValue ? [props.modelValue] : []);
+    });
+
+    const isInElement = (el: HTMLElement, inElement: HTMLElement) => {
+      let elToCheck: HTMLElement = el;
+
+      while (elToCheck.parentElement) {
+        if (elToCheck === inElement) {
+          return true;
+        }
+
+        elToCheck = elToCheck.parentElement;
+      }
+
+      return false;
+    };
+
+    const hasValue = computed(() => {
+      return (Array.isArray(props.modelValue) ? props.modelValue.length > 0 : !!props.modelValue);
+    });
+
+    const toggleOption = (option: Option) => {
+      if (props.multiple) {
+        const newValue = Array.from(Array.isArray(props.modelValue) ? props.modelValue : []);
+
+        if (newValue.includes(option.value)) {
+          newValue.splice(newValue.indexOf(option.value), 1);
+        } else {
+          newValue.push(option.value);
+        }
+
+        context.emit('update:modelValue', newValue);
+      } else {
+        showOptions.value = false;
+        context.emit('update:modelValue', option.value);
+      }
+    };
+
+    const clear = () => {
+      showOptions.value = false;
+      context.emit('update:modelValue', (props.multiple ? [] : ''));
+    };
+
+    const clickAwayDetection = (e: MouseEvent) => {
+      if (
+        showOptions.value &&
+        e.target instanceof HTMLElement &&
+        container.value &&
+        isInElement(e.target, container.value) &&
+        (
+          e.target.classList.contains('dropdown__selected') ||
+          e.target.nodeName.toLowerCase() === 'label'
+        )
+      ) {
+        return;
+      }
+
+      if (
+        showOptions.value &&
+        optionsContainer.value &&
+        e.target instanceof HTMLElement &&
+        !isInElement(e.target, optionsContainer.value)
+      ) {
+        showOptions.value = false;
+        return;
+      }
+
+      if (
+        showOptions.value &&
+        optionsContainer.value &&
+        e.target instanceof HTMLElement &&
+        isInElement(e.target, optionsContainer.value) &&
+        !e.target.classList.contains('dropdown__option')
+      ) {
+        showOptions.value = false;
+      }
+    };
+
+    window.addEventListener('click', clickAwayDetection);
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('click', clickAwayDetection);
+    });
+
+    return {
+      showOptions,
+      selected,
+      clear,
+      hasValue,
+      value,
+      toggleOption
+    };
   }
-
-  return false;
-};
-
-const hasValue = computed(() => {
-  return (Array.isArray(props.modelValue) ? props.modelValue.length > 0 : !!props.modelValue);
-});
-
-const instance = getCurrentInstance();
-
-const toggleOption = (option: Option) => {
-  if (props.multiple) {
-    const newValue = Array.from(Array.isArray(props.modelValue) ? props.modelValue : []);
-
-    if (newValue.includes(option.value)) {
-      newValue.splice(newValue.indexOf(option.value), 1);
-    } else {
-      newValue.push(option.value);
-    }
-
-    instance?.emit('update:modelValue', newValue);
-  } else {
-    showOptions.value = false;
-    instance?.emit('update:modelValue', option.value);
-  }
-};
-
-const clear = () => {
-  showOptions.value = false;
-  instance?.emit('update:modelValue', (props.multiple ? [] : ''));
-};
-
-const clickAwayDetection = (e: MouseEvent) => {
-  if (
-    showOptions.value &&
-    e.target instanceof HTMLElement &&
-    container.value &&
-    isInElement(e.target, container.value) &&
-    (
-      e.target.classList.contains('dropdown__selected') ||
-      e.target.nodeName.toLowerCase() === 'label'
-    )
-  ) {
-    return;
-  }
-
-  if (
-    showOptions.value &&
-    optionsContainer.value &&
-    e.target instanceof HTMLElement &&
-    !isInElement(e.target, optionsContainer.value)
-  ) {
-    showOptions.value = false;
-    return;
-  }
-
-  if (
-    showOptions.value &&
-    optionsContainer.value &&
-    e.target instanceof HTMLElement &&
-    isInElement(e.target, optionsContainer.value) &&
-    !e.target.classList.contains('dropdown__option')
-  ) {
-    showOptions.value = false;
-  }
-};
-
-window.addEventListener('click', clickAwayDetection);
-
-onBeforeUnmount(() => {
-  window.removeEventListener('click', clickAwayDetection);
 });
 </script>
 
