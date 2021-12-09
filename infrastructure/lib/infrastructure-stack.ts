@@ -11,8 +11,10 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as path from 'path';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
 
+type PowerupEnvironment = 'dev' | 'prod';
+
 interface Props extends cdk.StackProps {
-  environment: 'dev' | 'prod';
+  environment: PowerupEnvironment;
   trelloSecret: string;
 }
 
@@ -24,91 +26,22 @@ export class InfrastructureStack extends cdk.Stack {
       throw new Error('No AWS region specified');
     }
 
-    const table = new dynamodb.Table(this, 'dynamodb-table', {
-      tableName: `${props.environment}-activity-timer-pubsub`,
-      partitionKey: { name: 'connection_id', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: RemovalPolicy.DESTROY
-    });
+    const { webSocketApi } = this.constructPubSub(props.environment, props.trelloSecret, props.env.region);
+    this.constructWebsite(props.environment, webSocketApi);
+  }
 
-    table.addGlobalSecondaryIndex({
-      indexName: 'MemberIdIndex',
-      partitionKey: {
-        name: 'member_id',
-        type: dynamodb.AttributeType.STRING
-      },
-      projectionType: dynamodb.ProjectionType.ALL
-    });
-
-    const apiLambda = new lambda.Function(this, 'api-lambda', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'index.main',
-      code: lambda.Code.fromAsset(path.join(__dirname, '/../../src/api/http')),
-      environment: {
-        ACT_TRELLO_SECRET: props.trelloSecret,
-        ACT_DYNAMODB_TABLE: table.tableName,
-        ACT_AWS_REGION: props.env.region
-      },
-      timeout: Duration.seconds(5),
-      memorySize: 512
-    });
-
-    table.grantReadData(apiLambda);
-
-    const websocketLambda = new lambda.Function(this, 'api-websocket-lambda', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'index.main',
-      code: lambda.Code.fromAsset(path.join(__dirname, '/../../src/api/websocket')),
-      timeout: Duration.seconds(5),
-      memorySize: 512,
-      environment: {
-        ACT_DYNAMODB_TABLE: table.tableName,
-        ACT_AWS_REGION: props.env.region
-      }
-    });
-
-    table.grantReadWriteData(websocketLambda);
-
-    const apiIntegration = new LambdaProxyIntegration({
-      handler: apiLambda
-    });
-
-    const httpApi = new HttpApi(this, 'api', {
-      apiName: `${props.environment}-activity-timer-api`
-    });
-
-    httpApi.addRoutes({
-      path: '/webhook',
-      methods: [HttpMethod.POST, HttpMethod.GET, HttpMethod.HEAD],
-      integration: apiIntegration
-    });
-
-    const webSocketApi = new WebSocketApi(this, 'websocket-api', {
-      apiName: `${props.environment}-activity-timer-websocket-api`,
-      connectRouteOptions: { integration: new LambdaWebSocketIntegration({ handler: websocketLambda }) },
-      defaultRouteOptions: { integration: new LambdaWebSocketIntegration({ handler: websocketLambda }) },
-      disconnectRouteOptions: { integration: new LambdaWebSocketIntegration({ handler: websocketLambda }) }
-    });
-
-    webSocketApi.grantManageConnections(apiLambda);
-
-    const apiStage = new WebSocketStage(this, 'websocket', {
-      webSocketApi,
-      stageName: props.environment,
-      autoDeploy: true
-    });
-
-    const cloudfrontOAI = new OriginAccessIdentity(this, 'cloudfront-oai', {
-      comment: `OAI for activity timer ${props.environment}`
-    });
-
+  private constructWebsite (env: PowerupEnvironment, webSocketApi: WebSocketApi) {
     const siteBucket = new Bucket(this, 'website-bucket', {
-      bucketName: `${props.environment}-activity-timer-v2`,
+      bucketName: `${env}-activity-timer-v2`,
       websiteIndexDocument: 'index.html',
       websiteErrorDocument: 'index.html',
       accessControl: BucketAccessControl.PRIVATE,
       removalPolicy: RemovalPolicy.DESTROY,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+    });
+
+    const cloudfrontOAI = new OriginAccessIdentity(this, 'cloudfront-oai', {
+      comment: `OAI for activity timer ${env}`
     });
 
     siteBucket.addToResourcePolicy(new iam.PolicyStatement({
@@ -117,6 +50,9 @@ export class InfrastructureStack extends cdk.Stack {
       principals: [new iam.CanonicalUserPrincipal(cloudfrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
     }));
 
+    /**
+     * These content security policy headers are required by Trello.
+     */
     const responseFunction = new Function(this, 'website-cloudfront-viewer-response', {
       code: FunctionCode.fromInline(`
         function handler(event) {
@@ -133,7 +69,7 @@ export class InfrastructureStack extends cdk.Stack {
         }
       `),
       comment: 'Adds security headers',
-      functionName: `${props.environment}-activity-timer-viewer-response-func`
+      functionName: `${env}-activity-timer-viewer-response-func`
     });
 
     const distribution = new CloudFrontWebDistribution(this, 'website-cloudfront', {
@@ -164,5 +100,83 @@ export class InfrastructureStack extends cdk.Stack {
       distribution,
       distributionPaths: ['/*']
     });
+  }
+
+  private constructPubSub (env: PowerupEnvironment, trelloSecret: string, region: string) {
+    const table = new dynamodb.Table(this, 'dynamodb-table', {
+      tableName: `${env}-activity-timer-pubsub`,
+      partitionKey: { name: 'connection_id', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY
+    });
+
+    table.addGlobalSecondaryIndex({
+      indexName: 'MemberIdIndex',
+      partitionKey: {
+        name: 'member_id',
+        type: dynamodb.AttributeType.STRING
+      },
+      projectionType: dynamodb.ProjectionType.ALL
+    });
+
+    const apiLambda = new lambda.Function(this, 'api-lambda', {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: 'index.main',
+      code: lambda.Code.fromAsset(path.join(__dirname, '/../../src/api/http')),
+      environment: {
+        ACT_TRELLO_SECRET: trelloSecret,
+        ACT_DYNAMODB_TABLE: table.tableName,
+        ACT_AWS_REGION: region
+      },
+      timeout: Duration.seconds(5),
+      memorySize: 512
+    });
+
+    table.grantReadData(apiLambda);
+
+    const websocketLambda = new lambda.Function(this, 'api-websocket-lambda', {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: 'index.main',
+      code: lambda.Code.fromAsset(path.join(__dirname, '/../../src/api/websocket')),
+      timeout: Duration.seconds(5),
+      memorySize: 512,
+      environment: {
+        ACT_DYNAMODB_TABLE: table.tableName,
+        ACT_AWS_REGION: region
+      }
+    });
+
+    table.grantReadWriteData(websocketLambda);
+
+    const apiIntegration = new LambdaProxyIntegration({
+      handler: apiLambda
+    });
+
+    const httpApi = new HttpApi(this, 'api', {
+      apiName: `${env}-activity-timer-api`
+    });
+
+    httpApi.addRoutes({
+      path: '/webhook',
+      methods: [HttpMethod.POST, HttpMethod.GET, HttpMethod.HEAD],
+      integration: apiIntegration
+    });
+
+    const webSocketApi = new WebSocketApi(this, 'websocket-api', {
+      apiName: `${env}-activity-timer-websocket-api`,
+      connectRouteOptions: { integration: new LambdaWebSocketIntegration({ handler: websocketLambda }) },
+      defaultRouteOptions: { integration: new LambdaWebSocketIntegration({ handler: websocketLambda }) },
+      disconnectRouteOptions: { integration: new LambdaWebSocketIntegration({ handler: websocketLambda }) }
+    });
+
+    webSocketApi.grantManageConnections(apiLambda);
+
+    const apiStage = new WebSocketStage(this, 'websocket', {
+      webSocketApi,
+      stageName: env,
+      autoDeploy: true
+    });
+
+    return { webSocketApi, apiStage };
   }
 }

@@ -3,43 +3,53 @@
     <label>{{ label }}</label>
 
     <UIRow>
-      <input v-model="modelValue" type="range" :min="min" :max="max" @change="onChange" />
-      <input v-model="modelValue" type="number" @input="onChange" />
+      <input v-model="fieldValue" type="range" :min="min" :max="max" @change="onChange" />
+      <input v-model="fieldValue" type="number" @input="onChange" />
     </UIRow>
   </UIFormElement>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
 import UIRow from '../components/UIRow.vue';
-import { defineProps, getCurrentInstance } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import UIFormElement from './UIFormElement.vue';
 
-const props = defineProps({
-  modelValue: {
-    type: Number,
-    required: true
+export default defineComponent({
+  components: { UIFormElement, UIRow },
+  props: {
+    modelValue: {
+      type: Number,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    min: {
+      type: Number,
+      required: true
+    },
+    max: {
+      type: Number,
+      required: true
+    }
   },
-  label: {
-    type: String,
-    required: true
-  },
-  min: {
-    type: Number,
-    required: true
-  },
-  max: {
-    type: Number,
-    required: true
+  setup (props, context) {
+    const fieldValue = ref(props.modelValue);
+
+    watch(props, () => {
+      fieldValue.value = props.modelValue;
+    });
+
+    const onChange = (e: Event) => {
+      if (e.target instanceof HTMLInputElement) {
+        context.emit('update:modelValue', Number(e.target.value));
+      }
+    };
+
+    return { onChange, fieldValue };
   }
 });
-
-const instance = getCurrentInstance();
-
-const onChange = (e: Event) => {
-  if (e.target instanceof HTMLInputElement) {
-    instance?.emit('update:modelValue', Number(e.target.value));
-  }
-};
 </script>
 
 <style lang="scss" scoped>

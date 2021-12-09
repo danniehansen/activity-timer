@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.0] - 2021-12-05
 ### Changed
-- Exchanged webpack with vite for bundling.
+- Exchanged webpack with vite for faster bundling.
 - 'Activity timer history' board button has been re-done & now only available to Pro subscriptions.
 ### Added
 - Vue3
