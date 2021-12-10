@@ -97,6 +97,7 @@ export class InfrastructureStack extends cdk.Stack {
     new BucketDeployment(this, 'deployment-with-invalidation', {
       sources: [s3deploy.Source.asset('../dist')],
       destinationBucket: siteBucket,
+      prune: false,
       distribution,
       distributionPaths: ['/*']
     });
