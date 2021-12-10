@@ -7,16 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [2.0.0] - 2021-12-05
+## [2.0.0] - 2021-12-11
 ### Changed
-- Exchanged webpack with vite for faster bundling.
-- 'Activity timer history' board button has been re-done & now only available to Pro subscriptions.
+- Re-wrote the entire repository. Now features: Vue3, TypeScript, Vite & CDK (infrastructure)
+- 'Activity timer history' board button has been re-worked to 'Data exporter - Time tracking'. This new data exporter features a whole lot of filters and grouping options (filtering is a Pro feature)
 ### Added
-- Vue3
-- TypeScript
-- ESLint - For code style linting.
-- vue-tsc - For static code analysis.
-- CDK - Infrastructure as code. Makes it easy to re-deploy at various environments.
+- Added new data exporting tool for estimates. Being a scrum master just got a whole lot easier! (filtering is a Pro feature)
 
 ## [1.2.2] - 2021-08-23
 ### Added
