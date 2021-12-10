@@ -5,17 +5,13 @@
 
   <UIOptroStatus v-if="!loading" style="border-radius: 0;" />
 
-  <div class="unauthorized" v-if="!loading && !hasSubscription">
-    <p>This feature is restricted to Pro users only. <a :href="`https://www.optro.cloud/app/${powerupId}`" target="_blank" rel="noreferrer">Read more about the Pro plan here.</a></p>
-  </div>
-
-  <div class="unauthorized" v-else-if="!loading && !isAuthorized && hasSubscription">
+  <div class="unauthorized" v-if="!loading && !isAuthorized">
     <p>To access history data you need to allow Activity timer to read this data. Click the button below to allow this.</p>
     <UIButton @click="authorize()">Authorize</UIButton>
   </div>
 
-  <div class="authorized" v-else-if="!loading && isAuthorized && hasSubscription">
-    <div class="header">
+  <div class="authorized" v-else-if="!loading && isAuthorized">
+    <div class="header" v-if="hasSubscription">
       <div class="header__filters">
         <UIDropdown
           v-model="members"
@@ -53,6 +49,10 @@
       </div>
 
       <UICheckbox v-model="groupByMember" id="group_by_member" label="Group by member" />
+    </div>
+
+    <div class="unauthorized" v-else>
+      <p>Filtering in data export is restricted to Pro users only. Free plan can only do full exports. <a :href="`https://www.optro.cloud/app/${powerupId}`" target="_blank" rel="noreferrer">Read more about the Pro plan here.</a></p>
     </div>
 
     <table class="body" v-if="tableBody.length > 0">
@@ -486,11 +486,11 @@ trelloTick().then(() => {
 
 <style lang="scss" scoped>
 .unauthorized {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   text-align: center;
+
+  p {
+    margin-top: 0;
+  }
 }
 
 .authorized {
