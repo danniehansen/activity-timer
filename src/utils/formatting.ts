@@ -40,6 +40,6 @@ export function formatMemberName (member: Trello.PowerUp.Member) {
   if (!member) {
     return 'N/A';
   }
-  
+
   return member.fullName + (member.fullName !== member.username ? ' (' + member.username + ')' : '');
 }
