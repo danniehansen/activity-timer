@@ -4,7 +4,8 @@
   <MemberSettings v-else-if="page === 'member-settings'" />
   <NotificationSettings v-else-if="page === 'notification-settings'" />
   <Settings v-else-if="page === 'settings'" />
-  <History v-else-if="page === 'history'" />
+  <DataExporterTime v-else-if="page === 'time'" />
+  <DataExporterEstimates v-else-if="page === 'estimates'" />
 </template>
 
 <script setup lang="ts">
@@ -14,7 +15,8 @@ import ChangeEstimate from './capabilities/card-back-section/change_estimate.vue
 import MemberSettings from './pages/MemberSettings.vue';
 import NotificationSettings from './pages/NotificationSettings.vue';
 import Settings from './pages/Settings.vue';
-import History from './pages/History/History.vue';
+import DataExporterTime from './pages/DataExporter/TimeTracking/index.vue';
+import DataExporterEstimates from './pages/DataExporter/Estimates/index.vue';
 
 const t = getTrelloInstance();
 const urlSearchParams = new URLSearchParams(window.location.search);
