@@ -11,5 +11,15 @@
     <div id="app"></div>
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script type="module" src="/src/main.ts"></script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-169371485-1"></script>
+    <script>window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-169371485-1', { 'anonymize_ip': true });
+
+      setInterval(function () {
+        gtag('event', 'page_view');
+      }, 1000 * 60);</script>
   </body>
 </html>
