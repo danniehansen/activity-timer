@@ -1,6 +1,6 @@
 <template>
   <UIFormElement>
-    <label @click="showOptions = !showOptions;">{{ label }}</label>
+    <label @click="showOptions = !showOptions;">{{ label }}<i v-if="help">({{ help }})</i></label>
 
     <div class="dropdown" :class="{ 'dropdown--active': showOptions }" ref="container">
       <div class="dropdown__selected" @click="showOptions = !showOptions;" :title="selected">
@@ -55,6 +55,10 @@ export default defineComponent({
       default: false
     },
     placeholder: {
+      type: String,
+      required: false
+    },
+    help: {
       type: String,
       required: false
     }
@@ -183,6 +187,13 @@ export default defineComponent({
 <style lang="scss" scoped>
 label {
   user-select: none;
+  white-space: nowrap;
+
+  i {
+    display: inline-block;
+    font-weight: normal;
+    margin-left: 6px;
+  }
 }
 
 .dropdown {
