@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const https = require('https');
-const { DynamoDB, QueryCommand } = require('@aws-sdk/client-dynamodb');
+const { DynamoDB, QueryCommand, DeleteItemCommand } = require('@aws-sdk/client-dynamodb');
 const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require('@aws-sdk/client-apigatewaymanagementapi');
 
 const dynamoDbClient = new DynamoDB({ region: process.env.ACT_AWS_REGION });
@@ -164,7 +164,24 @@ async function main (event) {
             ConnectionId: item.connection_id.S
           });
 
-          await apiManagementClient.send(command);
+          try {
+            await apiManagementClient.send(command);
+          } catch (e) {
+            console.error('Encountered exception when attempting to send Websocket message to connection. Removing connection from DynamoDB...', e);
+
+            // In case exceptions happen with API Gateway we fall back to removing the
+            // connection from DynamoDB so we don't have dead clients around.
+            const command = new DeleteItemCommand({
+              TableName: process.env.ACT_DYNAMODB_TABLE,
+              Key: {
+                connection_id: {
+                  S: item.connection_id.S
+                }
+              }
+            });
+
+            await dynamoDbClient.send(command);
+          }
         }
       }
     }

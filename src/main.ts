@@ -21,23 +21,38 @@ if (window.location.hash) {
 
     setTrelloInstance(t);
   } catch (e) {
-    // When app key / app name is provided.
-    // Then it requires access to localStorage which
-    // isn't available in incognito.
+    // In incognito initialization will fail due to localStorage permission issue.
+    // So here we fall back to access without RestAPI client.
     const t = window.TrelloPowerUp.iframe();
-
     setTrelloInstance(t);
   }
 } else {
-  const t = window.TrelloPowerUp.initialize({
-    'card-badges': getCardBadges,
-    'card-buttons': getCardButtons,
-    'card-back-section': getCardBackSection,
-    'board-buttons': getBoardButtons,
-    'show-settings': getShowSettings
-  });
+  try {
+    const t = window.TrelloPowerUp.initialize({
+      'card-badges': getCardBadges,
+      'card-buttons': getCardButtons,
+      'card-back-section': getCardBackSection,
+      'board-buttons': getBoardButtons,
+      'show-settings': getShowSettings
+    }, {
+      appKey: getAppKey(),
+      appName: getAppName()
+    });
 
-  setTrelloInstance(t);
+    setTrelloInstance(t);
+  } catch (e) {
+    // In incognito initialization will fail due to localStorage permission issue.
+    // So here we fall back to access without RestAPI client.
+    const t = window.TrelloPowerUp.initialize({
+      'card-badges': getCardBadges,
+      'card-buttons': getCardButtons,
+      'card-back-section': getCardBackSection,
+      'board-buttons': getBoardButtons,
+      'show-settings': getShowSettings
+    });
+
+    setTrelloInstance(t);
+  }
 
   initializeWebsocket();
 }

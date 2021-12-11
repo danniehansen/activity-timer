@@ -8,6 +8,8 @@
   <div class="unauthorized" v-if="!loading && !isAuthorized">
     <p>To access tracking data you need to allow Activity timer to read this data. Click the button below to allow this.</p>
     <UIButton @click="authorize()">Authorize</UIButton>
+
+    <p v-if="rejectedAuth">You rejected Activity timer's request for accessing the data. If you change your mind you can always click 'Authorize' again.</p>
   </div>
 
   <div class="authorized" v-else-if="!loading && isAuthorized">
@@ -65,7 +67,7 @@
       />
     </div>
 
-    <div class="unauthorized" v-else>
+    <div class="requires-pro" v-else>
       <p>Filtering in data export is restricted to Pro users only. Free plan can only do full exports. <a :href="`https://www.optro.cloud/app/${powerupId}`" target="_blank" rel="noreferrer">Read more about the Pro plan here.</a></p>
     </div>
 
@@ -101,7 +103,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { getAppKey } from '../../../components/settings';
-import { getPowerupId, getTrelloCard, getTrelloInstance } from '../../../components/trello';
+import { clearToken, getPowerupId, getTrelloCard, getTrelloInstance } from '../../../components/trello';
 import UIButton from '../../../components/UIButton.vue';
 import UIDropdown, { Option } from '../../../components/UIDropdown.vue';
 import { Trello } from '../../../types/trello';
@@ -123,6 +125,7 @@ const dateFrom = ref('');
 const dateTo = ref('');
 const listOptions = ref<Option[]>([]);
 const lists = ref<string[]>([]);
+const rejectedAuth = ref(false);
 const groupByOptions = ref<Option[]>([
   {
     text: 'Card',
@@ -566,25 +569,26 @@ async function initialize () {
   }
 };
 
-async function clearToken () {
+async function authorize () {
+  rejectedAuth.value = false;
+
   try {
-    await getTrelloCard().getRestApi().clearToken();
+    await getTrelloCard().getRestApi().authorize({
+      scope: 'read',
+      expiration: 'never'
+    });
+
+    await trelloTick();
+    await getData();
   } catch (e) {
-    // Ignore exceptions in case no token exists
+    if (e instanceof Error && e.name === 'restApi::AuthDeniedError') {
+      rejectedAuth.value = true;
+      return;
+    }
+
+    await clearToken();
+    throw e;
   }
-};
-
-const authorize = async () => {
-  await clearToken();
-
-  await getTrelloCard().getRestApi().authorize({
-    scope: 'read,write,account',
-    expiration: 'never'
-  });
-
-  await trelloTick();
-
-  await getData();
 };
 
 const exportData = () => {
@@ -626,12 +630,21 @@ trelloTick().then(() => {
 </script>
 
 <style lang="scss" scoped>
-.unauthorized {
+.requires-pro {
   text-align: center;
 
   p {
     margin-top: 0;
   }
+}
+
+.unauthorized {
+  max-width: 475px;
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .authorized {
