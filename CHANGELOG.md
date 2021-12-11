@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - More fine tuned RestApi access scopes. Now data exporter only requires read access - while auto timer start requires read & write.
 - Made webhooks & RestApi access clearing more intelligent. It will now when clearing RestApi access de-register any webhooks registered. Webhooks will now also automatically de-register when auto timer start is disabled.
+- Added board button for clearing RestApi access. Allowing users to remove Activity timer's access to read or write data on behalf of the user.
 
 ## [2.0.0] - 2021-12-11
 ### Changed
