@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.0.1] - 2021-12-11
+### Added
+- More fine tuned RestApi access scopes. Now data exporter only requires read access - while auto timer start requires read & write.
+- Made webhooks & RestApi access clearing more intelligent. It will now when clearing RestApi access de-register any webhooks registered. Webhooks will now also automatically de-register when auto timer start is disabled.
+
 ## [2.0.0] - 2021-12-11
 ### Changed
 - Re-wrote the entire repository. Now features: Vue3, TypeScript, Vite & CDK (infrastructure)
