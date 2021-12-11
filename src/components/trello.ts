@@ -1,10 +1,15 @@
 import { Trello } from '../types/trello';
+import { disableAutoTimer } from '../utils/auto-timer';
 import { getAppKey } from './settings';
 
 type TrelloInstance = Trello.PowerUp.Plugin | Trello.PowerUp.IFrame;
 
 let trelloInstance: TrelloInstance | null = null;
 let memberIdCache: string | null = null;
+
+interface WebookResponseItem {
+  id: string;
+}
 
 interface TrelloToken {
   dateCreated: string;
@@ -58,7 +63,33 @@ export function getPowerupId () {
 
 export async function clearToken (t?: Trello.PowerUp.IFrame) {
   try {
-    await (t ?? getTrelloCard()).getRestApi().clearToken();
+    const token = await (t ?? getTrelloCard()).getRestApi().getToken();
+
+    if (token) {
+      // When token get's cleared - so do webhooks. Making it no longer functional. Better UI to disable auto timer then.
+      await disableAutoTimer();
+
+      // When clearing tokens we need to also clear the webhooks. Else it'll just continue to exist in infinity.
+      // We don't want that..
+      const response = await fetch(`https://api.trello.com/1/tokens/${token}/webhooks?key=${getAppKey()}`)
+        .then<WebookResponseItem[]>(response => response.json());
+
+      if (response && response.length > 0) {
+        const promises: Promise<Response>[] = [];
+
+        response.forEach((item) => {
+          promises.push(
+            fetch(`https://api.trello.com/1/tokens/${token}/webhooks/${item.id}?key=${getAppKey()}`, {
+              method: 'DELETE'
+            })
+          );
+        });
+
+        await Promise.all(promises);
+      }
+
+      await (t ?? getTrelloCard()).getRestApi().clearToken();
+    }
   } catch (e) {
     // Ignore exceptions in case no token exists
   }
