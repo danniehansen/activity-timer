@@ -143,6 +143,8 @@ async function main (event) {
           // If powerup doesn't have auto timer start enabled. Then we should disable the webhook
           // 410 will de-register the webhook.
           if (!validatePluginData(cardData.pluginData)) {
+            console.log('Plugin is either no longer active or auto start timer is no longer active. De-registering webhook for safety');
+
             return {
               statusCode: 410
             };
