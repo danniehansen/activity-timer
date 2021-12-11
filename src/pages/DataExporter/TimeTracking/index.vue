@@ -251,14 +251,14 @@ const filteredCards = computed<ApiCard[]>(() => {
     if (dateFromUnix) {
       ranges = new Ranges(
         card.data.id,
-        card.ranges.items.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix)
+        ranges.items.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix)
       );
     }
 
     if (dateToUnix) {
       ranges = new Ranges(
         card.data.id,
-        card.ranges.items.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix)
+        ranges.items.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix)
       );
     }
 
@@ -308,21 +308,21 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
     if (dateFromUnix) {
       ranges = new Ranges(
         card.data.id,
-        card.ranges.items.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix)
+        ranges.items.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix)
       );
     }
 
     if (dateToUnix) {
       ranges = new Ranges(
         card.data.id,
-        card.ranges.items.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix)
+        ranges.items.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix)
       );
     }
 
     if (members.value.length > 0) {
       ranges = new Ranges(
         card.data.id,
-        card.ranges.items.filter((item) => members.value.includes(item.memberId))
+        ranges.items.filter((item) => members.value.includes(item.memberId))
       );
     }
 
@@ -373,14 +373,14 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
           if (dateFromUnix) {
             ranges = new Ranges(
               card.data.id,
-              card.ranges.items.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix)
+              ranges.items.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix)
             );
           }
 
           if (dateToUnix) {
             ranges = new Ranges(
               card.data.id,
-              card.ranges.items.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix)
+              ranges.items.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix)
             );
           }
 
