@@ -3,16 +3,16 @@
     <UILoader v-if="loading" />
   </transition>
 
-  <UIOptroStatus v-if="!loading" style="border-radius: 0;" />
+  <UIOptroStatus v-if="ready" style="border-radius: 0;" />
 
-  <div class="unauthorized" v-if="!loading && !isAuthorized">
+  <div class="unauthorized" v-if="ready && !isAuthorized">
     <p>To access estimates data you need to allow Activity timer to read this data. Click the button below to allow this.</p>
     <UIButton @click="authorize()">Authorize</UIButton>
 
     <p v-if="rejectedAuth">You rejected Activity timer's request for accessing the data. If you change your mind you can always click 'Authorize' again.</p>
   </div>
 
-  <div class="authorized" v-else-if="!loading && isAuthorized">
+  <div class="authorized" v-else-if="ready && isAuthorized">
     <div class="header" v-if="hasSubscription">
       <div class="header__filters">
         <UIDropdown
@@ -78,7 +78,10 @@
     <p v-else>No cards found with estimates matching your filter</p>
 
     <div class="footer">
-      <UIButton @click="exportData()">Export to CSV</UIButton>
+      <div>
+        <UIButton @click="exportData()">Export to CSV</UIButton>
+        <UIButton @click="getData()">Refresh</UIButton>
+      </div>
 
       <div class="footer__info">
         <span>Total estimate (seconds): {{ totalTimeSeconds }}</span>
@@ -114,6 +117,7 @@ const lists = ref<string[]>([]);
 const rejectedAuth = ref(false);
 const groupByCard = ref(false);
 const loading = ref(true);
+const ready = ref(false);
 const hasSubscription = ref(false);
 const uniqueLabels = ref<Trello.PowerUp.Label[]>([]);
 const defaultColumns: (keyof ApiCardRowData)[] = [
@@ -143,10 +147,10 @@ const columnStyle: { [key: keyof ApiCardRowData]: any } = {
     whiteSpace: 'nowrap'
   },
   estimate_seconds: {
-    width: '135px'
+    width: '155px'
   },
   estimate_formatted: {
-    width: '135px'
+    width: '155px'
   }
 };
 
@@ -194,7 +198,7 @@ const columnOptions = ref<Option[]>([
 ]);
 
 let cards: ApiCard[] = [];
-const cardsLength = ref(0);
+const lastDataFetch = ref(0);
 
 const tableHead = computed<Option[]>(() => {
   const selectedColumns = (columns.value.length > 0 ? columns.value : defaultColumns);
@@ -204,7 +208,7 @@ const tableHead = computed<Option[]>(() => {
 });
 
 const filteredCards = computed<ApiCard[]>(() => {
-  if (cardsLength.value === 0) {
+  if (lastDataFetch.value === 0) {
     return [];
   }
 
@@ -352,7 +356,7 @@ async function getData () {
         return new ApiCard(card, listById, memberById, members);
       });
 
-    cardsLength.value = cards.length;
+    lastDataFetch.value = Date.now();
 
     getUniqueLabels();
   } catch (e) {
@@ -367,6 +371,7 @@ async function getData () {
 
   await new Promise((resolve) => setTimeout(resolve, Math.min(1500, Date.now() - getDataStart)));
 
+  ready.value = true;
   loading.value = false;
 };
 
@@ -548,7 +553,11 @@ table {
   align-items: center;
 
   button {
-    margin: 0;
+    margin: 0 0 0 15px;
+
+    &:first-child {
+      margin-left: 0;
+    }
   }
 
   span {
