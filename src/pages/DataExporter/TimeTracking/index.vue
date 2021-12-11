@@ -298,6 +298,7 @@ const filteredCards = computed<ApiCard[]>(() => {
   });
 });
 
+let rowCounter = 0;
 const rowDataList = computed<ApiCardRowData[]>(() => {
   const rowData: ApiCardRowData[] = [];
 
@@ -356,8 +357,10 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
       switch (groupBy.value) {
       case 'card':
         if (timeSpent > 0) {
+          rowCounter++;
           rowData.push({
             ...rowDataItem,
+            id: rowCounter,
             'member.id': membersInrange.join(', '),
             'member.name': membersInrange.map((memberId) => formatMemberName(memberById[memberId])).join(', '),
             start_datetime: (furthestBack ? formatDate(new Date(furthestBack * 1000)) : 'N/A'),
@@ -407,8 +410,10 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
           const timeSpent = ranges.items.filter((item) => item.memberId === memberId).reduce((a, b) => a + b.diff, 0);
 
           if (timeSpent > 0) {
+            rowCounter++;
             rowData.push({
               ...rowDataItem,
+              id: rowCounter,
               'member.id': memberId,
               'member.name': formatMemberName(memberById[memberId]),
               start_datetime: (furthestBack ? formatDate(new Date(furthestBack * 1000)) : 'N/A'),
@@ -423,8 +428,10 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
       default:
         ranges.items.forEach((range) => {
           if (range.diff > 0) {
+            rowCounter++;
             rowData.push({
               ...rowDataItem,
+              id: rowCounter,
               'member.id': range.memberId,
               'member.name': formatMemberName(memberById[range.memberId]),
               start_datetime: (furthestBack ? formatDate(new Date(range.start * 1000)) : 'N/A'),
