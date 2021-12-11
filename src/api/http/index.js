@@ -70,6 +70,8 @@ function httpRequest (url, queryParams) {
 }
 
 async function main (event) {
+  console.log('Incoming request', event);
+
   try {
     // Trello makes a HEAD request initially to "confirm" connectivity.
     // We need to respond with 200 as a OK signal.

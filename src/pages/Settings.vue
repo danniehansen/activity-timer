@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue';
-import { clearToken, getTrelloCard, getTrelloInstance, prepareWriteAuth, resizeTrelloFrame } from '../components/trello';
+import { clearToken, getTokenDetails, getTrelloCard, getTrelloInstance, prepareWriteAuth, resizeTrelloFrame } from '../components/trello';
 import UISlider from '../components/UISlider.vue';
 import UICheckbox from '../components/UICheckbox.vue';
 import UIButton from '../components/UIButton.vue';
@@ -98,6 +98,8 @@ async function enableAutoStartTimer () {
 };
 
 async function disableAutoStartTimer () {
+  await clearToken();
+  /*
   const token = await getTrelloCard().getRestApi().getToken();
 
   if (token) {
@@ -123,7 +125,7 @@ async function disableAutoStartTimer () {
         }
       });
   }
-
+*/
   autoStartTimerEnabled.value = false;
 };
 
