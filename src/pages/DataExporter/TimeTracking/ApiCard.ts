@@ -21,7 +21,7 @@ interface ListById {
 
 export interface ApiCardRowData {
   [key: string]: string | string[] | number;
-  'id': number,
+  'id': number | string,
   'card.id': string;
   'card.title': string;
   'card.description': string;
