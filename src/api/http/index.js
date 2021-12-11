@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const https = require('https');
 const { DynamoDB, QueryCommand, DeleteItemCommand } = require('@aws-sdk/client-dynamodb');
 const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require('@aws-sdk/client-apigatewaymanagementapi');
+const { error } = require('console');
 
 const dynamoDbClient = new DynamoDB({ region: process.env.ACT_AWS_REGION });
 
@@ -50,8 +51,10 @@ function validatePluginData (pluginData, validateListAgainst = null) {
  * This gets the job done.
  */
 function httpRequest (url, queryParams) {
-  return new Promise((resolve) => {
-    https.get(`${url}?${new URLSearchParams(queryParams).toString()}`, (resp) => {
+  return new Promise((resolve, reject) => {
+    https.get(`${url}?${new URLSearchParams(queryParams).toString()}`, {
+      timeout: 5000
+    }, (resp) => {
       let data = '';
 
       // A chunk of data has been received.
@@ -63,8 +66,10 @@ function httpRequest (url, queryParams) {
       resp.on('end', () => {
         resolve(JSON.parse(data));
       });
+    }).on('timeout', (err) => {
+      reject(err);
     }).on('error', (err) => {
-      console.error(err.message);
+      reject(err);
     });
   });
 }
@@ -127,64 +132,73 @@ async function main (event) {
       actionType === 'updateCard' &&
       listIdAfter !== listIdBefore
     ) {
-      const cardData = await httpRequest(`https://api.trello.com/1/boards/${boardId}`, {
-        token,
-        key: apiKey,
-        pluginData: 'true'
-      });
-
-      if (cardData.pluginData && validatePluginData(cardData.pluginData, listIdAfter)) {
-        // Search out websocket connections related with the member who did the card moving.
-        const command = new QueryCommand({
-          TableName: process.env.ACT_DYNAMODB_TABLE,
-          IndexName: 'MemberIdIndex',
-          Limit: 1,
-          KeyConditionExpression: 'member_id = :m',
-          ExpressionAttributeValues: {
-            ':m': {
-              S: memberId
-            }
-          }
+      try {
+        const cardData = await httpRequest(`https://api.trello.com/1/boards/${boardId}`, {
+          token,
+          key: apiKey,
+          pluginData: 'true'
         });
 
-        const response = await dynamoDbClient.send(command);
-
-        if (response.Items.length > 0) {
-          const item = response.Items[0];
-
-          const apiManagementClient = new ApiGatewayManagementApiClient({
-            region: process.env.ACT_AWS_REGION,
-            endpoint: `https://${item.api_id.S}.execute-api.${item.region.S}.amazonaws.com/${item.stage.S}`
-          });
-
-          // Notify the frontend that it should start the time for a specific card.
-          const command = new PostToConnectionCommand({
-            Data: JSON.stringify({
-              type: 'startTimer',
-              cardId
-            }),
-            ConnectionId: item.connection_id.S
-          });
-
-          try {
-            await apiManagementClient.send(command);
-          } catch (e) {
-            console.error('Encountered exception when attempting to send Websocket message to connection. Removing connection from DynamoDB...', e);
-
-            // In case exceptions happen with API Gateway we fall back to removing the
-            // connection from DynamoDB so we don't have dead clients around.
-            const command = new DeleteItemCommand({
-              TableName: process.env.ACT_DYNAMODB_TABLE,
-              Key: {
-                connection_id: {
-                  S: item.connection_id.S
-                }
+        if (cardData.pluginData && validatePluginData(cardData.pluginData, listIdAfter)) {
+        // Search out websocket connections related with the member who did the card moving.
+          const command = new QueryCommand({
+            TableName: process.env.ACT_DYNAMODB_TABLE,
+            IndexName: 'MemberIdIndex',
+            Limit: 1,
+            KeyConditionExpression: 'member_id = :m',
+            ExpressionAttributeValues: {
+              ':m': {
+                S: memberId
               }
+            }
+          });
+
+          const response = await dynamoDbClient.send(command);
+
+          if (response.Items.length > 0) {
+            const item = response.Items[0];
+
+            const apiManagementClient = new ApiGatewayManagementApiClient({
+              region: process.env.ACT_AWS_REGION,
+              endpoint: `https://${item.api_id.S}.execute-api.${item.region.S}.amazonaws.com/${item.stage.S}`
             });
 
-            await dynamoDbClient.send(command);
+            // Notify the frontend that it should start the time for a specific card.
+            const command = new PostToConnectionCommand({
+              Data: JSON.stringify({
+                type: 'startTimer',
+                cardId
+              }),
+              ConnectionId: item.connection_id.S
+            });
+
+            try {
+              await apiManagementClient.send(command);
+            } catch (e) {
+              console.error('Encountered exception when attempting to send Websocket message to connection. Removing connection from DynamoDB...', e);
+
+              // In case exceptions happen with API Gateway we fall back to removing the
+              // connection from DynamoDB so we don't have dead clients around.
+              const command = new DeleteItemCommand({
+                TableName: process.env.ACT_DYNAMODB_TABLE,
+                Key: {
+                  connection_id: {
+                    S: item.connection_id.S
+                  }
+                }
+              });
+
+              await dynamoDbClient.send(command);
+            }
           }
         }
+      } catch (e) {
+        console.error('Received exception... re-registering weboohk', e);
+
+        // 410 will de-register the webhook.
+        return {
+          statusCode: 410
+        };
       }
     }
 
