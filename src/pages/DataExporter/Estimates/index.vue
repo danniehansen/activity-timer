@@ -67,7 +67,7 @@
       </thead>
 
       <tbody>
-        <tr v-for="tableRow in tableBody" :key="tableRow['card.id']">
+        <tr v-for="tableRow in tableBody" :key="tableRow.id">
           <td v-for="columnItem in tableHead" :key="columnItem.value" :style="columnStyle[columnItem.value] ?? {}">
             {{ tableRow[columnItem.value] ?? '' }}
           </td>
@@ -247,6 +247,7 @@ const filteredCards = computed<ApiCard[]>(() => {
   });
 });
 
+let rowCounter = 0;
 const rowDataList = computed<ApiCardRowData[]>(() => {
   const rowData: ApiCardRowData[] = [];
 
@@ -270,8 +271,10 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
       });
 
       if (groupByCard.value) {
+        rowCounter++;
         rowData.push({
           ...rowDataItem,
+          id: rowCounter,
           'member.id': membersInEstimates.join(', '),
           'member.name': membersInEstimates.map((memberId) => formatMemberName(memberById[memberId])).join(', '),
           time_seconds: totalEstimate,
@@ -280,8 +283,10 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
       } else {
         estimates.items.forEach((item) => {
           if (item.time > 0) {
+            rowCounter++;
             rowData.push({
               ...rowDataItem,
+              id: rowCounter,
               'member.id': item.memberId,
               'member.name': formatMemberName(memberById[item.memberId]),
               estimate_seconds: item.time,

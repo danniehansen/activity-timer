@@ -79,7 +79,7 @@
       </thead>
 
       <tbody>
-        <tr v-for="tableRow in tableBody" :key="tableRow['card.id']">
+        <tr v-for="tableRow in tableBody" :key="tableRow.id">
           <td v-for="columnItem in tableHead" :key="columnItem.value" :style="columnStyle[columnItem.value] ?? {}">
             {{ tableRow[columnItem.value] ?? '' }}
           </td>
