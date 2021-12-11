@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Released]
 
 ## [2.0.2] - 2021-12-11
+### Added
+- Added refresh buttons for both data exporters. This fetches fresh data set. Very useful for scrum masters when having 1 window open to keep an eye on the estimates while planning the sprint.
 ### Fixed
 - Fixed issue with date from/to filtering on time tracking data exporter. Choosing both a from & to date caused it to show all previous tracking from, the from date.
 
