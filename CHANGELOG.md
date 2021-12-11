@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.0.2] - 2021-12-11
+### Fixed
+- Fixed issue with date from/to filtering on time tracking data exporter. Choosing both a from & to date caused it to show all previous tracking from, the from date.
+
 ## [2.0.1] - 2021-12-11
 ### Added
 - More fine tuned RestApi access scopes. Now data exporter only requires read access - while auto timer start requires read & write.

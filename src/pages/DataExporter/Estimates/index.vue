@@ -254,7 +254,7 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
     if (members.value.length > 0) {
       estimates = new Estimates(
         card.data.id,
-        card.estimates.items.filter((item) => members.value.includes(item.memberId))
+        estimates.items.filter((item) => members.value.includes(item.memberId))
       );
     }
 
