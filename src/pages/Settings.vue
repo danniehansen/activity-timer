@@ -30,12 +30,6 @@ import { disableAutoTimer, enableAutoTimer, getAutoTimerListId, hasAutoTimer, se
 import UIOptroStatus from '../components/UIOptroStatus.vue';
 import UILoader from '../components/UILoader.vue';
 
-interface WebookResponseItem {
-  webhooks: {
-    id: string;
-  }[]
-}
-
 const autoStartTimerEnabled = ref(false);
 const disableEstimate = ref(false);
 const threshold = ref(1);
@@ -91,41 +85,15 @@ async function enableAutoStartTimer () {
       body: formData
     });
 
-    if (response.status === 200) {
+    if ([200, 400].includes(response.status)) {
       autoStartTimerEnabled.value = true;
     }
   }
 };
 
 async function disableAutoStartTimer () {
+  // Clearing the token automatically remove any webhooks existing on it.
   await clearToken();
-  /*
-  const token = await getTrelloCard().getRestApi().getToken();
-
-  if (token) {
-    fetch(`https://api.trello.com/1/members/me/tokens?webhooks=true&key=${getAppKey()}&token=${token}`)
-      .then<WebookResponseItem[]>(response => response.json())
-      .then(async data => {
-        if (data && data.length > 0) {
-          const promises: Promise<Response>[] = [];
-
-          data.forEach((item) => {
-            if (item.webhooks && item.webhooks.length > 0) {
-              item.webhooks.forEach((webhook) => {
-                promises.push(
-                  fetch(`https://api.trello.com/1/webhooks/${webhook.id}?key=${getAppKey()}&token=${token}`, {
-                    method: 'DELETE'
-                  })
-                );
-              });
-            }
-          });
-
-          await Promise.all(promises);
-        }
-      });
-  }
-*/
   autoStartTimerEnabled.value = false;
 };
 

@@ -139,8 +139,23 @@ async function main (event) {
           pluginData: 'true'
         });
 
-        if (cardData.pluginData && validatePluginData(cardData.pluginData, listIdAfter)) {
-        // Search out websocket connections related with the member who did the card moving.
+        if (cardData.pluginData) {
+          // If powerup doesn't have auto timer start enabled. Then we should disable the webhook
+          // 410 will de-register the webhook.
+          if (!validatePluginData(cardData.pluginData)) {
+            return {
+              statusCode: 410
+            };
+          }
+
+          // If user did not move card to list from settings. Ignore it.
+          if (!validatePluginData(cardData.pluginData, listIdAfter)) {
+            return {
+              statusCode: 200
+            };
+          }
+
+          // Search out websocket connections related with the member who did the card moving.
           const command = new QueryCommand({
             TableName: process.env.ACT_DYNAMODB_TABLE,
             IndexName: 'MemberIdIndex',
