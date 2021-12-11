@@ -133,7 +133,7 @@ export class InfrastructureStack extends cdk.Stack {
       memorySize: 512
     });
 
-    table.grantReadData(apiLambda);
+    table.grantReadWriteData(apiLambda);
 
     const websocketLambda = new lambda.Function(this, 'api-websocket-lambda', {
       runtime: lambda.Runtime.NODEJS_14_X,
