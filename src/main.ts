@@ -12,48 +12,38 @@ import { initializeOptro } from './components/optro';
 import * as Sentry from '@sentry/vue';
 import { Integrations } from '@sentry/tracing';
 
+let incognito = false;
+
+try {
+  incognito = window.localStorage.getItem('incognito-test') === null;
+} catch (e) {
+  incognito = true;
+}
+
 if (window.location.hash) {
-  try {
-    const t = window.TrelloPowerUp.iframe({
+  const t = window.TrelloPowerUp.iframe(!incognito
+    ? {
       appKey: getAppKey(),
       appName: getAppName()
-    });
+    }
+    : undefined);
 
-    setTrelloInstance(t);
-  } catch (e) {
-    // In incognito initialization will fail due to localStorage permission issue.
-    // So here we fall back to access without RestAPI client.
-    const t = window.TrelloPowerUp.iframe();
-    setTrelloInstance(t);
-  }
+  setTrelloInstance(t);
 } else {
-  try {
-    const t = window.TrelloPowerUp.initialize({
-      'card-badges': getCardBadges,
-      'card-buttons': getCardButtons,
-      'card-back-section': getCardBackSection,
-      'board-buttons': getBoardButtons,
-      'show-settings': getShowSettings
-    }, {
+  const t = window.TrelloPowerUp.initialize({
+    'card-badges': getCardBadges,
+    'card-buttons': getCardButtons,
+    'card-back-section': getCardBackSection,
+    'board-buttons': getBoardButtons,
+    'show-settings': getShowSettings
+  }, !incognito
+    ? {
       appKey: getAppKey(),
       appName: getAppName()
-    });
+    }
+    : undefined);
 
-    setTrelloInstance(t);
-  } catch (e) {
-    // In incognito initialization will fail due to localStorage permission issue.
-    // So here we fall back to access without RestAPI client.
-    const t = window.TrelloPowerUp.initialize({
-      'card-badges': getCardBadges,
-      'card-buttons': getCardButtons,
-      'card-back-section': getCardBackSection,
-      'board-buttons': getBoardButtons,
-      'show-settings': getShowSettings
-    });
-
-    setTrelloInstance(t);
-  }
-
+  setTrelloInstance(t);
   initializeWebsocket();
 }
 

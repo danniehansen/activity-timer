@@ -5,7 +5,15 @@
 
   <UIOptroStatus v-if="ready" style="border-radius: 0;" />
 
-  <div class="unauthorized" v-if="ready && !isAuthorized">
+  <div class="unauthorized" v-if="isIncognito">
+    <p>It appears that you might be using incognito mode in your browser. Unfortunately some internal functionality does not work in Trello that is required for this page to work. If you wan't to use the data exporter tool you will have to jump out of incognito.</p>
+  </div>
+
+  <div class="unauthorized" v-else-if="unrecognizedError">
+    <p>Woops. An unrecognized error occurred. Our system have automatically logged it & will be looking into the matter. Please try again later or with a different browser.</p>
+  </div>
+
+  <div class="unauthorized" v-else-if="ready && !isAuthorized">
     <p>To access tracking data you need to allow Activity timer to read this data. Click the button below to allow this.</p>
     <UIButton @click="authorize()">Authorize</UIButton>
 
@@ -128,6 +136,8 @@ const dateFrom = ref('');
 const dateTo = ref('');
 const listOptions = ref<Option[]>([]);
 const lists = ref<string[]>([]);
+const isIncognito = ref(false);
+const unrecognizedError = ref(false);
 const rejectedAuth = ref(false);
 const groupByOptions = ref<Option[]>([
   {
@@ -470,7 +480,16 @@ const labelOptions = computed<Option[]>(() => {
 });
 
 async function trelloTick () {
-  isAuthorized.value = await getTrelloCard().getRestApi().isAuthorized();
+  try {
+    isAuthorized.value = await getTrelloCard().getRestApi().isAuthorized();
+  } catch (e) {
+    if (e instanceof Error && e.name === 'restApi::ApiNotConfiguredError') {
+      isIncognito.value = true;
+    } else {
+      unrecognizedError.value = true;
+      throw e;
+    }
+  }
 }
 
 function setTimeMidnight (date: Date) {
