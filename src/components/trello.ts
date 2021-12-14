@@ -91,7 +91,12 @@ export async function clearToken (t?: Trello.PowerUp.IFrame) {
       await (t ?? getTrelloCard()).getRestApi().clearToken();
     }
   } catch (e) {
-    // Ignore exceptions in case no token exists
+    // Ignore issues related to incognito
+    if (e instanceof Error && e.name === 'restApi::ApiNotConfiguredError') {
+      return;
+    }
+
+    throw e;
   }
 };
 
