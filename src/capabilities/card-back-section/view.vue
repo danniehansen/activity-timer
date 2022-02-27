@@ -1,5 +1,5 @@
 <template>
-  <UIRow>
+  <UIRow v-if="canWrite && visible">
     <div>
       <UIButton v-if="!isTracking" @click="startTracking">Start timer</UIButton>
       <UIButton v-else @click="stopTracking" :danger="true">Stop timer</UIButton>
@@ -12,6 +12,14 @@
       <UIInfo style="cursor: pointer;" v-if="ownEstimate != totalEstimate" @click="viewEstimates">Total estimate: {{ totalEstimateDisplay }}</UIInfo>
     </div>
   </UIRow>
+
+  <UIRow v-else-if="hasEstimates && totalEstimate && visible">
+    <div>
+      <UIInfo v-if="ownEstimate != totalEstimate">Total estimate: {{ totalEstimateDisplay }}</UIInfo>
+    </div>
+  </UIRow>
+
+  <p v-else>No options available.</p>
 </template>
 
 <script setup lang="ts">
@@ -19,19 +27,20 @@ import { ref, computed } from 'vue';
 import UIInfo from '../../components/UIInfo/UIInfo.vue';
 import UIRow from '../../components/UIRow.vue';
 import UIButton from '../../components/UIButton.vue';
-import { getMemberId, getTrelloCard, resizeTrelloFrame } from '../../components/trello';
+import { getMemberId, getTrelloCard, getTrelloInstance, resizeTrelloFrame } from '../../components/trello';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature } from '../../components/settings';
 import { Trello } from '../../types/trello';
+import { isVisible } from '../../utils/visibility';
 
 const isTracking = ref(false);
 const trackedTime = ref(0);
 const totalEstimate = ref(0);
 const ownEstimate = ref(0);
 const hasEstimates = ref(false);
-
-let cardId: string | null = null;
+const canWrite = ref(false);
+const visible = ref(false);
 
 const timeSpentDisplay = computed(() => {
   return formatTime(trackedTime.value);
@@ -46,6 +55,8 @@ const ownEstimateDisplay = computed(() => {
 });
 
 const trelloTick = async () => {
+  canWrite.value = await getTrelloCard().memberCanWriteToModel('card');
+  visible.value = await isVisible();
   hasEstimates.value = await hasEstimateFeature();
   const memberId = await getMemberId();
   const card = await getCardModel();
@@ -70,14 +81,7 @@ const getCardModel = async () => {
 };
 
 const getCardId = async () => {
-  if (cardId) {
-    return cardId;
-  }
-
-  const card = await getTrelloCard().card('id');
-  cardId = card.id;
-
-  return cardId;
+  return (await getTrelloCard().card('id')).id;
 };
 
 const startTracking = async () => {

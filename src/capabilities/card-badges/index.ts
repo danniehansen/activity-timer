@@ -7,6 +7,7 @@ import { hasEstimateFeature, hasSettingStopOnMove } from '../../components/setti
 import { getMemberId } from '../../components/trello';
 import { canTriggerNotification, triggerNotification } from '../../utils/notifications';
 import { clearRequestedTimerStart, getRequestedTimerStart } from '../../components/websocket';
+import { isVisible } from '../../utils/visibility';
 
 const clockIcon = `${window.location.origin}${ClockImage}`;
 const estimateImage = `${window.location.origin}${EstimateImage}`;
@@ -17,6 +18,12 @@ export async function getCardBadges (t: Trello.PowerUp.IFrame): Promise<(Trello.
   const memberId = await getMemberId();
   const card = await t.card('id', 'idList');
   const cardModel = new Card(card.id);
+
+  const visible = await isVisible();
+
+  if (!visible) {
+    return [];
+  }
 
   // Time badge
   badges.push({
