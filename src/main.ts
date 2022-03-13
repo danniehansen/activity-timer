@@ -15,7 +15,7 @@ import { Integrations } from '@sentry/tracing';
 let incognito = false;
 
 try {
-  incognito = window.localStorage.getItem('incognito-test') === null;
+  window.localStorage.getItem('incognito-test');
 } catch (e) {
   incognito = true;
 }

@@ -40,7 +40,7 @@ import { disableEstimateFeature, enableEstimateFeature, getApiHost, getAppKey, g
 import { disableAutoTimer, enableAutoTimer, getAutoTimerListId, hasAutoTimer, setAutoTimerListId } from '../utils/auto-timer';
 import UIOptroStatus from '../components/UIOptroStatus.vue';
 import UILoader from '../components/UILoader.vue';
-import { getVisibility, getVisibilityMembers, setVisibility, setVisibilityMemmbers, Visibility } from '../utils/visibility';
+import { getVisibility, getVisibilityMembers, setVisibility, setVisibilityMembers, Visibility } from '../utils/visibility';
 import { formatMemberName } from '../utils/formatting';
 
 const autoStartTimerEnabled = ref(false);
@@ -143,13 +143,13 @@ async function enableAutoStartTimer () {
       autoStartTimerEnabled.value = true;
     }
   }
-};
+}
 
 async function disableAutoStartTimer () {
   // Clearing the token automatically remove any webhooks existing on it.
   await clearToken();
   autoStartTimerEnabled.value = false;
-};
+}
 
 async function trelloTick () {
   autoStartTimerEnabled.value = await hasAutoTimer();
@@ -173,7 +173,7 @@ async function trelloTick () {
   ];
 
   setTimeout(resizeTrelloFrame);
-};
+}
 
 watch(disableEstimate, () => {
   if (disableEstimate.value) {
@@ -203,7 +203,7 @@ watch(visibility, async () => {
 });
 
 watch(visibilityMembers, async () => {
-  await setVisibilityMemmbers(visibilityMembers.value);
+  await setVisibilityMembers(visibilityMembers.value);
 });
 
 watch(autoStartTimerEnabled, () => {

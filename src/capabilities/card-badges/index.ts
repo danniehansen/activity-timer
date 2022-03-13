@@ -13,17 +13,17 @@ const clockIcon = `${window.location.origin}${ClockImage}`;
 const estimateImage = `${window.location.origin}${EstimateImage}`;
 
 export async function getCardBadges (t: Trello.PowerUp.IFrame): Promise<(Trello.PowerUp.CardBadge | Trello.PowerUp.CardBadgeDynamic)[]> {
-  const badges: Array<Trello.PowerUp.CardBadge | Trello.PowerUp.CardBadgeDynamic> = [];
-
-  const memberId = await getMemberId();
-  const card = await t.card('id', 'idList');
-  const cardModel = new Card(card.id);
-
   const visible = await isVisible();
 
   if (!visible) {
     return [];
   }
+  
+  const badges: Array<Trello.PowerUp.CardBadge | Trello.PowerUp.CardBadgeDynamic> = [];
+
+  const memberId = await getMemberId();
+  const card = await t.card('id', 'idList');
+  const cardModel = new Card(card.id);
 
   // Time badge
   badges.push({

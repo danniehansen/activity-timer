@@ -7,6 +7,7 @@ import { Ranges } from './ranges';
 import { getThresholdForTrackings } from './settings';
 import { Timer, TimerData } from './timer';
 import { Timers } from './timers';
+import * as Sentry from '@sentry/vue';
 
 export class Card {
   private _cardId: string;
@@ -132,6 +133,8 @@ export class Card {
       const threshold = await getThresholdForTrackings();
 
       if (Math.abs(Math.floor(new Date().getTime() / 1000) - timer.start) < threshold) {
+        Sentry.captureMessage('Ignored tracking due to it not meeting the threshold');
+
         t.alert({
           message: `Time tracking ignored. Threshold for registering new trackings is ${threshold} second(s).`,
           duration: 3
@@ -153,6 +156,8 @@ export class Card {
       try {
         await ranges.save();
       } catch (e) {
+        Sentry.captureException(e);
+
         if ((e + '').indexOf('PluginData length of 4096 characters exceeded') !== -1) {
           t.alert({
             message: 'Unable to save new time tracking. Too many exists on the same card.',
@@ -163,8 +168,6 @@ export class Card {
             message: 'Unrecognized error occurred while trying to stop the timer.',
             duration: 3
           });
-
-          throw e;
         }
       }
     }

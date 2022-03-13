@@ -41,6 +41,7 @@ const ownEstimate = ref(0);
 const hasEstimates = ref(false);
 const canWrite = ref(false);
 const visible = ref(false);
+let cardId: string | null = null;
 
 const timeSpentDisplay = computed(() => {
   return formatTime(trackedTime.value);
@@ -55,11 +56,17 @@ const ownEstimateDisplay = computed(() => {
 });
 
 const trelloTick = async () => {
+  if (!cardId) {
+    cardId = (await getTrelloCard().card('id')).id;
+  }
+
   canWrite.value = await getTrelloCard().memberCanWriteToModel('card');
   visible.value = await isVisible();
   hasEstimates.value = await hasEstimateFeature();
+
   const memberId = await getMemberId();
-  const card = await getCardModel();
+  const card = getCardModel();
+
   isTracking.value = await card.isRunning();
   trackedTime.value = await card.getTimeSpent();
 
@@ -75,13 +82,12 @@ const trelloTick = async () => {
   }
 };
 
-const getCardModel = async () => {
-  const cardId = await getCardId();
-  return new Card(cardId);
-};
+const getCardModel = () => {
+  if (!cardId) {
+    throw new Error('Unable to locate cardId');
+  }
 
-const getCardId = async () => {
-  return (await getTrelloCard().card('id')).id;
+  return new Card(cardId);
 };
 
 const startTracking = async () => {
@@ -91,7 +97,7 @@ const startTracking = async () => {
 };
 
 const stopTracking = async () => {
-  const cardModel = await getCardModel();
+  const cardModel = getCardModel();
   await cardModel.stopTracking(getTrelloCard());
 };
 
@@ -113,7 +119,7 @@ const viewEstimates = async (e: MouseEvent) => {
     mouseEvent: e,
     title: 'Estimates',
     items: async function (t) {
-      const cardModel = await getCardModel();
+      const cardModel = getCardModel();
       const items: Trello.PowerUp.PopupOptionsItem[] = [];
       const estimates = await cardModel.getEstimates();
       const board = await t.board('members');

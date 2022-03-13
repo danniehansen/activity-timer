@@ -58,7 +58,7 @@ export async function setVisibility (visibility: Visibility): Promise<void> {
   }
 }
 
-export async function setVisibilityMemmbers (members: string[]): Promise<void> {
+export async function setVisibilityMembers (members: string[]): Promise<void> {
   await getTrelloInstance().set('board', 'shared', 'act-timer-visibility-members', members);
 }
 
