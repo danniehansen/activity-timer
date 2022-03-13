@@ -10,7 +10,7 @@
         </div>
       </div>
 
-      <div class="dropdown__options" v-if="showOptions" ref="optionsContainer">
+      <div class="dropdown__options" :class="{ 'dropdown__options--top': optionsFromTop }" v-if="showOptions" ref="optionsContainer">
         <div
           class="dropdown__option"
           v-for="option in options"
@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onBeforeUnmount, PropType, ref, defineComponent } from 'vue';
+import { computed, onBeforeUnmount, PropType, ref, defineComponent, watch } from 'vue';
 import UIIcon from './UIIcon/UIIcon.vue';
 import UIFormElement from './UIFormElement.vue';
 
@@ -68,6 +68,7 @@ export default defineComponent({
     const optionsContainer = ref<HTMLDivElement | null>(null);
 
     const showOptions = ref(false);
+    const optionsFromTop = ref(false);
 
     const selected = computed(() => {
       if (Array.isArray(props.modelValue)) {
@@ -164,6 +165,14 @@ export default defineComponent({
       }
     };
 
+    watch(showOptions, () => {
+      if (showOptions.value && container.value) {
+        const rect = container.value.getBoundingClientRect();
+
+        optionsFromTop.value = window.innerHeight < (rect.bottom + 75);
+      }
+    });
+
     window.addEventListener('click', clickAwayDetection);
 
     onBeforeUnmount(() => {
@@ -178,7 +187,8 @@ export default defineComponent({
       value,
       toggleOption,
       container,
-      optionsContainer
+      optionsContainer,
+      optionsFromTop
     };
   }
 });
@@ -241,6 +251,17 @@ label {
     background-color: #fff;
     max-height: 175px;
     overflow: auto;
+
+    &--top {
+      top: auto;
+      bottom: 100%;
+      border: 1px solid #dfe1e6;
+      border-bottom: none;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
 
     &::-webkit-scrollbar {
       width: 8px;
