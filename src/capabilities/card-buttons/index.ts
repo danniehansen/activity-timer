@@ -4,7 +4,7 @@ import { manageTimeCallback } from './callbacks/ManageTime';
 import { notificationsCallback } from './callbacks/Notifications';
 import { settingsCallback } from './callbacks/Settings';
 import { timeSpentCallback } from './callbacks/TimeSpent';
-import {isVisible} from "../../utils/visibility";
+import { isVisible } from '../../utils/visibility';
 
 const icon = `${window.location.origin}${ClockImage}`;
 
@@ -14,7 +14,7 @@ export async function getCardButtons (t: Trello.PowerUp.IFrame): Promise<Trello.
   if (!visible) {
     return [];
   }
-  
+
   return [
     {
       icon,

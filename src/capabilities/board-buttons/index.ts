@@ -1,7 +1,7 @@
 import { Trello } from '../../types/trello';
 import ClockImage from '../../assets/images/clock.svg';
 import { clearToken } from '../../components/trello';
-import {isVisible} from "../../utils/visibility";
+import { isVisible } from '../../utils/visibility';
 
 const icon = `${window.location.origin}${ClockImage}`;
 
@@ -11,7 +11,7 @@ export async function getBoardButtons (t: Trello.PowerUp.IFrame): Promise<Trello
   if (!visible) {
     return [];
   }
-  
+
   return [
     {
       icon: {

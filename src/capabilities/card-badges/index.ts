@@ -18,7 +18,7 @@ export async function getCardBadges (t: Trello.PowerUp.IFrame): Promise<(Trello.
   if (!visible) {
     return [];
   }
-  
+
   const badges: Array<Trello.PowerUp.CardBadge | Trello.PowerUp.CardBadgeDynamic> = [];
 
   const memberId = await getMemberId();
