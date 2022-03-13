@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.0.4] - 2021-12-19
+### Fixed
+- Fixed issue with data exporter being blank when unauthorized.
+
 ## [2.0.3] - 2021-12-14
 ### Added
 - Added better error handling for data exporter when in incognito. Instead of a permanent loader it will now properly display that incognito might be the issue. With other unrecognized errors it will notify the user about this.

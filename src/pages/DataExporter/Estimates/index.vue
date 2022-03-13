@@ -13,7 +13,7 @@
     <p>Woops. An unrecognized error occurred. Our system have automatically logged it & will be looking into the matter. Please try again later or with a different browser.</p>
   </div>
 
-  <div class="unauthorized" v-else-if="ready && !isAuthorized">
+  <div class="unauthorized" v-else-if="!isAuthorized">
     <p>To access estimates data you need to allow Activity timer to read this data. Click the button below to allow this.</p>
     <UIButton @click="authorize()">Authorize</UIButton>
 
