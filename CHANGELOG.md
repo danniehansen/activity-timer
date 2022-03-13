@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.1.0] - 2022-03-13
+### Added
+- Added powerup visibility settings. You can now control if all, board members or specific members should be able to access powerup data from the UI.
+
 ## [2.0.4] - 2021-12-19
 ### Fixed
 - Fixed issue with data exporter being blank when unauthorized.
@@ -51,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0] - 2021-06-13
 ### Added
-- [BETA] Added auto-start timer feature. Automatically starts registering time when cards are moved to a specific list. This feature can be enabled on the power-up settings page. I've put a BETA label on this as it's highly subject to change due to the unknowns about added cost to hosting the power-up. 
+- [BETA] Added auto-start timer feature. Automatically starts registering time when cards are moved to a specific list. This feature can be enabled on the power-up settings page. I've put a BETA label on this as it's highly subject to change due to the unknowns about added cost to hosting the power-up.
 - Added threshold for registering trackings. If trackings added by manually starting / stopping the timer is less than x settings (default 30). Then power-up rejects the time tracking. This is to combat the 4096 character limit on power-ups for storage. You think 30 is too much or too little? Change it on the power-up settings page.
 ### Optimizations
 - Optimized card badge rendering by caching the member id.

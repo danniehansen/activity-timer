@@ -15,12 +15,23 @@
     <div><i v-if="autoStartTimerEnabled">(Requires browser reload after enabling)</i></div>
 
     <UIDropdown v-if="autoStartTimerEnabled" v-model="autoListId" label="List to auto-start tracking" :options="listOptions" />
+    <hr />
+    <UIDropdown v-model="visibility" label="Visibility" :options="visibilityOptions" placeholder="Visible to all" />
+
+    <UIDropdown
+      v-if="visibility === 'specific-members'"
+      v-model="visibilityMembers"
+      label="Visibility members"
+      :multiple="true"
+      :options="visibilityMembersOptions"
+      placeholder="Visible to all"
+    />
   </template>
 </template>
 
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue';
-import { clearToken, getTokenDetails, getTrelloCard, getTrelloInstance, prepareWriteAuth, resizeTrelloFrame } from '../components/trello';
+import { clearToken, getTrelloCard, getTrelloInstance, prepareWriteAuth, resizeTrelloFrame } from '../components/trello';
 import UISlider from '../components/UISlider.vue';
 import UICheckbox from '../components/UICheckbox.vue';
 import UIButton from '../components/UIButton.vue';
@@ -29,12 +40,33 @@ import { disableEstimateFeature, enableEstimateFeature, getApiHost, getAppKey, g
 import { disableAutoTimer, enableAutoTimer, getAutoTimerListId, hasAutoTimer, setAutoTimerListId } from '../utils/auto-timer';
 import UIOptroStatus from '../components/UIOptroStatus.vue';
 import UILoader from '../components/UILoader.vue';
+import { getVisibility, getVisibilityMembers, setVisibility, setVisibilityMembers, Visibility } from '../utils/visibility';
+import { formatMemberName } from '../utils/formatting';
 
 const autoStartTimerEnabled = ref(false);
 const disableEstimate = ref(false);
 const threshold = ref(1);
 const autoListId = ref('');
 const loading = ref(true);
+const visibility = ref('');
+const visibilityOptions = ref<Option[]>([
+  {
+    text: 'Visible to all',
+    value: ''
+  },
+  {
+    text: 'Visible to specific members',
+    value: 'specific-members'
+  },
+  {
+    text: 'Visible to members of board',
+    value: 'members-of-board'
+  }
+]);
+
+const visibilityMembers = ref<string[]>([]);
+const visibilityMembersOptions = ref<Option[]>([]);
+
 const listOptions = ref<Option[]>([
   {
     text: 'None',
@@ -45,6 +77,28 @@ const listOptions = ref<Option[]>([
 async function initialize () {
   const startTime = Date.now();
   await prepareWriteAuth();
+
+  const userVisibility = await getVisibility();
+
+  switch (userVisibility) {
+  case Visibility.MEMBERS_OF_BOARD:
+    visibility.value = 'members-of-board';
+    break;
+
+  case Visibility.SPECIFIC_MEMBERS:
+    visibility.value = 'specific-members';
+    break;
+  }
+
+  const members = await getTrelloCard().board('members');
+  visibilityMembersOptions.value = members.members.map((member) => {
+    return {
+      text: formatMemberName(member),
+      value: member.id
+    };
+  });
+
+  visibilityMembers.value = await getVisibilityMembers();
 
   getTrelloCard().render(trelloTick);
   await new Promise((resolve) => setTimeout(resolve, Math.max(0, 1500 - (Date.now() - startTime))));
@@ -89,13 +143,13 @@ async function enableAutoStartTimer () {
       autoStartTimerEnabled.value = true;
     }
   }
-};
+}
 
 async function disableAutoStartTimer () {
   // Clearing the token automatically remove any webhooks existing on it.
   await clearToken();
   autoStartTimerEnabled.value = false;
-};
+}
 
 async function trelloTick () {
   autoStartTimerEnabled.value = await hasAutoTimer();
@@ -119,7 +173,7 @@ async function trelloTick () {
   ];
 
   setTimeout(resizeTrelloFrame);
-};
+}
 
 watch(disableEstimate, () => {
   if (disableEstimate.value) {
@@ -131,6 +185,25 @@ watch(disableEstimate, () => {
 
 watch(threshold, () => {
   setThresholdForTrackings(threshold.value);
+});
+
+watch(visibility, async () => {
+  switch (visibility.value) {
+  case 'specific-members':
+    await setVisibility(Visibility.SPECIFIC_MEMBERS);
+    break;
+
+  case 'members-of-board':
+    await setVisibility(Visibility.MEMBERS_OF_BOARD);
+    break;
+
+  default:
+    await setVisibility(Visibility.ALL);
+  }
+});
+
+watch(visibilityMembers, async () => {
+  await setVisibilityMembers(visibilityMembers.value);
 });
 
 watch(autoStartTimerEnabled, () => {
