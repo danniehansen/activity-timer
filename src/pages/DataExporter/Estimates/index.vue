@@ -397,7 +397,7 @@ async function getData () {
 
   ready.value = true;
   loading.value = false;
-};
+}
 
 async function initialize () {
   const board = await getTrelloInstance().board('members');
@@ -445,9 +445,10 @@ async function initialize () {
   if (isAuthorized.value) {
     await getData();
   } else {
+    ready.value = true;
     loading.value = false;
   }
-};
+}
 
 async function authorize () {
   rejectedAuth.value = false;
@@ -469,7 +470,7 @@ async function authorize () {
     await clearToken();
     throw e;
   }
-};
+}
 
 const exportData = () => {
   const data: Array<Array<string>> = [];
