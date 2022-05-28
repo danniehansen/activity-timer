@@ -52,7 +52,10 @@ export class ApiCard {
     const pluginData = data.pluginData.find((pluginData) => {
       return (
         pluginData.value &&
-        pluginData.value.includes('act-timer-ranges')
+        (
+          pluginData.value.includes('act-timer-ranges') ||
+          pluginData.value.includes('act-timer-estimates')
+        )
       );
     });
 
