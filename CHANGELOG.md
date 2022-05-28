@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.1.1] - 2022-05-28
+### Fixed
+- Fixed issue with estimate data exporter not showing all cards when cards did not have any trackings.
+
 ## [2.1.0] - 2022-03-13
 ### Added
 - Added powerup visibility settings. You can now control if all, board members or specific members should be able to access powerup data from the UI.
