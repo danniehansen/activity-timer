@@ -5,7 +5,7 @@ export class Ranges {
   private _cardId: string;
   private _items: Range[] = [];
 
-  constructor (cardId: string, items?: Range[]) {
+  constructor(cardId: string, items?: Range[]) {
     this._cardId = cardId;
 
     if (items) {
@@ -13,25 +13,30 @@ export class Ranges {
     }
   }
 
-  get items () {
+  get items() {
     return this._items ?? [];
   }
 
-  get timeSpent () {
+  get timeSpent() {
     return this._items.reduce((a, b) => a + b.diff, 0);
   }
 
-  add (range: Range) {
+  add(range: Range) {
     this._items.push(range);
   }
 
-  serialize (): RangeData[] {
+  serialize(): RangeData[] {
     return this._items.map((item) => {
       return item.serialize();
     });
   }
 
-  async save () {
-    await getTrelloInstance().set(this._cardId, 'shared', 'act-timer-ranges', this.serialize());
+  async save() {
+    await getTrelloInstance().set(
+      this._cardId,
+      'shared',
+      'act-timer-ranges',
+      this.serialize()
+    );
   }
 }

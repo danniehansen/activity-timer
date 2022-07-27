@@ -5,33 +5,29 @@ export class Timer {
   private _start: number;
   private _listId: string;
 
-  constructor (memberId: string, listId: string, start: number) {
+  constructor(memberId: string, listId: string, start: number) {
     this._memberId = memberId;
     this._listId = listId;
     this._start = start;
   }
 
-  get memberId () {
+  get memberId() {
     return this._memberId;
   }
 
-  get listId () {
+  get listId() {
     return this._listId;
   }
 
-  get start () {
+  get start() {
     return this._start;
   }
 
-  get timeInSecond () {
+  get timeInSecond() {
     return Math.floor(new Date().getTime() / 1000) - this._start;
   }
 
-  serialize (): TimerData {
-    return [
-      this._memberId,
-      this._listId,
-      this._start
-    ];
+  serialize(): TimerData {
+    return [this._memberId, this._listId, this._start];
   }
 }

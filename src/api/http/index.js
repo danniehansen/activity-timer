@@ -1,16 +1,25 @@
 const crypto = require('crypto');
 const https = require('https');
-const { DynamoDB, QueryCommand, DeleteItemCommand } = require('@aws-sdk/client-dynamodb');
-const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require('@aws-sdk/client-apigatewaymanagementapi');
-const { error } = require('console');
+const {
+  DynamoDB,
+  QueryCommand,
+  DeleteItemCommand
+} = require('@aws-sdk/client-dynamodb');
+const {
+  ApiGatewayManagementApiClient,
+  PostToConnectionCommand
+} = require('@aws-sdk/client-apigatewaymanagementapi');
 
 const dynamoDbClient = new DynamoDB({ region: process.env.ACT_AWS_REGION });
 
 class ValidationException extends Error {}
 
-function verifyTrelloWebhookRequest (request, callbackURL) {
+function verifyTrelloWebhookRequest(request, callbackURL) {
   const base64Digest = function (s) {
-    return crypto.createHmac('sha1', process.env.ACT_TRELLO_SECRET).update(s).digest('base64');
+    return crypto
+      .createHmac('sha1', process.env.ACT_TRELLO_SECRET)
+      .update(s)
+      .digest('base64');
   };
 
   const content = request.body + callbackURL;
@@ -25,56 +34,63 @@ function verifyTrelloWebhookRequest (request, callbackURL) {
  * Will also check for a match against validateListAgainst & "act-timer-auto-timer-list-id"
  * if provided in the arguments.
  */
-function validatePluginData (pluginData, validateListAgainst = null) {
-  return pluginData.filter((plugin) => {
-    if (plugin.value) {
-      const jsonValue = JSON.parse(plugin.value);
+function validatePluginData(pluginData, validateListAgainst = null) {
+  return (
+    pluginData.filter((plugin) => {
+      if (plugin.value) {
+        const jsonValue = JSON.parse(plugin.value);
 
-      if (jsonValue) {
-        return (
-          jsonValue['act-timer-auto-timer'] &&
-          jsonValue['act-timer-auto-timer-list-id'] &&
-          (
-            !validateListAgainst ||
-            validateListAgainst === jsonValue['act-timer-auto-timer-list-id']
-          )
-        );
+        if (jsonValue) {
+          return (
+            jsonValue['act-timer-auto-timer'] &&
+            jsonValue['act-timer-auto-timer-list-id'] &&
+            (!validateListAgainst ||
+              validateListAgainst === jsonValue['act-timer-auto-timer-list-id'])
+          );
+        }
       }
-    }
 
-    return false;
-  }).length > 0;
+      return false;
+    }).length > 0
+  );
 }
 
 /**
  * Didn't fell like including a 3rd party library for a simple GET request.
  * This gets the job done.
  */
-function httpRequest (url, queryParams) {
+function httpRequest(url, queryParams) {
   return new Promise((resolve, reject) => {
-    https.get(`${url}?${new URLSearchParams(queryParams).toString()}`, {
-      timeout: 5000
-    }, (resp) => {
-      let data = '';
+    https
+      .get(
+        `${url}?${new URLSearchParams(queryParams).toString()}`,
+        {
+          timeout: 5000
+        },
+        (resp) => {
+          let data = '';
 
-      // A chunk of data has been received.
-      resp.on('data', (chunk) => {
-        data += chunk;
-      });
+          // A chunk of data has been received.
+          resp.on('data', (chunk) => {
+            data += chunk;
+          });
 
-      // The whole response has been received. Print out the result.
-      resp.on('end', () => {
-        resolve(JSON.parse(data));
+          // The whole response has been received. Print out the result.
+          resp.on('end', () => {
+            resolve(JSON.parse(data));
+          });
+        }
+      )
+      .on('timeout', (err) => {
+        reject(err);
+      })
+      .on('error', (err) => {
+        reject(err);
       });
-    }).on('timeout', (err) => {
-      reject(err);
-    }).on('error', (err) => {
-      reject(err);
-    });
   });
 }
 
-async function main (event) {
+async function main(event) {
   console.log('Incoming request', event);
 
   try {
@@ -110,7 +126,9 @@ async function main (event) {
 
     if (!verifyTrelloWebhookRequest(event, callbackUrl)) {
       // Failed to verify signature. De-registering webhook for safety
-      console.error('Failed to verify signature. De-registering webhook for safety');
+      console.error(
+        'Failed to verify signature. De-registering webhook for safety'
+      );
 
       // 410 will de-register the webhook.
       return {
@@ -133,17 +151,22 @@ async function main (event) {
       listIdAfter !== listIdBefore
     ) {
       try {
-        const cardData = await httpRequest(`https://api.trello.com/1/boards/${boardId}`, {
-          token,
-          key: apiKey,
-          pluginData: 'true'
-        });
+        const cardData = await httpRequest(
+          `https://api.trello.com/1/boards/${boardId}`,
+          {
+            token,
+            key: apiKey,
+            pluginData: 'true'
+          }
+        );
 
         if (cardData.pluginData) {
           // If powerup doesn't have auto timer start enabled. Then we should disable the webhook
           // 410 will de-register the webhook.
           if (!validatePluginData(cardData.pluginData)) {
-            console.log('Plugin is either no longer active or auto start timer is no longer active. De-registering webhook for safety');
+            console.log(
+              'Plugin is either no longer active or auto start timer is no longer active. De-registering webhook for safety'
+            );
 
             return {
               statusCode: 410
@@ -192,7 +215,10 @@ async function main (event) {
             try {
               await apiManagementClient.send(command);
             } catch (e) {
-              console.error('Encountered exception when attempting to send Websocket message to connection. Removing connection from DynamoDB...', e);
+              console.error(
+                'Encountered exception when attempting to send Websocket message to connection. Removing connection from DynamoDB...',
+                e
+              );
 
               // In case exceptions happen with API Gateway we fall back to removing the
               // connection from DynamoDB so we don't have dead clients around.

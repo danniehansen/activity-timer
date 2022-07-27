@@ -2,17 +2,28 @@ import { Card } from '../../../components/card';
 import { Ranges } from '../../../components/ranges';
 import { Range } from '../../../components/range';
 import { Trello } from '../../../types/trello';
-import { formatDate, formatMemberName, formatTime } from '../../../utils/formatting';
+import {
+  formatDate,
+  formatMemberName,
+  formatTime
+} from '../../../utils/formatting';
 import { getMemberId } from '../../../components/trello';
 
-function getManageRow (card: Card, ranges: Ranges, range: Range): Trello.PowerUp.PopupOptionsItem {
+function getManageRow(
+  card: Card,
+  ranges: Ranges,
+  range: Range
+): Trello.PowerUp.PopupOptionsItem {
   const start = new Date(range.start * 1000);
   const end = new Date(range.end * 1000);
   const rangeOnTheSameDay = start.toDateString() === end.toDateString();
   const rangeLengthInSeconds = range.end - range.start;
 
   return {
-    text: `${formatDate(start)} - ${formatDate(end, rangeOnTheSameDay)} (${formatTime(rangeLengthInSeconds, false)})`,
+    text: `${formatDate(start)} - ${formatDate(
+      end,
+      rangeOnTheSameDay
+    )} (${formatTime(rangeLengthInSeconds, false)})`,
     callback: function (t) {
       return t.popup({
         title: 'Edit time range',
@@ -25,7 +36,9 @@ function getManageRow (card: Card, ranges: Ranges, range: Range): Trello.PowerUp
                   type: 'datetime',
                   title: 'Change start from (' + formatDate(start) + ')',
                   callback: async function (t, opts) {
-                    range.start = Math.floor(new Date(opts.date).getTime() / 1000);
+                    range.start = Math.floor(
+                      new Date(opts.date).getTime() / 1000
+                    );
                     await ranges.save();
                     return t.closePopup();
                   },
@@ -40,7 +53,9 @@ function getManageRow (card: Card, ranges: Ranges, range: Range): Trello.PowerUp
                   type: 'datetime',
                   title: 'Change end from (' + formatDate(end) + ')',
                   callback: async function (t, opts) {
-                    range.end = Math.floor(new Date(opts.date).getTime() / 1000);
+                    range.end = Math.floor(
+                      new Date(opts.date).getTime() / 1000
+                    );
                     await ranges.save();
                     return t.closePopup();
                   },
@@ -51,9 +66,25 @@ function getManageRow (card: Card, ranges: Ranges, range: Range): Trello.PowerUp
             {
               text: 'Delete',
               callback: async (t) => {
-                const newRanges = new Ranges(card.id, ranges.items.filter((item) => item.rangeId !== range.rangeId));
-                await newRanges.save();
-                return t.closePopup();
+                return t.popup({
+                  type: 'confirm',
+                  title: 'Delete tracking',
+                  message:
+                    "You're about to delete a time tracking. Are you sure?",
+                  confirmText: 'Yes, delete tracking',
+                  onConfirm: async (t) => {
+                    const newRanges = new Ranges(
+                      card.id,
+                      ranges.items.filter(
+                        (item) => item.rangeId !== range.rangeId
+                      )
+                    );
+                    await newRanges.save();
+                    return t.closePopup();
+                  },
+                  confirmStyle: 'danger',
+                  cancelText: 'No, cancel'
+                });
               }
             }
           ];
@@ -63,10 +94,15 @@ function getManageRow (card: Card, ranges: Ranges, range: Range): Trello.PowerUp
   };
 }
 
-function openManuallyAdd (t: Trello.PowerUp.IFrame, card: Card, start = new Date(), end = new Date()) {
+function openManuallyAdd(
+  t: Trello.PowerUp.IFrame,
+  card: Card,
+  start = new Date(),
+  end = new Date()
+) {
   return t.popup({
     title: 'Manually add time tracking',
-    items: async (t: Trello.PowerUp.IFrame) => {
+    items: async () => {
       return [
         {
           text: `Edit start (${formatDate(start)}`,
@@ -113,7 +149,8 @@ function openManuallyAdd (t: Trello.PowerUp.IFrame, card: Card, start = new Date
               await ranges.save();
             } else {
               t.alert({
-                message: 'Unable to add time tracking. Start & end was the same.',
+                message:
+                  'Unable to add time tracking. Start & end was the same.',
                 duration: 3
               });
             }
@@ -126,48 +163,88 @@ function openManuallyAdd (t: Trello.PowerUp.IFrame, card: Card, start = new Date
   });
 }
 
-export async function manageTimeCallback (t: Trello.PowerUp.IFrame) {
+export async function manageTimeCallback(t: Trello.PowerUp.IFrame) {
   return t.popup({
     title: 'Manage time',
     items: async function (t) {
       const card = await Card.getFromContext(t);
+      const timers = await card.getTimers();
       const ranges = await card.getRanges();
       const board = await t.board('members');
 
       const items: Trello.PowerUp.PopupOptionsItem[] = [];
       const memberIds = board.members.map((member) => member.id);
 
-      board.members.sort((a, b) => {
-        const nameA = (a.fullName ?? '').toUpperCase();
-        const nameB = (b.fullName ?? '').toUpperCase();
+      board.members
+        .sort((a, b) => {
+          const nameA = (a.fullName ?? '').toUpperCase();
+          const nameB = (b.fullName ?? '').toUpperCase();
 
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
 
-        return 0;
-      }).forEach((member) => {
-        const memberRanges = ranges.items.filter((range) => {
-          return range.memberId === member.id;
+          return 0;
+        })
+        .forEach((member) => {
+          const memberRanges = ranges.items.filter((range) => {
+            return range.memberId === member.id;
+          });
+
+          const timer = timers.getByMemberId(member.id);
+
+          if (memberRanges.length > 0 || timer) {
+            items.push({
+              text: formatMemberName(member) + ':'
+            });
+
+            memberRanges.forEach((range) => {
+              items.push(getManageRow(card, ranges, range));
+            });
+
+            if (timer) {
+              items.push({
+                text: `Running: ${formatDate(
+                  new Date(timer.start * 1000)
+                )} (${formatTime(timer.timeInSecond, true)})`,
+                callback: function (t) {
+                  return t.popup({
+                    title: 'Active timer',
+                    items: async function () {
+                      return [
+                        {
+                          text: 'Stop time tracking',
+                          callback: async (t) => {
+                            return t.popup({
+                              type: 'confirm',
+                              title: 'Stop time tracking',
+                              message:
+                                "You're about to stop a time tracking. Are you sure?",
+                              confirmText: 'Yes, stop timer',
+                              onConfirm: async (t) => {
+                                await card.stopTrackingByMemberId(member.id, t);
+                                return t.closePopup();
+                              },
+                              confirmStyle: 'danger',
+                              cancelText: 'No, cancel'
+                            });
+                          }
+                        }
+                      ];
+                    }
+                  });
+                }
+              });
+            }
+
+            items.push({
+              text: '--------'
+            });
+          }
         });
-
-        if (memberRanges.length > 0) {
-          items.push({
-            text: formatMemberName(member) + ':'
-          });
-
-          memberRanges.forEach((range) => {
-            items.push(getManageRow(card, ranges, range));
-          });
-
-          items.push({
-            text: '--------'
-          });
-        }
-      });
 
       ranges.items
         .filter((range) => memberIds.indexOf(range.memberId) === -1)

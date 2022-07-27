@@ -2,20 +2,31 @@
   <UIRow v-if="canWrite && visible">
     <div>
       <UIButton v-if="!isTracking" @click="startTracking">Start timer</UIButton>
-      <UIButton v-else @click="stopTracking" :danger="true">Stop timer</UIButton>
+      <UIButton v-else @click="stopTracking" :danger="true"
+        >Stop timer</UIButton
+      >
 
       <UIInfo icon="clock">{{ timeSpentDisplay }}</UIInfo>
     </div>
 
     <div v-if="hasEstimates">
-      <UIInfo style="cursor: pointer;" @click="changeEstimate">Estimate: {{ ownEstimateDisplay }}</UIInfo>
-      <UIInfo style="cursor: pointer;" v-if="ownEstimate != totalEstimate" @click="viewEstimates">Total estimate: {{ totalEstimateDisplay }}</UIInfo>
+      <UIInfo style="cursor: pointer" @click="changeEstimate"
+        >Estimate: {{ ownEstimateDisplay }}</UIInfo
+      >
+      <UIInfo
+        style="cursor: pointer"
+        v-if="ownEstimate != totalEstimate"
+        @click="viewEstimates"
+        >Total estimate: {{ totalEstimateDisplay }}</UIInfo
+      >
     </div>
   </UIRow>
 
   <UIRow v-else-if="hasEstimates && totalEstimate && visible">
     <div>
-      <UIInfo v-if="ownEstimate != totalEstimate">Total estimate: {{ totalEstimateDisplay }}</UIInfo>
+      <UIInfo v-if="ownEstimate != totalEstimate"
+        >Total estimate: {{ totalEstimateDisplay }}</UIInfo
+      >
     </div>
   </UIRow>
 
@@ -27,7 +38,12 @@ import { ref, computed } from 'vue';
 import UIInfo from '../../components/UIInfo/UIInfo.vue';
 import UIRow from '../../components/UIRow.vue';
 import UIButton from '../../components/UIButton.vue';
-import { getMemberId, getTrelloCard, getTrelloInstance, resizeTrelloFrame } from '../../components/trello';
+import {
+  getMemberId,
+  getTrelloCard,
+  getTrelloInstance,
+  resizeTrelloFrame
+} from '../../components/trello';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature } from '../../components/settings';
@@ -126,50 +142,58 @@ const viewEstimates = async (e: MouseEvent) => {
 
       const membersFound = board.members.map((member) => member.id);
 
-      board.members.sort((a, b) => {
-        const nameA = (a.fullName ?? '').toUpperCase();
-        const nameB = (b.fullName ?? '').toUpperCase();
+      board.members
+        .sort((a, b) => {
+          const nameA = (a.fullName ?? '').toUpperCase();
+          const nameB = (b.fullName ?? '').toUpperCase();
 
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
 
-        return 0;
-      }).forEach((member) => {
-        const memberEstimates = estimates.items.filter((estimate) => {
-          return estimate.memberId === member.id;
-        });
-
-        let memberEstimate = 0;
-
-        memberEstimates.forEach((estimate) => {
-          memberEstimate += estimate.time;
-        });
-
-        if (memberEstimate > 0) {
-          items.push({
-            text: member.fullName + (member.fullName !== member.username ? ' (' + member.username + ')' : '') + ': ' + formatTime(memberEstimate),
-            callback: async (t: Trello.PowerUp.IFrame) => {
-              return t.popup({
-                type: 'confirm',
-                title: 'Delete estimate?',
-                message: 'Are you sure you wish to delete this estimate?',
-                confirmText: 'Yes, delete',
-                onConfirm: async (t) => {
-                  estimates.removeByMemberId(member.id);
-                  await estimates.save();
-                  return t.closePopup();
-                },
-                confirmStyle: 'danger',
-                cancelText: 'No, cancel'
-              });
-            }
+          return 0;
+        })
+        .forEach((member) => {
+          const memberEstimates = estimates.items.filter((estimate) => {
+            return estimate.memberId === member.id;
           });
-        }
-      });
+
+          let memberEstimate = 0;
+
+          memberEstimates.forEach((estimate) => {
+            memberEstimate += estimate.time;
+          });
+
+          if (memberEstimate > 0) {
+            items.push({
+              text:
+                member.fullName +
+                (member.fullName !== member.username
+                  ? ' (' + member.username + ')'
+                  : '') +
+                ': ' +
+                formatTime(memberEstimate),
+              callback: async (t: Trello.PowerUp.IFrame) => {
+                return t.popup({
+                  type: 'confirm',
+                  title: 'Delete estimate?',
+                  message: 'Are you sure you wish to delete this estimate?',
+                  confirmText: 'Yes, delete',
+                  onConfirm: async (t) => {
+                    estimates.removeByMemberId(member.id);
+                    await estimates.save();
+                    return t.closePopup();
+                  },
+                  confirmStyle: 'danger',
+                  cancelText: 'No, cancel'
+                });
+              }
+            });
+          }
+        });
 
       estimates.items.forEach((estimate, estimateIndex) => {
         if (!membersFound.includes(estimate.memberId)) {
