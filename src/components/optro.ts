@@ -3,7 +3,7 @@ import { getPowerupId, getTrelloInstance } from './trello';
 
 let optroClient: OptroLicenseApi | undefined;
 
-async function getOptroBoardLicense () {
+async function getOptroBoardLicense() {
   if (!optroClient) {
     throw new Error('No optro client defined');
   }
@@ -13,7 +13,7 @@ async function getOptroBoardLicense () {
   return optroClient.getBoardLicenseStatus(board.id);
 }
 
-export function initializeOptro () {
+export function initializeOptro() {
   if (typeof import.meta.env.VITE_OPTRO_API_KEY !== 'string') {
     return;
   }
@@ -30,11 +30,11 @@ export function initializeOptro () {
   );
 }
 
-export function hasOptroClient () {
+export function hasOptroClient() {
   return optroClient !== undefined;
 }
 
-export async function getSubscriptionStatus () {
+export async function getSubscriptionStatus() {
   if (hasOptroClient()) {
     const optroBoardLicense = await getOptroBoardLicense();
     return optroBoardLicense.isLicensed;

@@ -3,23 +3,36 @@ import EstimateImage from '../../assets/images/estimate.svg';
 import ClockImage from '../../assets/images/clock.svg';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
-import { hasEstimateFeature, hasSettingStopOnMove } from '../../components/settings';
+import {
+  hasEstimateFeature,
+  hasSettingStopOnMove
+} from '../../components/settings';
 import { getMemberId } from '../../components/trello';
-import { canTriggerNotification, triggerNotification } from '../../utils/notifications';
-import { clearRequestedTimerStart, getRequestedTimerStart } from '../../components/websocket';
+import {
+  canTriggerNotification,
+  triggerNotification
+} from '../../utils/notifications';
+import {
+  clearRequestedTimerStart,
+  getRequestedTimerStart
+} from '../../components/websocket';
 import { isVisible } from '../../utils/visibility';
 
 const clockIcon = `${window.location.origin}${ClockImage}`;
 const estimateImage = `${window.location.origin}${EstimateImage}`;
 
-export async function getCardBadges (t: Trello.PowerUp.IFrame): Promise<(Trello.PowerUp.CardBadge | Trello.PowerUp.CardBadgeDynamic)[]> {
+export async function getCardBadges(
+  t: Trello.PowerUp.IFrame
+): Promise<(Trello.PowerUp.CardBadge | Trello.PowerUp.CardBadgeDynamic)[]> {
   const visible = await isVisible();
 
   if (!visible) {
     return [];
   }
 
-  const badges: Array<Trello.PowerUp.CardBadge | Trello.PowerUp.CardBadgeDynamic> = [];
+  const badges: Array<
+    Trello.PowerUp.CardBadge | Trello.PowerUp.CardBadgeDynamic
+  > = [];
 
   const memberId = await getMemberId();
   const card = await t.card('id', 'idList');
@@ -72,7 +85,8 @@ export async function getCardBadges (t: Trello.PowerUp.IFrame): Promise<(Trello.
   badges.push({
     dynamic: async function () {
       const timers = await cardModel.getTimers();
-      const othersTracking = timers.items.filter((item) => item.memberId !== memberId).length > 0;
+      const othersTracking =
+        timers.items.filter((item) => item.memberId !== memberId).length > 0;
 
       const badge: Trello.PowerUp.CardBadge = {
         refresh: 60
@@ -108,10 +122,7 @@ export async function getCardBadges (t: Trello.PowerUp.IFrame): Promise<(Trello.
       if (card.id === getRequestedTimerStart()) {
         clearRequestedTimerStart();
 
-        await cardModel.startTracking(
-          (await t.card('idList')).idList,
-          t
-        );
+        await cardModel.startTracking((await t.card('idList')).idList, t);
       }
 
       return {

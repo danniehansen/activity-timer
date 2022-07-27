@@ -5,7 +5,7 @@ export class Timers {
   private _cardId: string;
   private _items: Timer[] = [];
 
-  constructor (cardId: string, timers?: Timer[]) {
+  constructor(cardId: string, timers?: Timer[]) {
     this._cardId = cardId;
 
     if (timers) {
@@ -13,19 +13,19 @@ export class Timers {
     }
   }
 
-  get items () {
+  get items() {
     return this._items;
   }
 
-  get timeSpent (): number {
+  get timeSpent(): number {
     return this._items.reduce((a, b) => a + b.timeInSecond, 0);
   }
 
-  add (timer: Timer) {
+  add(timer: Timer) {
     this._items.push(timer);
   }
 
-  getByMemberId (memberId: string): Timer | undefined {
+  getByMemberId(memberId: string): Timer | undefined {
     return this._items.reduce<Timer | undefined>((carry, item) => {
       if (item.memberId === memberId) {
         carry = item;
@@ -34,7 +34,7 @@ export class Timers {
     }, undefined);
   }
 
-  removeByMemberId (memberId: string): boolean {
+  removeByMemberId(memberId: string): boolean {
     const lengthBefore = this._items.length;
 
     this._items = this._items.filter((item) => {
@@ -44,27 +44,28 @@ export class Timers {
     return this._items.length !== lengthBefore;
   }
 
-  serialize (): TimerData[] {
+  serialize(): TimerData[] {
     return this._items.map((item) => {
       return item.serialize();
     });
   }
 
-  startByMember (memberId: string, listId: string) {
+  startByMember(memberId: string, listId: string) {
     this._items = this._items.filter((item) => {
       return item.memberId !== memberId;
     });
 
     this.add(
-      new Timer(
-        memberId,
-        listId,
-        Math.floor(new Date().getTime() / 1000)
-      )
+      new Timer(memberId, listId, Math.floor(new Date().getTime() / 1000))
     );
   }
 
-  async save () {
-    await getTrelloInstance().set(this._cardId, 'shared', 'act-timer-running', this.serialize());
+  async save() {
+    await getTrelloInstance().set(
+      this._cardId,
+      'shared',
+      'act-timer-running',
+      this.serialize()
+    );
   }
 }

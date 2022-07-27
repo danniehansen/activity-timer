@@ -5,7 +5,7 @@ import { getAutoTimerListId, hasAutoTimer } from '../utils/auto-timer';
 let lastWebsocketConnection: number | null = null;
 let requestedTimerStart: string | null = null;
 
-async function initiateWebsocket () {
+async function initiateWebsocket() {
   const websocketUri = getWebsocket();
 
   if (!websocketUri) {
@@ -15,7 +15,10 @@ async function initiateWebsocket () {
   const memberId = await getMemberId();
 
   // Security measures to avoid spamming new connections
-  if (lastWebsocketConnection !== null && Math.abs(new Date().getTime() - lastWebsocketConnection) < 5000) {
+  if (
+    lastWebsocketConnection !== null &&
+    Math.abs(new Date().getTime() - lastWebsocketConnection) < 5000
+  ) {
     // TODO: Investigate other ways of showing an alert. Doesn't look like .alert() is available through the capability initializer.
     /* getTrelloCard().alert({
       message: 'Attempted to establish too many connections. Auto-timer will be de-activated for this session.',
@@ -29,11 +32,11 @@ async function initiateWebsocket () {
 
   const socket = new WebSocket(websocketUri);
 
-  socket.onopen = (e) => {
+  socket.onopen = () => {
     socket.send(JSON.stringify({ listen_member_id: memberId }));
   };
 
-  socket.onerror = (e) => {
+  socket.onerror = () => {
     socket.close();
   };
 
@@ -45,16 +48,17 @@ async function initiateWebsocket () {
         requestedTimerStart = data.cardId;
       }
     } catch (e) {
+      console.error('[ActivityTimer][ERROR]', e);
     }
   };
 
-  socket.onclose = (e) => {
+  socket.onclose = () => {
     // API Gateway websockets auto-close after 10 minutes. So we just initiate a new connection.
     initiateWebsocket();
   };
 }
 
-export async function initializeWebsocket () {
+export async function initializeWebsocket() {
   const hasAutoTimerFeature = await hasAutoTimer();
   const autoTimerListId = await getAutoTimerListId();
 
@@ -63,10 +67,10 @@ export async function initializeWebsocket () {
   }
 }
 
-export function getRequestedTimerStart () {
+export function getRequestedTimerStart() {
   return requestedTimerStart;
 }
 
-export function clearRequestedTimerStart () {
+export function clearRequestedTimerStart() {
   requestedTimerStart = null;
 }

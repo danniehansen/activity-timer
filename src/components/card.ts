@@ -12,16 +12,21 @@ import * as Sentry from '@sentry/vue';
 export class Card {
   private _cardId: string;
 
-  constructor (cardId: string) {
+  constructor(cardId: string) {
     this._cardId = cardId;
   }
 
-  get id () {
+  get id() {
     return this._cardId;
   }
 
-  async getRanges (): Promise<Ranges> {
-    const data = await getTrelloInstance().get<RangeData[]>(this._cardId, 'shared', 'act-timer-ranges', []);
+  async getRanges(): Promise<Ranges> {
+    const data = await getTrelloInstance().get<RangeData[]>(
+      this._cardId,
+      'shared',
+      'act-timer-ranges',
+      []
+    );
 
     return new Ranges(
       this._cardId,
@@ -40,8 +45,13 @@ export class Card {
     );
   }
 
-  async getTimers (): Promise<Timers> {
-    const data = await getTrelloInstance().get<TimerData[]>(this._cardId, 'shared', 'act-timer-running', []);
+  async getTimers(): Promise<Timers> {
+    const data = await getTrelloInstance().get<TimerData[]>(
+      this._cardId,
+      'shared',
+      'act-timer-running',
+      []
+    );
 
     return new Timers(
       this._cardId,
@@ -60,8 +70,13 @@ export class Card {
     );
   }
 
-  async getEstimates (): Promise<Estimates> {
-    const data = await getTrelloInstance().get<EstimateData[]>(this._cardId, 'shared', 'act-timer-estimates', []);
+  async getEstimates(): Promise<Estimates> {
+    const data = await getTrelloInstance().get<EstimateData[]>(
+      this._cardId,
+      'shared',
+      'act-timer-estimates',
+      []
+    );
 
     return new Estimates(
       this._cardId,
@@ -77,19 +92,22 @@ export class Card {
     );
   }
 
-  async getTimeSpent (): Promise<number> {
+  async getTimeSpent(): Promise<number> {
     const timers = await this.getTimers();
     const ranges = await this.getRanges();
     return timers.timeSpent + ranges.timeSpent;
   }
 
-  async isRunning (): Promise<boolean> {
+  async isRunning(): Promise<boolean> {
     const timers = await this.getTimers();
     const memberId = await getMemberId();
     return timers.getByMemberId(memberId) !== undefined;
   }
 
-  async startTracking (listId: string, trelloInstance: Trello.PowerUp.IFrame = getTrelloCard()) {
+  async startTracking(
+    listId: string,
+    trelloInstance: Trello.PowerUp.IFrame = getTrelloCard()
+  ) {
     const currentCard = new Card(this._cardId);
     const memberId = await getMemberId();
     const timers = await currentCard.getTimers();
@@ -122,7 +140,7 @@ export class Card {
     await timers.save();
   }
 
-  async stopTracking (t: Trello.PowerUp.IFrame) {
+  async stopTracking(t: Trello.PowerUp.IFrame) {
     const memberId = await getMemberId();
     const timers = await this.getTimers();
     const timer = timers.getByMemberId(memberId);
@@ -132,8 +150,13 @@ export class Card {
 
       const threshold = await getThresholdForTrackings();
 
-      if (Math.abs(Math.floor(new Date().getTime() / 1000) - timer.start) < threshold) {
-        Sentry.captureMessage('Ignored tracking due to it not meeting the threshold');
+      if (
+        Math.abs(Math.floor(new Date().getTime() / 1000) - timer.start) <
+        threshold
+      ) {
+        Sentry.captureMessage(
+          'Ignored tracking due to it not meeting the threshold'
+        );
 
         t.alert({
           message: `Time tracking ignored. Threshold for registering new trackings is ${threshold} second(s).`,
@@ -158,14 +181,19 @@ export class Card {
       } catch (e) {
         Sentry.captureException(e);
 
-        if ((e + '').indexOf('PluginData length of 4096 characters exceeded') !== -1) {
+        if (
+          (e + '').indexOf('PluginData length of 4096 characters exceeded') !==
+          -1
+        ) {
           t.alert({
-            message: 'Unable to save new time tracking. Too many exists on the same card.',
+            message:
+              'Unable to save new time tracking. Too many exists on the same card.',
             duration: 6
           });
         } else {
           t.alert({
-            message: 'Unrecognized error occurred while trying to stop the timer.',
+            message:
+              'Unrecognized error occurred while trying to stop the timer.',
             duration: 3
           });
         }
@@ -173,7 +201,7 @@ export class Card {
     }
   }
 
-  static async getFromContext (t?: Trello.PowerUp.IFrame) {
+  static async getFromContext(t?: Trello.PowerUp.IFrame) {
     const card = await (t ?? getTrelloCard()).card('id');
     return new Card(card.id);
   }
