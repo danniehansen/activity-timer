@@ -240,6 +240,14 @@ export async function manageTimeCallback(t: Trello.PowerUp.IFrame) {
               });
             }
 
+            const timeSpent =
+              memberRanges.reduce((a, b) => a + b.diff, 0) +
+              (timer ? timer.timeInSecond : 0);
+
+            items.push({
+              text: `Time spent: ${formatTime(timeSpent)}`
+            });
+
             items.push({
               text: '--------'
             });
