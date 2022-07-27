@@ -9,6 +9,7 @@ export async function timeSpentCallback(t: Trello.PowerUp.IFrame) {
       const card = await Card.getFromContext(t);
       const ranges = await card.getRanges();
       const board = await t.board('members');
+      const timers = await card.getTimers();
 
       const items: Trello.PowerUp.PopupOptionsItem[] = [];
       const memberIds = board.members.map((member) => member.id);
@@ -28,9 +29,13 @@ export async function timeSpentCallback(t: Trello.PowerUp.IFrame) {
           return 0;
         })
         .forEach((member) => {
-          const timeSpent = ranges.items
-            .filter((item) => item.memberId === member.id)
-            .reduce((a, b) => a + b.diff, 0);
+          const timer = timers.getByMemberId(member.id);
+
+          const timeSpent =
+            ranges.items
+              .filter((item) => item.memberId === member.id)
+              .reduce((a, b) => a + b.diff, 0) +
+            (timer ? timer.timeInSecond : 0);
 
           if (timeSpent !== 0) {
             items.push({
