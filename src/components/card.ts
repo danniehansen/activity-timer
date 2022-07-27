@@ -142,6 +142,10 @@ export class Card {
 
   async stopTracking(t: Trello.PowerUp.IFrame) {
     const memberId = await getMemberId();
+    return await this.stopTrackingByMemberId(memberId, t);
+  }
+
+  async stopTrackingByMemberId(memberId: string, t?: Trello.PowerUp.IFrame) {
     const timers = await this.getTimers();
     const timer = timers.getByMemberId(memberId);
 
@@ -158,10 +162,12 @@ export class Card {
           'Ignored tracking due to it not meeting the threshold'
         );
 
-        t.alert({
-          message: `Time tracking ignored. Threshold for registering new trackings is ${threshold} second(s).`,
-          duration: 3
-        });
+        if (t) {
+          t.alert({
+            message: `Time tracking ignored. Threshold for registering new trackings is ${threshold} second(s).`,
+            duration: 6
+          });
+        }
 
         return;
       }
@@ -181,21 +187,26 @@ export class Card {
       } catch (e) {
         Sentry.captureException(e);
 
-        if (
-          (e + '').indexOf('PluginData length of 4096 characters exceeded') !==
-          -1
-        ) {
-          t.alert({
-            message:
-              'Unable to save new time tracking. Too many exists on the same card.',
-            duration: 6
-          });
-        } else {
-          t.alert({
-            message:
-              'Unrecognized error occurred while trying to stop the timer.',
-            duration: 3
-          });
+        console.error('[ActivityTimer][ERROR]', e);
+
+        if (t) {
+          if (
+            (e + '').indexOf(
+              'PluginData length of 4096 characters exceeded'
+            ) !== -1
+          ) {
+            t.alert({
+              message:
+                'Unable to save new time tracking. Too many exists on the same card.',
+              duration: 6
+            });
+          } else {
+            t.alert({
+              message:
+                'Unrecognized error occurred while trying to stop the timer.',
+              duration: 3
+            });
+          }
         }
       }
     }

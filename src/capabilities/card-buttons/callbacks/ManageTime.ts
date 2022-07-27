@@ -66,12 +66,25 @@ function getManageRow(
             {
               text: 'Delete',
               callback: async (t) => {
-                const newRanges = new Ranges(
-                  card.id,
-                  ranges.items.filter((item) => item.rangeId !== range.rangeId)
-                );
-                await newRanges.save();
-                return t.closePopup();
+                return t.popup({
+                  type: 'confirm',
+                  title: 'Delete tracking',
+                  message:
+                    "You're about to delete a time tracking. Are you sure?",
+                  confirmText: 'Yes, delete tracking',
+                  onConfirm: async (t) => {
+                    const newRanges = new Ranges(
+                      card.id,
+                      ranges.items.filter(
+                        (item) => item.rangeId !== range.rangeId
+                      )
+                    );
+                    await newRanges.save();
+                    return t.closePopup();
+                  },
+                  confirmStyle: 'danger',
+                  cancelText: 'No, cancel'
+                });
               }
             }
           ];
@@ -155,6 +168,7 @@ export async function manageTimeCallback(t: Trello.PowerUp.IFrame) {
     title: 'Manage time',
     items: async function (t) {
       const card = await Card.getFromContext(t);
+      const timers = await card.getTimers();
       const ranges = await card.getRanges();
       const board = await t.board('members');
 
@@ -180,7 +194,9 @@ export async function manageTimeCallback(t: Trello.PowerUp.IFrame) {
             return range.memberId === member.id;
           });
 
-          if (memberRanges.length > 0) {
+          const timer = timers.getByMemberId(member.id);
+
+          if (memberRanges.length > 0 || timer) {
             items.push({
               text: formatMemberName(member) + ':'
             });
@@ -188,6 +204,41 @@ export async function manageTimeCallback(t: Trello.PowerUp.IFrame) {
             memberRanges.forEach((range) => {
               items.push(getManageRow(card, ranges, range));
             });
+
+            if (timer) {
+              items.push({
+                text: `Running: ${formatDate(
+                  new Date(timer.start * 1000)
+                )} (${formatTime(timer.timeInSecond, true)})`,
+                callback: function (t) {
+                  return t.popup({
+                    title: 'Active timer',
+                    items: async function () {
+                      return [
+                        {
+                          text: 'Stop time tracking',
+                          callback: async (t) => {
+                            return t.popup({
+                              type: 'confirm',
+                              title: 'Stop time tracking',
+                              message:
+                                "You're about to stop a time tracking. Are you sure?",
+                              confirmText: 'Yes, stop timer',
+                              onConfirm: async (t) => {
+                                await card.stopTrackingByMemberId(member.id, t);
+                                return t.closePopup();
+                              },
+                              confirmStyle: 'danger',
+                              cancelText: 'No, cancel'
+                            });
+                          }
+                        }
+                      ];
+                    }
+                  });
+                }
+              });
+            }
 
             items.push({
               text: '--------'
