@@ -175,6 +175,7 @@ export default defineComponent({
         showOptions.value &&
         e.target instanceof HTMLElement &&
         container.value &&
+        container.value instanceof HTMLDivElement &&
         isInElement(e.target, container.value) &&
         (e.target.classList.contains('dropdown__selected') ||
           e.target.nodeName.toLowerCase() === 'label')
@@ -186,6 +187,7 @@ export default defineComponent({
         showOptions.value &&
         optionsContainer.value &&
         e.target instanceof HTMLElement &&
+        optionsContainer.value instanceof HTMLDivElement &&
         !isInElement(e.target, optionsContainer.value)
       ) {
         showOptions.value = false;
@@ -196,6 +198,7 @@ export default defineComponent({
         showOptions.value &&
         optionsContainer.value &&
         e.target instanceof HTMLElement &&
+        optionsContainer.value instanceof HTMLDivElement &&
         isInElement(e.target, optionsContainer.value) &&
         !e.target.classList.contains('dropdown__option')
       ) {
