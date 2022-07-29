@@ -1,6 +1,11 @@
 <template>
   <div class="loader">
-    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    <div class="lds-ellipsis">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
   </div>
 </template>
 
@@ -73,5 +78,4 @@
     transform: translate(24px, 0);
   }
 }
-
 </style>
