@@ -1,21 +1,42 @@
 <template>
   <UIFormElement>
-    <label @click="showOptions = !showOptions;">{{ label }}<i v-if="help">({{ help }})</i></label>
+    <label @click="showOptions = !showOptions"
+      >{{ label }}<i v-if="help">({{ help }})</i></label
+    >
 
-    <div class="dropdown" :class="{ 'dropdown--active': showOptions }" ref="container">
-      <div class="dropdown__selected" @click="showOptions = !showOptions;" :title="selected">
+    <div
+      class="dropdown"
+      :class="{ 'dropdown--active': showOptions }"
+      ref="container"
+    >
+      <div
+        class="dropdown__selected"
+        @click="showOptions = !showOptions"
+        :title="selected"
+      >
         {{ selected || placeholder }}
-        <div class="dropdown__selected-clear" @click.stop="clear()" v-if="hasValue">
+        <div
+          class="dropdown__selected-clear"
+          @click.stop="clear()"
+          v-if="hasValue"
+        >
           <UIIcon icon="clear" />
         </div>
       </div>
 
-      <div class="dropdown__options" :class="{ 'dropdown__options--top': optionsFromTop }" v-if="showOptions" ref="optionsContainer">
+      <div
+        class="dropdown__options"
+        :class="{ 'dropdown__options--top': optionsFromTop }"
+        v-if="showOptions"
+        ref="optionsContainer"
+      >
         <div
           class="dropdown__option"
           v-for="option in options"
           :key="option.value"
-          :class="{ 'dropdown__option--selected': value.includes(option.value) }"
+          :class="{
+            'dropdown__option--selected': value.includes(option.value)
+          }"
           :title="option.text"
           @click="toggleOption(option)"
         >
@@ -27,7 +48,14 @@
 </template>
 
 <script lang="ts">
-import { computed, onBeforeUnmount, PropType, ref, defineComponent, watch } from 'vue';
+import {
+  computed,
+  onBeforeUnmount,
+  PropType,
+  ref,
+  defineComponent,
+  watch
+} from 'vue';
 import UIIcon from './UIIcon/UIIcon.vue';
 import UIFormElement from './UIFormElement.vue';
 
@@ -63,7 +91,7 @@ export default defineComponent({
       required: false
     }
   },
-  setup (props, context) {
+  setup(props, context) {
     const container = ref<HTMLDivElement | null>(null);
     const optionsContainer = ref<HTMLDivElement | null>(null);
 
@@ -72,11 +100,19 @@ export default defineComponent({
 
     const selected = computed(() => {
       if (Array.isArray(props.modelValue)) {
-        return props.modelValue.map((optionValue) => {
-          return props.options?.find((opt) => opt.value === optionValue)?.text ?? '';
-        }).join(', ');
+        return props.modelValue
+          .map((optionValue) => {
+            return (
+              props.options?.find((opt) => opt.value === optionValue)?.text ??
+              ''
+            );
+          })
+          .join(', ');
       } else if (props.modelValue) {
-        return props.options?.find((opt) => opt.value === props.modelValue)?.text ?? '';
+        return (
+          props.options?.find((opt) => opt.value === props.modelValue)?.text ??
+          ''
+        );
       }
 
       return '';
@@ -87,7 +123,7 @@ export default defineComponent({
         return props.modelValue;
       }
 
-      return (props.modelValue ? [props.modelValue] : []);
+      return props.modelValue ? [props.modelValue] : [];
     });
 
     const isInElement = (el: HTMLElement, inElement: HTMLElement) => {
@@ -105,12 +141,16 @@ export default defineComponent({
     };
 
     const hasValue = computed(() => {
-      return (Array.isArray(props.modelValue) ? props.modelValue.length > 0 : !!props.modelValue);
+      return Array.isArray(props.modelValue)
+        ? props.modelValue.length > 0
+        : !!props.modelValue;
     });
 
     const toggleOption = (option: Option) => {
       if (props.multiple) {
-        const newValue = Array.from(Array.isArray(props.modelValue) ? props.modelValue : []);
+        const newValue = Array.from(
+          Array.isArray(props.modelValue) ? props.modelValue : []
+        );
 
         if (newValue.includes(option.value)) {
           newValue.splice(newValue.indexOf(option.value), 1);
@@ -127,7 +167,7 @@ export default defineComponent({
 
     const clear = () => {
       showOptions.value = false;
-      context.emit('update:modelValue', (props.multiple ? [] : ''));
+      context.emit('update:modelValue', props.multiple ? [] : '');
     };
 
     const clickAwayDetection = (e: MouseEvent) => {
@@ -136,10 +176,8 @@ export default defineComponent({
         e.target instanceof HTMLElement &&
         container.value &&
         isInElement(e.target, container.value) &&
-        (
-          e.target.classList.contains('dropdown__selected') ||
-          e.target.nodeName.toLowerCase() === 'label'
-        )
+        (e.target.classList.contains('dropdown__selected') ||
+          e.target.nodeName.toLowerCase() === 'label')
       ) {
         return;
       }
@@ -169,7 +207,7 @@ export default defineComponent({
       if (showOptions.value && container.value) {
         const rect = container.value.getBoundingClientRect();
 
-        optionsFromTop.value = window.innerHeight < (rect.bottom + 75);
+        optionsFromTop.value = window.innerHeight < rect.bottom + 75;
       }
     });
 
@@ -224,8 +262,8 @@ label {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #172B4D;
-    background-color: #FAFBFC;
+    color: #172b4d;
+    background-color: #fafbfc;
 
     &-clear {
       position: absolute;
@@ -283,7 +321,7 @@ label {
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
-    color: #5E6C84;
+    color: #5e6c84;
 
     &:hover {
       background-color: #dfe1e6;

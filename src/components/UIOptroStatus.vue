@@ -1,16 +1,29 @@
 <template>
-  <div class="badge" :class="{'badge--pro': !loading && isPro, 'badge--free': !loading && !isPro}">
+  <div
+    class="badge"
+    :class="{
+      'badge--pro': !loading && isPro,
+      'badge--free': !loading && !isPro
+    }"
+  >
     <template v-if="!loading && isPro">
-      You're on the Pro Plan. <a href="https://optro.cloud/account" target="_blank" rel="noreferrer">Manage</a>
+      You're on the Pro Plan.
+      <a href="https://optro.cloud/account" target="_blank" rel="noreferrer"
+        >Manage</a
+      >
     </template>
 
     <template v-else-if="!loading && !isPro">
-      You're on the Free Plan <a :href="`https://www.optro.cloud/app/${powerupId}`" target="_blank" rel="noreferrer">Upgrade</a>
+      You're on the Free Plan
+      <a
+        :href="`https://www.optro.cloud/app/${powerupId}`"
+        target="_blank"
+        rel="noreferrer"
+        >Upgrade</a
+      >
     </template>
 
-    <template v-else>
-      Loading...
-    </template>
+    <template v-else> Loading... </template>
   </div>
 </template>
 
@@ -23,7 +36,7 @@ const loading = ref(true);
 const isPro = ref(false);
 const powerupId = getPowerupId();
 
-async function refresh () {
+async function refresh() {
   loading.value = true;
   isPro.value = await getSubscriptionStatus();
   loading.value = false;
@@ -40,11 +53,11 @@ refresh();
   padding: 8px;
 
   &--pro {
-    background-color: #42526E;
+    background-color: #42526e;
   }
 
   &--free {
-    background-color: #5AAC44;
+    background-color: #5aac44;
   }
 
   a {

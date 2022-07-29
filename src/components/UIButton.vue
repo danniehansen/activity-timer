@@ -1,5 +1,5 @@
 <template>
-  <button :class="{'mod-primary': !props.danger, 'mod-danger': props.danger}">
+  <button :class="{ 'mod-primary': !props.danger, 'mod-danger': props.danger }">
     <slot></slot>
   </button>
 </template>

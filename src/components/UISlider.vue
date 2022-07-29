@@ -3,7 +3,13 @@
     <label>{{ label }}</label>
 
     <UIRow>
-      <input v-model="fieldValue" type="range" :min="min" :max="max" @change="onChange" />
+      <input
+        v-model="fieldValue"
+        type="range"
+        :min="min"
+        :max="max"
+        @change="onChange"
+      />
       <input v-model="fieldValue" type="number" @input="onChange" />
     </UIRow>
   </UIFormElement>
@@ -34,7 +40,7 @@ export default defineComponent({
       required: true
     }
   },
-  setup (props, context) {
+  setup(props, context) {
     const fieldValue = ref(props.modelValue);
 
     watch(props, () => {
@@ -53,11 +59,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-input[type="number"] {
+input[type='number'] {
   width: 60px;
 }
 
-input[type="range"] {
+input[type='range'] {
   padding: 2px 0;
   line-height: 16px;
   height: 16px;
@@ -70,7 +76,7 @@ input[type="range"] {
     width: 10px;
     height: 10px;
     padding: 0;
-    background-color: #172B4D;
+    background-color: #172b4d;
     appearance: none;
     border-radius: 50%;
   }

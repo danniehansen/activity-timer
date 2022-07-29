@@ -5,9 +5,9 @@
 </template>
 
 <style lang="scss" scoped>
-  .row {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-  }
+.row {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
 </style>

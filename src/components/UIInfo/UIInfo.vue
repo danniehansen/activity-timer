@@ -1,5 +1,5 @@
 <template>
-  <div class="info-display" :class="{'info-display--has-icon': icon}">
+  <div class="info-display" :class="{ 'info-display--has-icon': icon }">
     <UIIcon v-if="icon" :icon="icon" />
     <slot></slot>
   </div>
@@ -33,7 +33,7 @@ export default defineComponent({
   margin: 8px 4px 0 0;
   text-align: center;
   appearance: none;
-  background-color: rgba(9, 30, 66, .04);
+  background-color: rgba(9, 30, 66, 0.04);
   box-shadow: none;
   border: none;
   position: relative;
