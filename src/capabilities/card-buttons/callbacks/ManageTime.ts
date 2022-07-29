@@ -9,6 +9,48 @@ import {
 } from '../../../utils/formatting';
 import { getMemberId } from '../../../components/trello';
 
+async function promptDateTime(
+  t: Trello.PowerUp.IFrame,
+  options: {
+    title: string;
+    closeOnPick?: boolean;
+    onPick: (t: Trello.PowerUp.IFrame, datetime: Date) => void;
+    initialValue?: Date;
+  }
+): Promise<void> {
+  return t.popup({
+    title: options.title,
+    url: './index.html',
+    args: {
+      page: 'datetime',
+      ...(options.initialValue && {
+        initialValue: options.initialValue.getTime()
+      }),
+      closeOnPick: options.closeOnPick ?? true ? '1' : '0'
+    },
+    callback: (t: Trello.PowerUp.IFrame) => {
+      const datetimeValue = localStorage.getItem('datetimeValue');
+      const datetimeValueInitially = localStorage.getItem(
+        'datetimeValueInitially'
+      );
+
+      if (!datetimeValue) {
+        return;
+      }
+
+      if (
+        options.initialValue &&
+        options.initialValue.getTime() !== Number(datetimeValueInitially)
+      ) {
+        return;
+      }
+
+      options.onPick(t, new Date(Number(datetimeValue)));
+    },
+    height: 357
+  });
+}
+
 function getManageRow(
   card: Card,
   ranges: Ranges,
@@ -31,35 +73,27 @@ function getManageRow(
           return [
             {
               text: 'Edit start (' + formatDate(start) + ')',
-              callback: (t) => {
-                return t.popup({
-                  type: 'datetime',
+              callback: async (t) => {
+                return promptDateTime(t, {
                   title: 'Change start from (' + formatDate(start) + ')',
-                  callback: async function (t, opts) {
-                    range.start = Math.floor(
-                      new Date(opts.date).getTime() / 1000
-                    );
+                  initialValue: start,
+                  onPick: async (t, date) => {
+                    range.start = Math.floor(date.getTime() / 1000);
                     await ranges.save();
-                    return t.closePopup();
-                  },
-                  date: start
+                  }
                 });
               }
             },
             {
               text: 'Edit end (' + formatDate(end) + ')',
               callback: (t) => {
-                return t.popup({
-                  type: 'datetime',
+                return promptDateTime(t, {
                   title: 'Change end from (' + formatDate(end) + ')',
-                  callback: async function (t, opts) {
-                    range.end = Math.floor(
-                      new Date(opts.date).getTime() / 1000
-                    );
+                  initialValue: end,
+                  onPick: async (t, date) => {
+                    range.end = Math.floor(date.getTime() / 1000);
                     await ranges.save();
-                    return t.closePopup();
-                  },
-                  date: end
+                  }
                 });
               }
             },
@@ -107,26 +141,26 @@ function openManuallyAdd(
         {
           text: `Edit start (${formatDate(start)}`,
           callback: (t) => {
-            return t.popup({
-              type: 'datetime',
+            return promptDateTime(t, {
               title: `Change start (${formatDate(start)})`,
-              callback: async function (t, opts) {
-                openManuallyAdd(t, card, new Date(opts.date), end);
-              },
-              date: start
+              initialValue: start,
+              closeOnPick: false,
+              onPick: async (t, date) => {
+                openManuallyAdd(t, card, date, end);
+              }
             });
           }
         },
         {
           text: `Edit end (${formatDate(end)})`,
           callback: (t) => {
-            return t.popup({
-              type: 'datetime',
+            return promptDateTime(t, {
               title: `Change end (${formatDate(start)})`,
-              callback: async function (t, opts) {
-                openManuallyAdd(t, card, start, new Date(opts.date));
-              },
-              date: end
+              initialValue: end,
+              closeOnPick: false,
+              onPick: async (t, date) => {
+                openManuallyAdd(t, card, start, date);
+              }
             });
           }
         },

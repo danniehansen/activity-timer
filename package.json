@@ -19,6 +19,7 @@
     "@types/jest": "^27.0.3",
     "@vitejs/plugin-vue": "^1.9.3",
     "@vue/test-utils": "^2.0.0-rc.17",
+    "@vuepic/vue-datepicker": "^3.3.1",
     "export-to-csv": "^0.2.1",
     "jest": "^27.3.1",
     "sass": "^1.43.4",
@@ -29,8 +30,6 @@
     "vue-jest": "^5.0.0-alpha.10"
   },
   "devDependencies": {
-    "vue-eslint-parser": "^9.0.3",
-    "vue-tsc": "^0.38.4",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
     "@vue/eslint-config-typescript": "^11.0.0",
@@ -38,6 +37,8 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.2.0",
-    "prettier": "2.7.1"
+    "prettier": "2.7.1",
+    "vue-eslint-parser": "^9.0.3",
+    "vue-tsc": "^0.38.4"
   }
 }

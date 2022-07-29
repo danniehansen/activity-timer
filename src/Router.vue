@@ -6,6 +6,7 @@
   <Settings v-else-if="page === 'settings'" />
   <DataExporterTime v-else-if="page === 'time'" />
   <DataExporterEstimates v-else-if="page === 'estimates'" />
+  <DatetimePicker v-else-if="page === 'datetime'" />
 </template>
 
 <script setup lang="ts">
@@ -17,6 +18,7 @@ import NotificationSettings from './pages/NotificationSettings.vue';
 import Settings from './pages/Settings.vue';
 import DataExporterTime from './pages/DataExporter/TimeTracking/index.vue';
 import DataExporterEstimates from './pages/DataExporter/Estimates/index.vue';
+import DatetimePicker from './components/DatetimePicker.vue';
 
 const t = getTrelloInstance();
 const urlSearchParams = new URLSearchParams(window.location.search);
@@ -32,11 +34,13 @@ if ('args' in t) {
 }
 
 if (page === 'enable-notifications') {
-  Notification.requestPermission().then(() => {
-    window.close();
-  }).catch(() => {
-    window.close();
-  });
+  Notification.requestPermission()
+    .then(() => {
+      window.close();
+    })
+    .catch(() => {
+      window.close();
+    });
 }
 </script>
 
