@@ -5,14 +5,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, CSSProperties, defineProps, PropType, StyleValue } from 'vue';
+import { computed, CSSProperties, defineProps, PropType } from 'vue';
 
 type AlignItems = 'left' | 'center' | 'right';
 
 const props = defineProps({
   alignItems: {
     type: String as PropType<AlignItems>,
-    required: false
+    required: false,
+    default: undefined
   }
 });
 
@@ -21,17 +22,17 @@ const style = computed<CSSProperties>(() => {
 
   if (props.alignItems) {
     switch (props.alignItems) {
-    case 'left':
-      styleDefinition['justify-content'] = 'flex-start';
-      break;
+      case 'left':
+        styleDefinition['justify-content'] = 'flex-start';
+        break;
 
-    case 'center':
-      styleDefinition['justify-content'] = 'middle';
-      break;
+      case 'center':
+        styleDefinition['justify-content'] = 'middle';
+        break;
 
-    case 'right':
-      styleDefinition['justify-content'] = 'flex-end';
-      break;
+      case 'right':
+        styleDefinition['justify-content'] = 'flex-end';
+        break;
     }
   }
 
@@ -40,9 +41,9 @@ const style = computed<CSSProperties>(() => {
 </script>
 
 <style lang="scss" scoped>
-  .column {
-    display: flex;
-    width: 100%;
-    flex-shrink: 1;
-  }
+.column {
+  display: flex;
+  width: 100%;
+  flex-shrink: 1;
+}
 </style>

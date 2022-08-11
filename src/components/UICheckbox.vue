@@ -27,7 +27,7 @@ export default defineComponent({
       required: true
     }
   },
-  setup (props, context) {
+  setup(props, context) {
     const fieldValue = ref(props.modelValue);
 
     watch(props, () => {

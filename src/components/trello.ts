@@ -25,27 +25,25 @@ interface TrelloToken {
   }[];
 }
 
-export function setTrelloInstance (t: TrelloInstance) {
+export function setTrelloInstance(t: TrelloInstance) {
   trelloInstance = t;
 }
 
-export function getTrelloInstance (): TrelloInstance {
+export function getTrelloInstance(): TrelloInstance {
   return trelloInstance as TrelloInstance;
 }
 
-export function getTrelloCard (): Trello.PowerUp.IFrame {
+export function getTrelloCard(): Trello.PowerUp.IFrame {
   return trelloInstance as Trello.PowerUp.IFrame;
 }
 
-export function resizeTrelloFrame (): void {
+export function resizeTrelloFrame(): void {
   if (trelloInstance && 'sizeTo' in trelloInstance) {
-    trelloInstance.sizeTo(
-      document.documentElement.offsetHeight
-    );
+    trelloInstance.sizeTo(document.documentElement.offsetHeight);
   }
 }
 
-export async function getMemberId () {
+export async function getMemberId() {
   if (memberIdCache === null) {
     memberIdCache = (await getTrelloInstance().member('id')).id;
   }
@@ -53,7 +51,7 @@ export async function getMemberId () {
   return memberIdCache;
 }
 
-export function getPowerupId () {
+export function getPowerupId() {
   if (typeof import.meta.env.VITE_POWERUP_ID !== 'string') {
     return '';
   }
@@ -61,7 +59,7 @@ export function getPowerupId () {
   return import.meta.env.VITE_POWERUP_ID;
 }
 
-export async function clearToken (t?: Trello.PowerUp.IFrame) {
+export async function clearToken(t?: Trello.PowerUp.IFrame) {
   try {
     const token = await (t ?? getTrelloCard()).getRestApi().getToken();
 
@@ -71,17 +69,23 @@ export async function clearToken (t?: Trello.PowerUp.IFrame) {
 
       // When clearing tokens we need to also clear the webhooks. Else it'll just continue to exist in infinity.
       // We don't want that..
-      const response = await fetch(`https://api.trello.com/1/tokens/${token}/webhooks?key=${getAppKey()}`)
-        .then<WebookResponseItem[]>(response => response.json());
+      const response = await fetch(
+        `https://api.trello.com/1/tokens/${token}/webhooks?key=${getAppKey()}`
+      ).then<WebookResponseItem[]>((response) => response.json());
 
       if (response && response.length > 0) {
         const promises: Promise<Response>[] = [];
 
         response.forEach((item) => {
           promises.push(
-            fetch(`https://api.trello.com/1/tokens/${token}/webhooks/${item.id}?key=${getAppKey()}`, {
-              method: 'DELETE'
-            })
+            fetch(
+              `https://api.trello.com/1/tokens/${token}/webhooks/${
+                item.id
+              }?key=${getAppKey()}`,
+              {
+                method: 'DELETE'
+              }
+            )
           );
         });
 
@@ -98,7 +102,7 @@ export async function clearToken (t?: Trello.PowerUp.IFrame) {
 
     throw e;
   }
-};
+}
 
 /**
  * Trello will have 1 RestApi token stored per powerup. So for us
@@ -106,11 +110,14 @@ export async function clearToken (t?: Trello.PowerUp.IFrame) {
  * tools we need to gracefully handle revoking these tokens &
  * prepare the user to accept write access.
  */
-export async function prepareWriteAuth () {
+export async function prepareWriteAuth() {
   const tokenData = await getTokenDetails();
 
   if (tokenData) {
-    const writePermissions = tokenData.permissions.reduce((a, b) => a + (b.write ? 1 : 0), 0);
+    const writePermissions = tokenData.permissions.reduce(
+      (a, b) => a + (b.write ? 1 : 0),
+      0
+    );
 
     // If token doesnt have write permission. We need to clear it.
     // As we cannot use tokens authorized for reads to perform writes.
@@ -120,16 +127,19 @@ export async function prepareWriteAuth () {
   }
 }
 
-export async function getTokenDetails (): Promise<TrelloToken | undefined> {
+export async function getTokenDetails(): Promise<TrelloToken | undefined> {
   const token = await getTrelloCard().getRestApi().getToken();
 
   if (token) {
     try {
-      const response = await fetch(`https://api.trello.com/1/tokens/${token}/?key=${getAppKey()}`, {
-        method: 'GET'
-      });
+      const response = await fetch(
+        `https://api.trello.com/1/tokens/${token}/?key=${getAppKey()}`,
+        {
+          method: 'GET'
+        }
+      );
 
-      return await response.json() as TrelloToken;
+      return (await response.json()) as TrelloToken;
     } catch (e) {
       // Ignore API errors. I suspect they'll be expirations.
       // Better to just have users re-auth.

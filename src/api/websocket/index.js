@@ -1,8 +1,12 @@
-const { DynamoDB, PutItemCommand, DeleteItemCommand } = require('@aws-sdk/client-dynamodb');
+const {
+  DynamoDB,
+  PutItemCommand,
+  DeleteItemCommand
+} = require('@aws-sdk/client-dynamodb');
 
 const client = new DynamoDB({ region: process.env.ACT_AWS_REGION });
 
-async function main (event, context) {
+async function main(event) {
   const {
     requestContext: { connectionId, routeKey, apiId, stage }
   } = event;

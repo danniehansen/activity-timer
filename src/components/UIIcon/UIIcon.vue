@@ -17,8 +17,8 @@ const props = defineProps({
 <style scoped>
 @font-face {
   font-family: 'icomoon';
-  src:  url('./assets/fonts/icomoon.eot');
-  src:  url('./assets/fonts/icomoon.eot') format('embedded-opentype'),
+  src: url('./assets/fonts/icomoon.eot');
+  src: url('./assets/fonts/icomoon.eot') format('embedded-opentype'),
     url('./assets/fonts/icomoon.ttf') format('truetype'),
     url('./assets/fonts/icomoon.woff') format('woff'),
     url('./assets/fonts/icomoon.svg') format('svg');
@@ -27,7 +27,8 @@ const props = defineProps({
   font-display: block;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+[class^='icon-'],
+[class*=' icon-'] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;
   speak: never;
@@ -43,10 +44,10 @@ const props = defineProps({
 }
 
 .icon-clock:before {
-  content: "\e900";
+  content: '\e900';
 }
 
 .icon-clear:before {
-  content: "\e901";
+  content: '\e901';
 }
 </style>
