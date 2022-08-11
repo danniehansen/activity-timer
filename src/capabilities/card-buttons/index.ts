@@ -8,7 +8,7 @@ import { isVisible } from '../../utils/visibility';
 
 const icon = `${window.location.origin}${ClockImage}`;
 
-export async function getCardButtons (t: Trello.PowerUp.IFrame): Promise<Trello.PowerUp.CardButton[]> {
+export async function getCardButtons(): Promise<Trello.PowerUp.CardButton[]> {
   const visible = await isVisible();
 
   if (!visible) {

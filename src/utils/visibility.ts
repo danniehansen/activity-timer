@@ -6,8 +6,12 @@ export enum Visibility {
   MEMBERS_OF_BOARD
 }
 
-export async function getVisibility (): Promise<Visibility> {
-  const visibility = await getTrelloInstance().get('board', 'shared', 'act-timer-visibility');
+export async function getVisibility(): Promise<Visibility> {
+  const visibility = await getTrelloInstance().get(
+    'board',
+    'shared',
+    'act-timer-visibility'
+  );
 
   switch (visibility) {
     case 'specific-members':
@@ -20,7 +24,7 @@ export async function getVisibility (): Promise<Visibility> {
   return Visibility.ALL;
 }
 
-export async function isVisible (): Promise<boolean> {
+export async function isVisible(): Promise<boolean> {
   const visibility = await getVisibility();
 
   switch (visibility) {
@@ -42,26 +46,51 @@ export async function isVisible (): Promise<boolean> {
   return true;
 }
 
-export async function setVisibility (visibility: Visibility): Promise<void> {
+export async function setVisibility(visibility: Visibility): Promise<void> {
   switch (visibility) {
     case Visibility.MEMBERS_OF_BOARD:
-      await getTrelloInstance().set('board', 'shared', 'act-timer-visibility', 'members-of-board');
+      await getTrelloInstance().set(
+        'board',
+        'shared',
+        'act-timer-visibility',
+        'members-of-board'
+      );
       break;
 
     case Visibility.SPECIFIC_MEMBERS:
-      await getTrelloInstance().set('board', 'shared', 'act-timer-visibility', 'specific-members');
+      await getTrelloInstance().set(
+        'board',
+        'shared',
+        'act-timer-visibility',
+        'specific-members'
+      );
       break;
 
     case Visibility.ALL:
-      await getTrelloInstance().set('board', 'shared', 'act-timer-visibility', '');
+      await getTrelloInstance().set(
+        'board',
+        'shared',
+        'act-timer-visibility',
+        ''
+      );
       break;
   }
 }
 
-export async function setVisibilityMembers (members: string[]): Promise<void> {
-  await getTrelloInstance().set('board', 'shared', 'act-timer-visibility-members', members);
+export async function setVisibilityMembers(members: string[]): Promise<void> {
+  await getTrelloInstance().set(
+    'board',
+    'shared',
+    'act-timer-visibility-members',
+    members
+  );
 }
 
-export async function getVisibilityMembers (): Promise<string[]> {
-  return await getTrelloInstance().get<string[]>('board', 'shared', 'act-timer-visibility-members', []);
+export async function getVisibilityMembers(): Promise<string[]> {
+  return await getTrelloInstance().get<string[]>(
+    'board',
+    'shared',
+    'act-timer-visibility-members',
+    []
+  );
 }

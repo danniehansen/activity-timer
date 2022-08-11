@@ -5,7 +5,9 @@ import { isVisible } from '../../utils/visibility';
 
 const icon = `${window.location.origin}${ClockImage}`;
 
-export async function getBoardButtons (t: Trello.PowerUp.IFrame): Promise<Trello.PowerUp.BoardButtonCallback[]> {
+export async function getBoardButtons(): Promise<
+  Trello.PowerUp.BoardButtonCallback[]
+> {
   const visible = await isVisible();
 
   if (!visible) {
@@ -58,7 +60,8 @@ export async function getBoardButtons (t: Trello.PowerUp.IFrame): Promise<Trello
               return t.popup({
                 type: 'confirm',
                 title: 'Are you sure?',
-                message: 'This will disrupt the auto tracking start feature if you have it enabled.',
+                message:
+                  'This will disrupt the auto tracking start feature if you have it enabled.',
                 confirmText: 'Yes, clear RestApi access',
                 onConfirm: async (t) => {
                   await clearToken(t);

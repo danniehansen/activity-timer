@@ -2,34 +2,23 @@ module.exports = {
   root: true,
   env: {
     browser: true,
-    es2021: true
+    amd: true,
+    node: true
+  },
+  parser: 'vue-eslint-parser',
+  parserOptions: {
+    parser: '@typescript-eslint/parser'
   },
   extends: [
-    'plugin:vue/essential',
-    'standard'
+    'plugin:vue/strongly-recommended',
+    'eslint:recommended',
+    '@vue/typescript/recommended',
+    'prettier'
   ],
-  parserOptions: {
-    ecmaVersion: 13,
-    parser: '@typescript-eslint/parser',
-    sourceType: 'module'
-  },
-  plugins: [
-    'vue',
-    '@typescript-eslint',
-    'editorconfig'
-  ],
+  plugins: ['@typescript-eslint', 'prettier'],
   rules: {
-    semi: [2, 'always'],
-    indent: ['off', 2],
-    'editorconfig/charset': 'error',
-    'editorconfig/eol-last': 'off',
-    'editorconfig/indent': 'error',
-    'editorconfig/linebreak-style': 'error',
-    'editorconfig/no-trailing-spaces': 'error',
-    'no-unused-vars': 'off',
-    'no-use-before-define': 'off',
-    'vue/no-multiple-template-root': 'off',
-    'eol-last': 'off',
-    'no-new': 'off'
+    'prettier/prettier': 'error',
+    // not needed for vue 3
+    'vue/no-multiple-template-root': 'off'
   }
 };

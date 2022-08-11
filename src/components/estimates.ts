@@ -5,7 +5,7 @@ export class Estimates {
   private _cardId: string;
   private _items: Estimate[] = [];
 
-  constructor (cardId: string, items?: Estimate[]) {
+  constructor(cardId: string, items?: Estimate[]) {
     this._cardId = cardId;
 
     if (items) {
@@ -13,23 +13,23 @@ export class Estimates {
     }
   }
 
-  get items () {
+  get items() {
     return this._items;
   }
 
-  get totalEstimate (): number {
+  get totalEstimate(): number {
     return this._items.reduce((a, b) => a + b.time, 0);
   }
 
-  add (item: Estimate) {
+  add(item: Estimate) {
     this._items.push(item);
   }
 
-  clear () {
+  clear() {
     this._items = [];
   }
 
-  getByMemberId (memberId: string): Estimate | undefined {
+  getByMemberId(memberId: string): Estimate | undefined {
     return this._items.reduce<Estimate | undefined>((carry, item) => {
       if (item.memberId === memberId) {
         carry = item;
@@ -38,7 +38,7 @@ export class Estimates {
     }, undefined);
   }
 
-  removeByMemberId (memberId: string): boolean {
+  removeByMemberId(memberId: string): boolean {
     const lengthBefore = this._items.length;
 
     this._items = this._items.filter((item) => {
@@ -48,13 +48,18 @@ export class Estimates {
     return this._items.length !== lengthBefore;
   }
 
-  serialize (): EstimateData[] {
+  serialize(): EstimateData[] {
     return this._items.map((item) => {
       return item.serialize();
     });
   }
 
-  async save () {
-    await getTrelloInstance().set(this._cardId, 'shared', 'act-timer-estimates', this.serialize());
+  async save() {
+    await getTrelloInstance().set(
+      this._cardId,
+      'shared',
+      'act-timer-estimates',
+      this.serialize()
+    );
   }
 }

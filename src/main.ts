@@ -21,27 +21,32 @@ try {
 }
 
 if (window.location.hash) {
-  const t = window.TrelloPowerUp.iframe(!incognito
-    ? {
-      appKey: getAppKey(),
-      appName: getAppName()
-    }
-    : undefined);
+  const t = window.TrelloPowerUp.iframe(
+    !incognito
+      ? {
+          appKey: getAppKey(),
+          appName: getAppName()
+        }
+      : undefined
+  );
 
   setTrelloInstance(t);
 } else {
-  const t = window.TrelloPowerUp.initialize({
-    'card-badges': getCardBadges,
-    'card-buttons': getCardButtons,
-    'card-back-section': getCardBackSection,
-    'board-buttons': getBoardButtons,
-    'show-settings': getShowSettings
-  }, !incognito
-    ? {
-      appKey: getAppKey(),
-      appName: getAppName()
-    }
-    : undefined);
+  const t = window.TrelloPowerUp.initialize(
+    {
+      'card-badges': getCardBadges,
+      'card-buttons': getCardButtons,
+      'card-back-section': getCardBackSection,
+      'board-buttons': getBoardButtons,
+      'show-settings': getShowSettings
+    },
+    !incognito
+      ? {
+          appKey: getAppKey(),
+          appName: getAppName()
+        }
+      : undefined
+  );
 
   setTrelloInstance(t);
   initializeWebsocket();
@@ -51,7 +56,10 @@ initializeOptro();
 
 const app = createApp(Router);
 
-if (typeof import.meta.env.VITE_SENTRY_DSN === 'string' && typeof import.meta.env.VITE_APP_ORIGIN === 'string') {
+if (
+  typeof import.meta.env.VITE_SENTRY_DSN === 'string' &&
+  typeof import.meta.env.VITE_APP_ORIGIN === 'string'
+) {
   Sentry.init({
     app,
     dsn: import.meta.env.VITE_SENTRY_DSN,

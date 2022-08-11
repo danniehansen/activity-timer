@@ -8,7 +8,7 @@ export class Range {
   private _end: number;
   private _rangeId: number;
 
-  constructor (memberId: string, start: number, end: number) {
+  constructor(memberId: string, start: number, end: number) {
     this._memberId = memberId;
     this._start = start;
     this._end = end;
@@ -18,39 +18,35 @@ export class Range {
     this._rangeId = rangeId;
   }
 
-  get memberId () {
+  get memberId() {
     return this._memberId;
   }
 
-  get start () {
+  get start() {
     return this._start;
   }
 
-  set start (value: number) {
+  set start(value: number) {
     this._start = value;
   }
 
-  get end () {
+  get end() {
     return this._end;
   }
 
-  set end (value: number) {
+  set end(value: number) {
     this._end = value;
   }
 
-  get diff () {
+  get diff() {
     return this._end - this._start;
   }
 
-  get rangeId () {
+  get rangeId() {
     return this._rangeId;
   }
 
-  serialize (): RangeData {
-    return [
-      this._memberId,
-      this._start,
-      this._end
-    ];
+  serialize(): RangeData {
+    return [this._memberId, this._start, this._end];
   }
 }

@@ -10,7 +10,11 @@ import { ref } from 'vue';
 import { Card } from '../../components/card';
 import { Estimate } from '../../components/estimate';
 import UIButton from '../../components/UIButton.vue';
-import { getMemberId, getTrelloCard, resizeTrelloFrame } from '../../components/trello';
+import {
+  getMemberId,
+  getTrelloCard,
+  resizeTrelloFrame
+} from '../../components/trello';
 
 const estimate = ref<number | null>(null);
 
@@ -35,12 +39,7 @@ const save = async () => {
   estimates.removeByMemberId(memberId);
 
   if (estimate.value) {
-    estimates.add(
-      new Estimate(
-        memberId,
-        estimate.value * 3600
-      )
-    );
+    estimates.add(new Estimate(memberId, estimate.value * 3600));
   }
 
   await estimates.save();

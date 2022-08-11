@@ -3,21 +3,36 @@
     <UILoader v-if="loading" />
   </transition>
 
-  <UIOptroStatus v-if="ready" style="border-radius: 0;" />
+  <UIOptroStatus v-if="ready" style="border-radius: 0" />
 
   <div class="unauthorized" v-if="isIncognito">
-    <p>It appears that you might be using incognito mode in your browser. Unfortunately some internal functionality does not work in Trello that is required for this page to work. If you wan't to use the data exporter tool you will have to jump out of incognito.</p>
+    <p>
+      It appears that you might be using incognito mode in your browser.
+      Unfortunately some internal functionality does not work in Trello that is
+      required for this page to work. If you wan't to use the data exporter tool
+      you will have to jump out of incognito.
+    </p>
   </div>
 
   <div class="unauthorized" v-else-if="unrecognizedError">
-    <p>Woops. An unrecognized error occurred. Our system have automatically logged it & will be looking into the matter. Please try again later or with a different browser.</p>
+    <p>
+      Woops. An unrecognized error occurred. Our system have automatically
+      logged it & will be looking into the matter. Please try again later or
+      with a different browser.
+    </p>
   </div>
 
   <div class="unauthorized" v-else-if="!isAuthorized">
-    <p>To access estimates data you need to allow Activity timer to read this data. Click the button below to allow this.</p>
+    <p>
+      To access estimates data you need to allow Activity timer to read this
+      data. Click the button below to allow this.
+    </p>
     <UIButton @click="authorize()">Authorize</UIButton>
 
-    <p v-if="rejectedAuth">You rejected Activity timer's request for accessing the data. If you change your mind you can always click 'Authorize' again.</p>
+    <p v-if="rejectedAuth">
+      You rejected Activity timer's request for accessing the data. If you
+      change your mind you can always click 'Authorize' again.
+    </p>
   </div>
 
   <div class="authorized" v-else-if="ready && isAuthorized">
@@ -64,19 +79,34 @@
     </div>
 
     <div class="requires-pro" v-else>
-      <p>Filtering in data export is restricted to Pro users only. Free plan can only do full exports. <a :href="`https://www.optro.cloud/app/${powerupId}`" target="_blank" rel="noreferrer">Read more about the Pro plan here.</a></p>
+      <p>
+        Filtering in data export is restricted to Pro users only. Free plan can
+        only do full exports.
+        <a
+          :href="`https://www.optro.cloud/app/${powerupId}`"
+          target="_blank"
+          rel="noreferrer"
+          >Read more about the Pro plan here.</a
+        >
+      </p>
     </div>
 
     <table class="body" v-if="tableBody.length > 0">
       <thead>
         <tr>
-          <th v-for="headItem in tableHead" :key="headItem.value">{{ headItem.text }}</th>
+          <th v-for="headItem in tableHead" :key="headItem.value">
+            {{ headItem.text }}
+          </th>
         </tr>
       </thead>
 
       <tbody>
         <tr v-for="tableRow in tableBody" :key="tableRow.id">
-          <td v-for="columnItem in tableHead" :key="columnItem.value" :style="columnStyle[columnItem.value] ?? {}">
+          <td
+            v-for="columnItem in tableHead"
+            :key="columnItem.value"
+            :style="columnStyle[columnItem.value] ?? {}"
+          >
             {{ tableRow[columnItem.value] ?? '' }}
           </td>
         </tr>
@@ -102,7 +132,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { getAppKey } from '../../../components/settings';
-import { clearToken, getPowerupId, getTrelloCard, getTrelloInstance } from '../../../components/trello';
+import {
+  clearToken,
+  getPowerupId,
+  getTrelloCard,
+  getTrelloInstance
+} from '../../../components/trello';
 import UIButton from '../../../components/UIButton.vue';
 import UIDropdown, { Option } from '../../../components/UIDropdown.vue';
 import { Trello } from '../../../types/trello';
@@ -211,7 +246,8 @@ let cards: ApiCard[] = [];
 const lastDataFetch = ref(0);
 
 const tableHead = computed<Option[]>(() => {
-  const selectedColumns = (columns.value.length > 0 ? columns.value : defaultColumns);
+  const selectedColumns =
+    columns.value.length > 0 ? columns.value : defaultColumns;
   return columnOptions.value.filter((column) => {
     return selectedColumns.includes(column.value);
   });
@@ -276,9 +312,11 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
     const totalEstimate = estimates.totalEstimate;
 
     if (totalEstimate > 0) {
-      const membersInEstimates = estimates.items.map((item) => item.memberId).filter((value, index, self) => {
-        return self.indexOf(value) === index;
-      });
+      const membersInEstimates = estimates.items
+        .map((item) => item.memberId)
+        .filter((value, index, self) => {
+          return self.indexOf(value) === index;
+        });
 
       if (groupByCard.value) {
         rowCounter++;
@@ -286,7 +324,9 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
           ...rowDataItem,
           id: rowCounter,
           'member.id': membersInEstimates.join(', '),
-          'member.name': membersInEstimates.map((memberId) => formatMemberName(memberById[memberId])).join(', '),
+          'member.name': membersInEstimates
+            .map((memberId) => formatMemberName(memberById[memberId]))
+            .join(', '),
           time_seconds: totalEstimate,
           time_formatted: formatTime(totalEstimate, true)
         });
@@ -332,7 +372,7 @@ const labelOptions = computed<Option[]>(() => {
   });
 });
 
-async function trelloTick () {
+async function trelloTick() {
   try {
     isAuthorized.value = await getTrelloCard().getRestApi().isAuthorized();
   } catch (e) {
@@ -345,7 +385,7 @@ async function trelloTick () {
   }
 }
 
-function getUniqueLabels () {
+function getUniqueLabels() {
   const newLabels: Trello.PowerUp.Label[] = [];
 
   cards.forEach((card) => {
@@ -361,7 +401,7 @@ function getUniqueLabels () {
   uniqueLabels.value = newLabels;
 }
 
-async function getData () {
+async function getData() {
   const getDataStart = Date.now();
 
   loading.value = true;
@@ -370,8 +410,11 @@ async function getData () {
   const board = await getTrelloInstance().board('id');
 
   try {
-    const data = await fetch(`https://api.trello.com/1/boards/${board.id}/cards/all?pluginData=true&fields=id,idList,name,desc,labels,pluginData,closed&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`)
-      .then<Trello.PowerUp.Card[]>((res) => res.json());
+    const data = await fetch(
+      `https://api.trello.com/1/boards/${
+        board.id
+      }/cards/all?pluginData=true&fields=id,idList,name,desc,labels,pluginData,closed&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
+    ).then<Trello.PowerUp.Card[]>((res) => res.json());
 
     cards = data
       // Remove cards which has been archived
@@ -393,13 +436,15 @@ async function getData () {
     await trelloTick();
   }
 
-  await new Promise((resolve) => setTimeout(resolve, Math.min(1500, Date.now() - getDataStart)));
+  await new Promise((resolve) =>
+    setTimeout(resolve, Math.min(1500, Date.now() - getDataStart))
+  );
 
   ready.value = true;
   loading.value = false;
 }
 
-async function initialize () {
+async function initialize() {
   const board = await getTrelloInstance().board('members');
 
   // Get the initial subscription status
@@ -414,7 +459,9 @@ async function initialize () {
     memberById[member.id] = member;
   });
 
-  listOptions.value = (await getTrelloInstance().lists('id', 'name')).map<Option>((list) => {
+  listOptions.value = (
+    await getTrelloInstance().lists('id', 'name')
+  ).map<Option>((list) => {
     listById[list.id] = list;
 
     return {
@@ -423,24 +470,26 @@ async function initialize () {
     };
   });
 
-  memberOptions.value = board.members.sort((a, b) => {
-    const nameA = (a.fullName ?? '').toUpperCase();
-    const nameB = (b.fullName ?? '').toUpperCase();
+  memberOptions.value = board.members
+    .sort((a, b) => {
+      const nameA = (a.fullName ?? '').toUpperCase();
+      const nameB = (b.fullName ?? '').toUpperCase();
 
-    if (nameA < nameB) {
-      return -1;
-    }
-    if (nameA > nameB) {
-      return 1;
-    }
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
 
-    return 0;
-  }).map<Option>((member) => {
-    return {
-      value: member.id,
-      text: formatMemberName(member)
-    };
-  });
+      return 0;
+    })
+    .map<Option>((member) => {
+      return {
+        value: member.id,
+        text: formatMemberName(member)
+      };
+    });
 
   if (isAuthorized.value) {
     await getData();
@@ -450,7 +499,7 @@ async function initialize () {
   }
 }
 
-async function authorize () {
+async function authorize() {
   rejectedAuth.value = false;
 
   try {

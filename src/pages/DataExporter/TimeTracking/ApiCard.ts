@@ -4,7 +4,11 @@ import { Estimates } from '../../../components/estimates';
 import { Range } from '../../../components/range';
 import { Ranges } from '../../../components/ranges';
 import { Trello } from '../../../types/trello';
-import { formatDate, formatMemberName, formatTime } from '../../../utils/formatting';
+import {
+  formatDate,
+  formatMemberName,
+  formatTime
+} from '../../../utils/formatting';
 
 interface PluginRawData {
   'act-timer-ranges': [string, number, number][];
@@ -21,7 +25,7 @@ interface ListById {
 
 export interface ApiCardRowData {
   [key: string]: string | string[] | number;
-  'id': number | string,
+  id: number | string;
   'card.id': string;
   'card.title': string;
   'card.description': string;
@@ -30,12 +34,12 @@ export interface ApiCardRowData {
   'list.name': string;
   'member.id': string;
   'member.name': string;
-  'start_datetime': string;
-  'end_datetime': string;
-  'time_seconds': number;
-  'time_formatted': string;
-  'estimate_seconds': number;
-  'estimate_formatted': string;
+  start_datetime: string;
+  end_datetime: string;
+  time_seconds: number;
+  time_formatted: string;
+  estimate_seconds: number;
+  estimate_formatted: string;
 }
 
 export class ApiCard {
@@ -46,35 +50,44 @@ export class ApiCard {
   private _memberById: MemberById;
   private _listById: ListById;
 
-  constructor (data: Trello.PowerUp.Card, listById: ListById, memberById: MemberById, selectedMembers: Ref<string[]>) {
+  constructor(
+    data: Trello.PowerUp.Card,
+    listById: ListById,
+    memberById: MemberById,
+    selectedMembers: Ref<string[]>
+  ) {
     this._data = data;
 
     const pluginData = data.pluginData.find((pluginData) => {
       return (
         pluginData.value &&
-        (
-          pluginData.value.includes('act-timer-ranges') ||
-          pluginData.value.includes('act-timer-estimates')
-        )
+        (pluginData.value.includes('act-timer-ranges') ||
+          pluginData.value.includes('act-timer-estimates'))
       );
     });
 
     if (pluginData) {
       const parsedPluginData = JSON.parse(pluginData.value) as PluginRawData;
 
-      if (parsedPluginData['act-timer-ranges'] && parsedPluginData['act-timer-ranges'].length > 0) {
-        this._ranges = new Ranges(this._data.id, parsedPluginData['act-timer-ranges'].map((rangeData) => {
-          return new Range(
-            // Member id
-            rangeData[0],
+      if (
+        parsedPluginData['act-timer-ranges'] &&
+        parsedPluginData['act-timer-ranges'].length > 0
+      ) {
+        this._ranges = new Ranges(
+          this._data.id,
+          parsedPluginData['act-timer-ranges'].map((rangeData) => {
+            return new Range(
+              // Member id
+              rangeData[0],
 
-            // Start
-            rangeData[1],
+              // Start
+              rangeData[1],
 
-            // End
-            rangeData[2]
-          );
-        }));
+              // End
+              rangeData[2]
+            );
+          })
+        );
       } else {
         this._ranges = new Ranges(this._data.id);
       }
@@ -103,18 +116,23 @@ export class ApiCard {
     this._memberById = memberById;
     this._listById = listById;
     this._rowData = computed<ApiCardRowData>(() => {
-      const ranges = (selectedMembers.value.length > 0
-        ? new Ranges(
-          this._data.id,
-          this._ranges.items.filter((item) => selectedMembers.value.includes(item.memberId))
-        )
-        : this._ranges);
+      const ranges =
+        selectedMembers.value.length > 0
+          ? new Ranges(
+              this._data.id,
+              this._ranges.items.filter((item) =>
+                selectedMembers.value.includes(item.memberId)
+              )
+            )
+          : this._ranges;
 
       const timeSpent = ranges.timeSpent;
 
-      const members = ranges.items.map((item) => item.memberId).filter((value, index, self) => {
-        return self.indexOf(value) === index;
-      });
+      const members = ranges.items
+        .map((item) => item.memberId)
+        .filter((value, index, self) => {
+          return self.indexOf(value) === index;
+        });
 
       const furthestBack = ranges.items.reduce<number | null>((carry, item) => {
         if (carry === null || item.start < carry) {
@@ -124,13 +142,16 @@ export class ApiCard {
         return carry;
       }, null);
 
-      const furthestAhead = ranges.items.reduce<number | null>((carry, item) => {
-        if (carry === null || item.start > carry) {
-          carry = item.end;
-        }
+      const furthestAhead = ranges.items.reduce<number | null>(
+        (carry, item) => {
+          if (carry === null || item.start > carry) {
+            carry = item.end;
+          }
 
-        return carry;
-      }, null);
+          return carry;
+        },
+        null
+      );
 
       return {
         id: this._data.id,
@@ -140,14 +161,21 @@ export class ApiCard {
         'card.labels': this._data.labels.map((label) => label.name).join(', '),
         'list.id': this._data.idList,
         'list.name': this._listById[this._data.idList]?.name ?? 'N/A',
-        start_datetime: (furthestBack ? formatDate(new Date(furthestBack * 1000)) : 'N/A'),
-        end_datetime: (furthestAhead ? formatDate(new Date(furthestAhead * 1000)) : 'N/A'),
+        start_datetime: furthestBack
+          ? formatDate(new Date(furthestBack * 1000))
+          : 'N/A',
+        end_datetime: furthestAhead
+          ? formatDate(new Date(furthestAhead * 1000))
+          : 'N/A',
         'member.id': members.join(', '),
-        'member.name': members.filter((member) => {
-          return this._memberById[member] !== undefined;
-        }).map((member) => {
-          return formatMemberName(this._memberById[member]);
-        }).join(', '),
+        'member.name': members
+          .filter((member) => {
+            return this._memberById[member] !== undefined;
+          })
+          .map((member) => {
+            return formatMemberName(this._memberById[member]);
+          })
+          .join(', '),
         time_seconds: timeSpent,
         time_formatted: formatTime(timeSpent, true),
         estimate_seconds: this._estimates.totalEstimate,
@@ -156,19 +184,19 @@ export class ApiCard {
     });
   }
 
-  get data () {
+  get data() {
     return this._data;
   }
 
-  get ranges () {
+  get ranges() {
     return this._ranges;
   }
 
-  get estimates () {
+  get estimates() {
     return this._estimates;
   }
 
-  get rowData () {
+  get rowData() {
     return this._rowData;
   }
 }

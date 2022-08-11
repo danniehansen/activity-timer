@@ -1,12 +1,31 @@
-import { CloudFrontAllowedMethods, CloudFrontWebDistribution, OriginAccessIdentity, Function, FunctionCode, FunctionEventType } from '@aws-cdk/aws-cloudfront';
-import { BlockPublicAccess, Bucket, BucketAccessControl } from '@aws-cdk/aws-s3';
+import {
+  CloudFrontAllowedMethods,
+  CloudFrontWebDistribution,
+  OriginAccessIdentity,
+  Function,
+  FunctionCode,
+  FunctionEventType
+} from '@aws-cdk/aws-cloudfront';
+import {
+  BlockPublicAccess,
+  Bucket,
+  BucketAccessControl
+} from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
 import { Duration, RemovalPolicy } from '@aws-cdk/core';
 import * as iam from '@aws-cdk/aws-iam';
 import { BucketDeployment } from '@aws-cdk/aws-s3-deployment';
 import * as s3deploy from '@aws-cdk/aws-s3-deployment';
-import { LambdaProxyIntegration, LambdaWebSocketIntegration } from '@aws-cdk/aws-apigatewayv2-integrations';
-import { HttpApi, HttpMethod, WebSocketApi, WebSocketStage } from '@aws-cdk/aws-apigatewayv2';
+import {
+  LambdaProxyIntegration,
+  LambdaWebSocketIntegration
+} from '@aws-cdk/aws-apigatewayv2-integrations';
+import {
+  HttpApi,
+  HttpMethod,
+  WebSocketApi,
+  WebSocketStage
+} from '@aws-cdk/aws-apigatewayv2';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as path from 'path';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
@@ -19,18 +38,25 @@ interface Props extends cdk.StackProps {
 }
 
 export class InfrastructureStack extends cdk.Stack {
-  constructor (scope: cdk.Construct, id: string, props: Props) {
+  constructor(scope: cdk.Construct, id: string, props: Props) {
     super(scope, id, props);
 
     if (!props.env?.region) {
       throw new Error('No AWS region specified');
     }
 
-    const { webSocketApi } = this.constructPubSub(props.environment, props.trelloSecret, props.env.region);
+    const { webSocketApi } = this.constructPubSub(
+      props.environment,
+      props.trelloSecret,
+      props.env.region
+    );
     this.constructWebsite(props.environment, webSocketApi);
   }
 
-  private constructWebsite (env: PowerupEnvironment, webSocketApi: WebSocketApi) {
+  private constructWebsite(
+    env: PowerupEnvironment,
+    webSocketApi: WebSocketApi
+  ) {
     const siteBucket = new Bucket(this, 'website-bucket', {
       bucketName: `${env}-activity-timer-v2`,
       websiteIndexDocument: 'index.html',
@@ -44,17 +70,26 @@ export class InfrastructureStack extends cdk.Stack {
       comment: `OAI for activity timer ${env}`
     });
 
-    siteBucket.addToResourcePolicy(new iam.PolicyStatement({
-      actions: ['s3:GetObject'],
-      resources: [siteBucket.arnForObjects('*')],
-      principals: [new iam.CanonicalUserPrincipal(cloudfrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
-    }));
+    siteBucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        actions: ['s3:GetObject'],
+        resources: [siteBucket.arnForObjects('*')],
+        principals: [
+          new iam.CanonicalUserPrincipal(
+            cloudfrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId
+          )
+        ]
+      })
+    );
 
     /**
      * These content security policy headers are required by Trello.
      */
-    const responseFunction = new Function(this, 'website-cloudfront-viewer-response', {
-      code: FunctionCode.fromInline(`
+    const responseFunction = new Function(
+      this,
+      'website-cloudfront-viewer-response',
+      {
+        code: FunctionCode.fromInline(`
         function handler(event) {
           var response = event.response;
           var headers = response.headers;
@@ -68,31 +103,38 @@ export class InfrastructureStack extends cdk.Stack {
           return response;
         }
       `),
-      comment: 'Adds security headers',
-      functionName: `${env}-activity-timer-viewer-response-func`
-    });
+        comment: 'Adds security headers',
+        functionName: `${env}-activity-timer-viewer-response-func`
+      }
+    );
 
-    const distribution = new CloudFrontWebDistribution(this, 'website-cloudfront', {
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: siteBucket,
-            originAccessIdentity: cloudfrontOAI
-          },
-          behaviors: [
-            {
-              isDefaultBehavior: true,
-              compress: true,
-              allowedMethods: CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
-              functionAssociations: [{
-                function: responseFunction,
-                eventType: FunctionEventType.VIEWER_RESPONSE
-              }]
-            }
-          ]
-        }
-      ]
-    });
+    const distribution = new CloudFrontWebDistribution(
+      this,
+      'website-cloudfront',
+      {
+        originConfigs: [
+          {
+            s3OriginSource: {
+              s3BucketSource: siteBucket,
+              originAccessIdentity: cloudfrontOAI
+            },
+            behaviors: [
+              {
+                isDefaultBehavior: true,
+                compress: true,
+                allowedMethods: CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
+                functionAssociations: [
+                  {
+                    function: responseFunction,
+                    eventType: FunctionEventType.VIEWER_RESPONSE
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    );
 
     new BucketDeployment(this, 'deployment-with-invalidation', {
       sources: [s3deploy.Source.asset('../dist')],
@@ -103,10 +145,17 @@ export class InfrastructureStack extends cdk.Stack {
     });
   }
 
-  private constructPubSub (env: PowerupEnvironment, trelloSecret: string, region: string) {
+  private constructPubSub(
+    env: PowerupEnvironment,
+    trelloSecret: string,
+    region: string
+  ) {
     const table = new dynamodb.Table(this, 'dynamodb-table', {
       tableName: `${env}-activity-timer-pubsub`,
-      partitionKey: { name: 'connection_id', type: dynamodb.AttributeType.STRING },
+      partitionKey: {
+        name: 'connection_id',
+        type: dynamodb.AttributeType.STRING
+      },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: RemovalPolicy.DESTROY
     });
@@ -138,7 +187,9 @@ export class InfrastructureStack extends cdk.Stack {
     const websocketLambda = new lambda.Function(this, 'api-websocket-lambda', {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'index.main',
-      code: lambda.Code.fromAsset(path.join(__dirname, '/../../src/api/websocket')),
+      code: lambda.Code.fromAsset(
+        path.join(__dirname, '/../../src/api/websocket')
+      ),
       timeout: Duration.seconds(5),
       memorySize: 512,
       environment: {
@@ -165,9 +216,21 @@ export class InfrastructureStack extends cdk.Stack {
 
     const webSocketApi = new WebSocketApi(this, 'websocket-api', {
       apiName: `${env}-activity-timer-websocket-api`,
-      connectRouteOptions: { integration: new LambdaWebSocketIntegration({ handler: websocketLambda }) },
-      defaultRouteOptions: { integration: new LambdaWebSocketIntegration({ handler: websocketLambda }) },
-      disconnectRouteOptions: { integration: new LambdaWebSocketIntegration({ handler: websocketLambda }) }
+      connectRouteOptions: {
+        integration: new LambdaWebSocketIntegration({
+          handler: websocketLambda
+        })
+      },
+      defaultRouteOptions: {
+        integration: new LambdaWebSocketIntegration({
+          handler: websocketLambda
+        })
+      },
+      disconnectRouteOptions: {
+        integration: new LambdaWebSocketIntegration({
+          handler: websocketLambda
+        })
+      }
     });
 
     webSocketApi.grantManageConnections(apiLambda);

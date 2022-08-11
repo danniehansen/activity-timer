@@ -2,7 +2,7 @@
   <UIFormElement>
     <label>{{ label }}</label>
 
-    <input v-model="fieldValue" type="date"  @input="onChange" />
+    <input v-model="fieldValue" type="date" @input="onChange" />
   </UIFormElement>
 </template>
 
@@ -22,7 +22,7 @@ export default defineComponent({
       required: true
     }
   },
-  setup (props, context) {
+  setup(props, context) {
     const fieldValue = ref(props.modelValue);
 
     watch(props, () => {
