@@ -204,6 +204,7 @@ export namespace Trello {
       dueComplete: boolean;
       id: string;
       idList: string;
+      idBoard: string;
       idShort: number;
       labels: Label[];
       locationName: string | null;
