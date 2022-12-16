@@ -201,6 +201,22 @@ const columnStyle: { [key: keyof ApiCardRowData]: any } = {
 
 const columnOptions = ref<Option[]>([
   {
+    text: 'Board name',
+    value: 'board.name'
+  },
+  {
+    text: 'Board id',
+    value: 'board.id'
+  },
+  {
+    text: 'List id',
+    value: 'list.id'
+  },
+  {
+    text: 'List name',
+    value: 'list.name'
+  },
+  {
     text: 'Card id',
     value: 'card.id'
   },
@@ -215,14 +231,6 @@ const columnOptions = ref<Option[]>([
   {
     text: 'Card labels',
     value: 'card.labels'
-  },
-  {
-    text: 'List id',
-    value: 'list.id'
-  },
-  {
-    text: 'List name',
-    value: 'list.name'
   },
   {
     text: 'Member id(s)',
@@ -416,11 +424,15 @@ async function getData() {
       }/cards/all?pluginData=true&fields=id,idList,name,desc,labels,pluginData,closed&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
     ).then<Trello.PowerUp.Card[]>((res) => res.json());
 
+    const boardData = await fetch(
+      `https://api.trello.com/1/boards/${board.id}?fields=name&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
+    ).then<Trello.PowerUp.Board>((res) => res.json());
+
     cards = data
       // Remove cards which has been archived
       .filter((card) => !card.closed)
       .map<ApiCard>((card) => {
-        return new ApiCard(card, listById, memberById, members);
+        return new ApiCard(boardData, card, listById, memberById, members);
       });
 
     lastDataFetch.value = Date.now();

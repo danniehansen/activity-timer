@@ -26,6 +26,8 @@ interface ListById {
 export interface ApiCardRowData {
   [key: string]: string | string[] | number;
   id: number | string;
+  'board.name': string;
+  'board.id': string;
   'card.id': string;
   'card.title': string;
   'card.description': string;
@@ -43,6 +45,7 @@ export interface ApiCardRowData {
 }
 
 export class ApiCard {
+  private _boardData: Trello.PowerUp.Board;
   private _data: Trello.PowerUp.Card;
   private _ranges: Ranges;
   private _estimates: Estimates;
@@ -51,11 +54,13 @@ export class ApiCard {
   private _listById: ListById;
 
   constructor(
+    boardData: Trello.PowerUp.Board,
     data: Trello.PowerUp.Card,
     listById: ListById,
     memberById: MemberById,
     selectedMembers: Ref<string[]>
   ) {
+    this._boardData = boardData;
     this._data = data;
 
     const pluginData = data.pluginData.find((pluginData) => {
@@ -155,6 +160,8 @@ export class ApiCard {
 
       return {
         id: this._data.id,
+        'board.name': this._boardData.name,
+        'board.id': this._boardData.id,
         'card.id': this._data.id,
         'card.title': this._data.name,
         'card.description': this._data.desc,
