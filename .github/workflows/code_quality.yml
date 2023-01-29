@@ -13,9 +13,9 @@ jobs:
         with:
           node-version: 14.x
       - name: Install dependencies
-        run: yarn install
+        run: npm ci
       - name: Run vue-tsc
-        run: yarn analyze
+        run: npm run analyze
   eslint:
     runs-on: ubuntu-latest
     steps:
@@ -24,9 +24,9 @@ jobs:
         with:
           node-version: 14.x
       - name: Install dependencies
-        run: yarn install
+        run: npm ci
       - name: Run vue-tsc
-        run: yarn lint
+        run: npm run lint
   jest:
     runs-on: ubuntu-latest
     steps:
@@ -35,9 +35,9 @@ jobs:
         with:
           node-version: 14.x
       - name: Install dependencies
-        run: yarn install
+        run: npm ci
       - name: Run vue-tsc
-        run: yarn test
+        run: npm run test
   test-infrastructure:
     runs-on: ubuntu-latest
     steps:
@@ -48,6 +48,6 @@ jobs:
       - name: Create folder for testing
         run: mkdir dist
       - name: Install dependencies
-        run: cd infrastructure && yarn install
+        run: cd infrastructure && npm ci
       - name: Run vue-tsc
-        run: cd infrastructure && yarn test
+        run: cd infrastructure && npm run test

@@ -18,9 +18,9 @@ jobs:
         with:
           node-version: 14.x
       - name: Install dependencies
-        run: yarn install && cd src/api/http && yarn install && cd .. && cd websocket && yarn install
+        run: npm ci && cd src/api/http && npm ci && cd .. && cd websocket && npm ci
       - name: Build
-        run: yarn build
+        run: npm run build
         env:
           VITE_APP_NAME: 'Activity timer'
           VITE_APP_KEY: ${{ secrets.ACT_APP_KEY }}
@@ -38,4 +38,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.V2_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: 'eu-west-1'
           TRELLO_SECRET: ${{ secrets.ACT_TRELLO_SECRET }}
-        run: cd infrastructure && yarn install && yarn cdk bootstrap && yarn cdk deploy --require-approval never
+        run: cd infrastructure && npm ci && npm run cdk bootstrap && npm run cdk deploy --require-approval never
