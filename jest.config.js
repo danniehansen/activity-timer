@@ -1,8 +1,7 @@
 module.exports = {
-  moduleFileExtensions: ['js', 'ts', 'json', 'vue'],
+  moduleFileExtensions: ['js', 'ts', 'json'],
   testPathIgnorePatterns: ['/node_modules/', '/infrastructure/'],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
-    '^.+\\.vue$': 'vue-jest'
+    '^.+\\.ts$': 'ts-jest'
   }
 };
