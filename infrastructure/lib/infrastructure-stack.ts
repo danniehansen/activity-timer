@@ -201,7 +201,10 @@ export class InfrastructureStack extends cdk.Stack {
 
     table.grantReadWriteData(websocketLambda);
 
-    const apiIntegration = new HttpLambdaIntegration('api-integration', apiLambda);
+    const apiIntegration = new HttpLambdaIntegration(
+      'api-integration',
+      apiLambda
+    );
 
     const httpApi = new HttpApi(this, 'api', {
       apiName: `${env}-activity-timer-api`
@@ -216,13 +219,22 @@ export class InfrastructureStack extends cdk.Stack {
     const webSocketApi = new WebSocketApi(this, 'websocket-api', {
       apiName: `${env}-activity-timer-websocket-api`,
       connectRouteOptions: {
-        integration: new WebSocketLambdaIntegration('api-websocket-connect', websocketLambda)
+        integration: new WebSocketLambdaIntegration(
+          'api-websocket-connect',
+          websocketLambda
+        )
       },
       defaultRouteOptions: {
-        integration: new WebSocketLambdaIntegration('api-websocket-default', websocketLambda)
+        integration: new WebSocketLambdaIntegration(
+          'api-websocket-default',
+          websocketLambda
+        )
       },
       disconnectRouteOptions: {
-        integration: new WebSocketLambdaIntegration('api-websocket-disconnect', websocketLambda)
+        integration: new WebSocketLambdaIntegration(
+          'api-websocket-disconnect',
+          websocketLambda
+        )
       }
     });
 
