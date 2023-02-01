@@ -17,10 +17,10 @@
     "ts-jest": "^26.2.0"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.62.2-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.62.2-alpha.0",
-    "aws-cdk": "^2.62.2",
-    "aws-cdk-lib": "^2.62.2",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.63.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.63.0-alpha.0",
+    "aws-cdk": "^2.63.0",
+    "aws-cdk-lib": "^2.63.0",
     "constructs": "^10.1.234",
     "source-map-support": "^0.5.16",
     "ts-node": "^9.0.0",
