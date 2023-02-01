@@ -5,30 +5,31 @@ import {
   Function,
   FunctionCode,
   FunctionEventType
-} from '@aws-cdk/aws-cloudfront';
+} from 'aws-cdk-lib/aws-cloudfront';
 import {
   BlockPublicAccess,
   Bucket,
   BucketAccessControl
-} from '@aws-cdk/aws-s3';
-import * as cdk from '@aws-cdk/core';
-import { Duration, RemovalPolicy } from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import { BucketDeployment } from '@aws-cdk/aws-s3-deployment';
-import * as s3deploy from '@aws-cdk/aws-s3-deployment';
+} from 'aws-cdk-lib/aws-s3';
+import * as cdk from 'aws-cdk-lib/core';
+import { Duration, RemovalPolicy } from 'aws-cdk-lib/core';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import { BucketDeployment } from 'aws-cdk-lib/aws-s3-deployment';
+import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import {
-  LambdaProxyIntegration,
-  LambdaWebSocketIntegration
-} from '@aws-cdk/aws-apigatewayv2-integrations';
+  HttpLambdaIntegration,
+  WebSocketLambdaIntegration
+} from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import {
   HttpApi,
   HttpMethod,
   WebSocketApi,
   WebSocketStage
-} from '@aws-cdk/aws-apigatewayv2';
-import * as lambda from '@aws-cdk/aws-lambda';
+} from '@aws-cdk/aws-apigatewayv2-alpha';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
-import * as dynamodb from '@aws-cdk/aws-dynamodb';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import { Construct } from 'constructs';
 
 type PowerupEnvironment = 'dev' | 'prod';
 
@@ -38,7 +39,7 @@ interface Props extends cdk.StackProps {
 }
 
 export class InfrastructureStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props: Props) {
+  constructor(scope: Construct, id: string, props: Props) {
     super(scope, id, props);
 
     if (!props.env?.region) {
@@ -200,9 +201,7 @@ export class InfrastructureStack extends cdk.Stack {
 
     table.grantReadWriteData(websocketLambda);
 
-    const apiIntegration = new LambdaProxyIntegration({
-      handler: apiLambda
-    });
+    const apiIntegration = new HttpLambdaIntegration('api-integration', apiLambda);
 
     const httpApi = new HttpApi(this, 'api', {
       apiName: `${env}-activity-timer-api`
@@ -217,19 +216,13 @@ export class InfrastructureStack extends cdk.Stack {
     const webSocketApi = new WebSocketApi(this, 'websocket-api', {
       apiName: `${env}-activity-timer-websocket-api`,
       connectRouteOptions: {
-        integration: new LambdaWebSocketIntegration({
-          handler: websocketLambda
-        })
+        integration: new WebSocketLambdaIntegration('api-websocket-connect', websocketLambda)
       },
       defaultRouteOptions: {
-        integration: new LambdaWebSocketIntegration({
-          handler: websocketLambda
-        })
+        integration: new WebSocketLambdaIntegration('api-websocket-default', websocketLambda)
       },
       disconnectRouteOptions: {
-        integration: new LambdaWebSocketIntegration({
-          handler: websocketLambda
-        })
+        integration: new WebSocketLambdaIntegration('api-websocket-disconnect', websocketLambda)
       }
     });
 
