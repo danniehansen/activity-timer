@@ -11,8 +11,8 @@ import {
   Bucket,
   BucketAccessControl
 } from 'aws-cdk-lib/aws-s3';
-import * as cdk from 'aws-cdk-lib/core';
-import { Duration, RemovalPolicy } from 'aws-cdk-lib/core';
+import * as cdk from 'aws-cdk-lib';
+import { Duration, RemovalPolicy } from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { BucketDeployment } from 'aws-cdk-lib/aws-s3-deployment';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
