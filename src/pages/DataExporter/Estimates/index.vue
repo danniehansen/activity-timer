@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, CSSProperties, ref, watch } from 'vue';
 import { getAppKey } from '../../../components/settings';
 import {
   clearToken,
@@ -149,6 +149,11 @@ import { getSubscriptionStatus } from '../../../components/optro';
 import UIOptroStatus from '../../../components/UIOptroStatus.vue';
 import { Estimates } from '../../../components/estimates';
 import UICheckbox from '../../../components/UICheckbox.vue';
+import { setStorage, getStorage } from '../../../utils/local-storage';
+
+interface Settings {
+  columns: string[];
+}
 
 const isAuthorized = ref(false);
 const memberOptions = ref<Option[]>();
@@ -183,8 +188,23 @@ const listById: {
   [key: string]: Trello.PowerUp.List;
 } = {};
 
-// TODO: Find CSS.Properties types package
-const columnStyle: { [key: keyof ApiCardRowData]: any } = {
+const settings = computed<Settings>(() => {
+  return {
+    columns: columns.value
+  };
+});
+
+watch(settings, () => {
+  setStorage('export-estimates', settings.value);
+});
+
+const currentSettings = getStorage<Settings>('export-estimates');
+
+if (currentSettings?.columns) {
+  columns.value = currentSettings.columns;
+}
+
+const columnStyle: { [key: keyof ApiCardRowData]: CSSProperties } = {
   'card.description': {
     maxWidth: '200px',
     overflow: 'hidden',
@@ -425,7 +445,9 @@ async function getData() {
     ).then<Trello.PowerUp.Card[]>((res) => res.json());
 
     const boardData = await fetch(
-      `https://api.trello.com/1/boards/${board.id}?fields=name&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
+      `https://api.trello.com/1/boards/${
+        board.id
+      }?fields=name&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
     ).then<Trello.PowerUp.Board>((res) => res.json());
 
     cards = data

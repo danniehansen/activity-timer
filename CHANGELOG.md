@@ -10,13 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.4.0] - 2023-02-01
 
 ### Security
- - Updated dependencies
+ - Updated dependencies (including major version of CDK)
 
 ### Removed
  - Removed Google Analytics since it's not GDPR compliant by default
 
 ### Changed
  - Changed yarn out with npm
+
+### Added
+ - Made export page remember your choice of columns
 
 ## [2.3.0] - 2022-12-16
 
