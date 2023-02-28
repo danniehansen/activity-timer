@@ -97,7 +97,7 @@ export class InfrastructureStack extends cdk.Stack {
 
           // Set HTTP security headers
           headers['strict-transport-security'] = { value: 'max-age=63072000; includeSubdomains; preload'};
-          headers['content-security-policy'] = { value: "default-src 'none'; font-src 'self' data:; img-src 'self' https://www.google-analytics.com/; script-src 'self' 'unsafe-inline' https://p.trellocdn.com/ https://www.googletagmanager.com/ https://www.google-analytics.com/; style-src 'self' https://p.trellocdn.com/; object-src 'none'; connect-src 'self' ${webSocketApi.apiEndpoint} *.ingest.sentry.io https://api.optro.cloud/ https://api.trello.com/"};
+          headers['content-security-policy'] = { value: "default-src 'none'; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://p.trellocdn.com/; style-src 'self' https://p.trellocdn.com/; object-src 'none'; connect-src 'self' ${webSocketApi.apiEndpoint} *.ingest.sentry.io https://api.optro.cloud/ https://api.trello.com/"};
           headers['x-content-type-options'] = { value: 'nosniff'};
 
           // Return the response to viewers
