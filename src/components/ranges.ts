@@ -40,7 +40,7 @@ export class Ranges {
     );
   }
 
-  filter(fn: () => boolean): Ranges {
+  filter(fn: (item: Range) => boolean): Ranges {
     return new Ranges(this._cardId, this._items.filter(fn));
   }
 }
