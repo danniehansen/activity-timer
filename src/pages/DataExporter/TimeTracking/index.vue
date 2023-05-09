@@ -319,31 +319,22 @@ const filteredCards = computed<ApiCard[]>(() => {
   }
 
   const dateFromUnix = dateFrom.value
-    ? Math.floor(new Date(dateFrom.value).getTime() / 1000)
+    ? Math.floor(new Date(dateFrom.value + '00:00:00').getTime() / 1000)
     : 0;
+
   const dateToUnix = dateTo.value
-    ? Math.floor(setTimeMidnight(new Date(dateTo.value)).getTime() / 1000)
+    ? Math.floor(new Date(dateTo.value + ' 23:59:59').getTime() / 1000)
     : 0;
 
   return cards.filter((card) => {
     let ranges = card.ranges;
 
     if (dateFromUnix) {
-      ranges = new Ranges(
-        card.data.id,
-        ranges.items.filter(
-          (item) => item.start >= dateFromUnix || item.end >= dateFromUnix
-        )
-      );
+      ranges = ranges.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix);
     }
 
     if (dateToUnix) {
-      ranges = new Ranges(
-        card.data.id,
-        ranges.items.filter(
-          (item) => item.start <= dateToUnix || item.end <= dateToUnix
-        )
-      );
+      ranges = ranges.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix);
     }
 
     if (labels.value.length > 0) {
@@ -382,41 +373,28 @@ let rowCounter = 0;
 const rowDataList = computed<ApiCardRowData[]>(() => {
   const rowData: ApiCardRowData[] = [];
 
+  const dateFromUnix = dateFrom.value
+    ? Math.floor(new Date(dateFrom.value + ' 00:00:00').getTime() / 1000)
+    : 0;
+
+  const dateToUnix = dateTo.value
+    ? Math.floor(new Date(dateTo.value + ' 23:59:59').getTime() / 1000)
+    : 0;
+
   filteredCards.value.forEach((card) => {
     const rowDataItem = card.rowData.value;
-
-    const dateFromUnix = dateFrom.value
-      ? Math.floor(new Date(dateFrom.value).getTime() / 1000)
-      : 0;
-    const dateToUnix = dateTo.value
-      ? Math.floor(setTimeMidnight(new Date(dateTo.value)).getTime() / 1000)
-      : 0;
-
     let ranges = card.ranges;
 
     if (dateFromUnix) {
-      ranges = new Ranges(
-        card.data.id,
-        ranges.items.filter(
-          (item) => item.start >= dateFromUnix || item.end >= dateFromUnix
-        )
-      );
+      ranges = ranges.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix);
     }
 
     if (dateToUnix) {
-      ranges = new Ranges(
-        card.data.id,
-        ranges.items.filter(
-          (item) => item.start <= dateToUnix || item.end <= dateToUnix
-        )
-      );
+      ranges = ranges.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix);
     }
 
     if (members.value.length > 0) {
-      ranges = new Ranges(
-        card.data.id,
-        ranges.items.filter((item) => members.value.includes(item.memberId))
-      );
+      ranges = ranges.filter((item) => members.value.includes(item.memberId));
     }
 
     if (ranges.timeSpent > 0) {
@@ -437,7 +415,7 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
       }, null);
 
       let furthestAhead = ranges.items.reduce<number | null>((carry, item) => {
-        if (carry === null || item.start > carry) {
+        if (carry === null || item.end > carry) {
           carry = item.end;
         }
 
@@ -508,7 +486,7 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
 
               furthestAhead = ranges.items.reduce<number | null>(
                 (carry, item) => {
-                  if (carry === null || item.start > carry) {
+                  if (carry === null || item.end > carry) {
                     carry = item.end;
                   }
 
@@ -600,13 +578,6 @@ async function trelloTick() {
       throw e;
     }
   }
-}
-
-function setTimeMidnight(date: Date) {
-  date.setHours(23);
-  date.setMinutes(59);
-  date.setSeconds(59);
-  return date;
 }
 
 function getUniqueLabels() {

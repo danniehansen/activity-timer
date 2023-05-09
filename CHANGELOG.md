@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.4.1] - 2023-05-09
+
+### Security
+ - Updated packages to latest version matching selectors in package.json
+
+### Fixed
+ - Fixed developer documentation mentioning yarn instead of npm
+ - Fixed an issue where timezone wasn't properly handled when filtering time ranges in data exporter
+
 ## [2.4.0] - 2023-02-01
 
 ### Security

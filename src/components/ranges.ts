@@ -39,4 +39,8 @@ export class Ranges {
       this.serialize()
     );
   }
+
+  filter(fn: (item: Range) => boolean): Ranges {
+    return new Ranges(this._cardId, this._items.filter(fn));
+  }
 }

@@ -16,7 +16,7 @@ git clone git@github.com:danniehansen/activity-timer.git project-folder
 & afterwards install the packages:
 
 ```
-cd project-folder && yarn install
+cd project-folder && npm install
 ```
 
 ## Configuration
@@ -53,31 +53,31 @@ When this is done you can create a new Trello board under your new Trello team. 
 ## Commands
 
 ```
-yarn dev
+npm run dev
 ```
 This will startup the local development environment. Before you can view your powerup locally you need to open up `https://localhost:3001/` & allow the self signed certificate. Once allowed you can refresh the Trello board & see your local powerup in action!
 <hr />
 
 ```
-yarn lint
+npm run lint
 ```
 This will run ESlint on all of your .js / .ts files & ensure that you're compatible with Activity timers code style.
 <hr />
 
 ```
-yarn analyze
+npm run analyze
 ```
 This will run `vue-tsc` & analyze the TypeScript files for issues.
 <hr />
 
 ```
-yarn test
+npm run test
 ```
 This will run `jest` to perform unit testing on our application.
 <hr />
 
 ```
-yarn build
+npm run build
 ```
 This will run vite & create a production build. Command outputs to the `dist` folder.
 
