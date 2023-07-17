@@ -1,9 +1,8 @@
 import { Trello } from '../../types/trello';
-import ClockImage from '../../assets/images/clock.svg';
-import { clearToken } from '../../components/trello';
+import ClockImageWhite from '../../assets/images/clock_white.svg';
+import { clearToken, getMemberId } from '../../components/trello';
 import { isVisible } from '../../utils/visibility';
-
-const icon = `${window.location.origin}${ClockImage}`;
+import { Card } from '../../components/card';
 
 export async function getBoardButtons(): Promise<
   Trello.PowerUp.BoardButtonCallback[]
@@ -17,8 +16,8 @@ export async function getBoardButtons(): Promise<
   return [
     {
       icon: {
-        light: icon,
-        dark: icon
+        light: `${window.location.origin}${ClockImageWhite}`,
+        dark: `${window.location.origin}${ClockImageWhite}`
       },
       text: 'Activity timer',
       callback: async (t) => {
@@ -75,6 +74,35 @@ export async function getBoardButtons(): Promise<
                 cancelText: 'No, cancel'
               });
             }
+          });
+        }
+
+        // Check if active timer is running
+        let running = false;
+
+        const cards = await t.cards('id');
+        const memberId = await getMemberId();
+
+        for (const card of cards) {
+          const cardModel = new Card(card.id);
+          const cardTimers = await cardModel.getTimers();
+          const timer = cardTimers.getByMemberId(memberId);
+
+          if (timer) {
+            running = true;
+
+            items.push({
+              text: 'Timer: Running. Click to open card',
+              callback: async (t) => {
+                return t.showCard(card.id);
+              }
+            });
+          }
+        }
+
+        if (!running) {
+          items.push({
+            text: 'Timer: Not running'
           });
         }
 

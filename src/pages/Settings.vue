@@ -7,8 +7,8 @@
     <UIOptroStatus />
 
     <UICheckbox
-      v-model="disableEstimate"
       id="disable-estimate"
+      v-model="disableEstimate"
       label="Disable estimate feature"
     />
     <hr />

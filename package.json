@@ -1,14 +1,14 @@
 {
   "name": "activity_timer",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "author": "Dannie Hansen",
   "license": "MIT",
   "scripts": {
     "dev": "vite --port 3001 --https",
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
-    "lint": "eslint --ext .js --ext .ts .",
-    "lint:fix": "eslint --ext .js --ext .ts . --fix",
+    "lint": "eslint --ext .js --ext .ts --ext .vue .",
+    "lint:fix": "eslint --ext .js --ext .ts --ext .vue . --fix",
     "analyze": "vue-tsc --noEmit",
     "test": "jest src --passWithNoTests"
   },
@@ -28,13 +28,14 @@
     "vue": "^3.2.16"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.30.7",
-    "@typescript-eslint/parser": "^5.30.7",
-    "@vue/eslint-config-typescript": "^11.0.0",
-    "eslint": "^8.20.0",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
+    "@vue/eslint-config-typescript": "^11.0.3",
+    "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-vue": "^9.2.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "eslint-plugin-vue": "^9.15.1",
     "prettier": "2.7.1",
     "vue-eslint-parser": "^9.0.3",
     "vue-tsc": "^0.38.4"

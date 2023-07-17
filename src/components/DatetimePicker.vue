@@ -3,8 +3,8 @@
     v-model="date"
     :transitions="false"
     inline
-    @update:modelValue="onSubmit"
-    @updateMonthYear="resize"
+    @update:model-value="onSubmit"
+    @update-month-year="resize"
   />
 </template>
 

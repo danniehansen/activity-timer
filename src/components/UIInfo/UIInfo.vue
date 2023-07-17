@@ -16,7 +16,8 @@ export default defineComponent({
   props: {
     icon: {
       type: String as PropType<Icon>,
-      required: false
+      required: false,
+      default: undefined
     }
   }
 });
@@ -38,6 +39,10 @@ export default defineComponent({
   border: none;
   position: relative;
   padding: 0 12px;
+
+  html[data-color-mode='dark'] & {
+    background-color: rgba(9, 30, 66, 0.25);
+  }
 
   .icon {
     padding-right: 10px;
