@@ -142,7 +142,12 @@ export class InfrastructureStack extends cdk.Stack {
       destinationBucket: siteBucket,
       prune: false,
       distribution,
-      distributionPaths: ['/*']
+      distributionPaths: ['/*'],
+      cacheControl: [
+        s3deploy.CacheControl.setPublic(),
+        s3deploy.CacheControl.maxAge(Duration.minutes(0)),
+        s3deploy.CacheControl.sMaxAge(Duration.days(31))
+      ]
     });
   }
 
