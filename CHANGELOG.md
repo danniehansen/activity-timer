@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.5.0] - 2023-07-17
+
+### Security
+ - Updated dependencies
+
+### Changed
+ - Changed Cache-Control headers of deployment so that browsers never cache the assets. This will help with pushing new releases out.
+
+### Added
+ - Added new board contextmenu item that indicates if an active timer is running. https://github.com/danniehansen/activity-timer/issues/101
+ - Added support for Trello's new theme mode. Dark mode now actually looks OK & board button in light mode is no longer black.
+
 ## [2.4.0] - 2023-02-01
 
 ### Security
