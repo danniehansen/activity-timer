@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, PropType } from 'vue';
+import { PropType } from 'vue';
 import { Icon } from './Types';
 
 const props = defineProps({

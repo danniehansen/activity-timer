@@ -2,7 +2,7 @@
   <UIRow v-if="canWrite && visible">
     <div>
       <UIButton v-if="!isTracking" @click="startTracking">Start timer</UIButton>
-      <UIButton v-else @click="stopTracking" :danger="true"
+      <UIButton v-else :danger="true" @click="stopTracking"
         >Stop timer</UIButton
       >
 
@@ -14,8 +14,8 @@
         >Estimate: {{ ownEstimateDisplay }}</UIInfo
       >
       <UIInfo
-        style="cursor: pointer"
         v-if="ownEstimate != totalEstimate"
+        style="cursor: pointer"
         @click="viewEstimates"
         >Total estimate: {{ totalEstimateDisplay }}</UIInfo
       >
@@ -38,12 +38,7 @@ import { ref, computed } from 'vue';
 import UIInfo from '../../components/UIInfo/UIInfo.vue';
 import UIRow from '../../components/UIRow.vue';
 import UIButton from '../../components/UIButton.vue';
-import {
-  getMemberId,
-  getTrelloCard,
-  getTrelloInstance,
-  resizeTrelloFrame
-} from '../../components/trello';
+import { getMemberId, getTrelloCard } from '../../components/trello';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature } from '../../components/settings';
@@ -195,7 +190,7 @@ const viewEstimates = async (e: MouseEvent) => {
           }
         });
 
-      estimates.items.forEach((estimate, estimateIndex) => {
+      estimates.items.forEach((estimate) => {
         if (!membersFound.includes(estimate.memberId)) {
           items.push({
             text: 'N/A: ' + formatTime(estimate.time),

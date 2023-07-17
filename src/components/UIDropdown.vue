@@ -5,35 +5,35 @@
     >
 
     <div
+      ref="container"
       class="dropdown"
       :class="{ 'dropdown--active': showOptions }"
-      ref="container"
     >
       <div
         class="dropdown__selected"
-        @click="showOptions = !showOptions"
         :title="selected"
+        @click="showOptions = !showOptions"
       >
         {{ selected || placeholder }}
         <div
+          v-if="hasValue"
           class="dropdown__selected-clear"
           @click.stop="clear()"
-          v-if="hasValue"
         >
           <UIIcon icon="clear" />
         </div>
       </div>
 
       <div
-        class="dropdown__options"
-        :class="{ 'dropdown__options--top': optionsFromTop }"
         v-if="showOptions"
         ref="optionsContainer"
+        class="dropdown__options"
+        :class="{ 'dropdown__options--top': optionsFromTop }"
       >
         <div
-          class="dropdown__option"
           v-for="option in options"
           :key="option.value"
+          class="dropdown__option"
           :class="{
             'dropdown__option--selected': value.includes(option.value)
           }"
@@ -68,7 +68,7 @@ export default defineComponent({
   components: { UIFormElement, UIIcon },
   props: {
     modelValue: {
-      value: [String, Array as PropType<string[]>],
+      type: [String, Array],
       required: true
     },
     label: {
@@ -76,7 +76,8 @@ export default defineComponent({
       required: true
     },
     options: {
-      type: Array as PropType<Option[]>
+      type: Array as PropType<Option[]>,
+      required: true
     },
     multiple: {
       type: Boolean,
@@ -84,13 +85,16 @@ export default defineComponent({
     },
     placeholder: {
       type: String,
-      required: false
+      required: false,
+      default: ''
     },
     help: {
       type: String,
-      required: false
+      required: false,
+      default: ''
     }
   },
+  emits: ['update:modelValue'],
   setup(props, context) {
     const container = ref<HTMLDivElement | null>(null);
     const optionsContainer = ref<HTMLDivElement | null>(null);

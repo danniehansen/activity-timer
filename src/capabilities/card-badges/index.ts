@@ -1,6 +1,6 @@
 import { Trello } from '../../types/trello';
 import EstimateImage from '../../assets/images/estimate.svg';
-import ClockImage from '../../assets/images/clock.svg';
+import ClockImageBlack from '../../assets/images/clock_black.svg';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import {
@@ -18,7 +18,7 @@ import {
 } from '../../components/websocket';
 import { isVisible } from '../../utils/visibility';
 
-const clockIcon = `${window.location.origin}${ClockImage}`;
+const clockIcon = `${window.location.origin}${ClockImageBlack}`;
 const estimateImage = `${window.location.origin}${EstimateImage}`;
 
 export async function getCardBadges(

@@ -5,7 +5,7 @@
 
   <UIOptroStatus v-if="ready" style="border-radius: 0" />
 
-  <div class="unauthorized" v-if="isIncognito">
+  <div v-if="isIncognito" class="unauthorized">
     <p>
       It appears that you might be using incognito mode in your browser.
       Unfortunately some internal functionality does not work in Trello that is
@@ -14,7 +14,7 @@
     </p>
   </div>
 
-  <div class="unauthorized" v-else-if="unrecognizedError">
+  <div v-else-if="unrecognizedError" class="unauthorized">
     <p>
       Woops. An unrecognized error occurred. Our system have automatically
       logged it & will be looking into the matter. Please try again later or
@@ -22,7 +22,7 @@
     </p>
   </div>
 
-  <div class="unauthorized" v-else-if="!isAuthorized">
+  <div v-else-if="!isAuthorized" class="unauthorized">
     <p>
       To access tracking data you need to allow Activity timer to read this
       data. Click the button below to allow this.
@@ -35,8 +35,8 @@
     </p>
   </div>
 
-  <div class="authorized" v-else-if="ready && isAuthorized">
-    <div class="header" v-if="hasSubscription">
+  <div v-else-if="ready && isAuthorized" class="authorized">
+    <div v-if="hasSubscription" class="header">
       <div class="header__filters">
         <UIDropdown
           v-model="members"
@@ -84,7 +84,7 @@
       />
     </div>
 
-    <div class="requires-pro" v-else>
+    <div v-else class="requires-pro">
       <p>
         Filtering in data export is restricted to Pro users only. Free plan can
         only do full exports.
@@ -97,7 +97,7 @@
       </p>
     </div>
 
-    <table class="body" v-if="tableBody.length > 0">
+    <table v-if="tableBody.length > 0" class="body">
       <thead>
         <tr>
           <th v-for="headItem in tableHead" :key="headItem.value">
@@ -330,11 +330,15 @@ const filteredCards = computed<ApiCard[]>(() => {
     let ranges = card.ranges;
 
     if (dateFromUnix) {
-      ranges = ranges.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix);
+      ranges = ranges.filter(
+        (item) => item.start >= dateFromUnix || item.end >= dateFromUnix
+      );
     }
 
     if (dateToUnix) {
-      ranges = ranges.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix);
+      ranges = ranges.filter(
+        (item) => item.start <= dateToUnix || item.end <= dateToUnix
+      );
     }
 
     if (labels.value.length > 0) {
@@ -386,11 +390,15 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
     let ranges = card.ranges;
 
     if (dateFromUnix) {
-      ranges = ranges.filter((item) => item.start >= dateFromUnix || item.end >= dateFromUnix);
+      ranges = ranges.filter(
+        (item) => item.start >= dateFromUnix || item.end >= dateFromUnix
+      );
     }
 
     if (dateToUnix) {
-      ranges = ranges.filter((item) => item.start <= dateToUnix || item.end <= dateToUnix);
+      ranges = ranges.filter(
+        (item) => item.start <= dateToUnix || item.end <= dateToUnix
+      );
     }
 
     if (members.value.length > 0) {

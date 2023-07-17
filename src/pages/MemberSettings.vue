@@ -2,8 +2,8 @@
   <UIOptroStatus />
 
   <UICheckbox
-    v-model="stopOnMove"
     id="stop-on-move"
+    v-model="stopOnMove"
     label="Stop active tracking when card moves"
   />
 

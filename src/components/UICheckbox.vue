@@ -1,7 +1,7 @@
 <template>
   <UIFormElement>
     <div class="checkbox">
-      <input type="checkbox" v-model="fieldValue" :id="id" @input="onChange" />
+      <input :id="id" v-model="fieldValue" type="checkbox" @input="onChange" />
       <label :for="id">{{ label }}</label>
     </div>
   </UIFormElement>
@@ -27,6 +27,7 @@ export default defineComponent({
       required: true
     }
   },
+  emits: ['update:modelValue'],
   setup(props, context) {
     const fieldValue = ref(props.modelValue);
 

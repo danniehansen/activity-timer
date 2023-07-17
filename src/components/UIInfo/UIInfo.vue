@@ -16,7 +16,8 @@ export default defineComponent({
   props: {
     icon: {
       type: String as PropType<Icon>,
-      required: false
+      required: false,
+      default: undefined
     }
   }
 });

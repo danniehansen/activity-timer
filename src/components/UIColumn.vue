@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, CSSProperties, defineProps, PropType } from 'vue';
+import { computed, CSSProperties, PropType } from 'vue';
 
 type AlignItems = 'left' | 'center' | 'right';
 

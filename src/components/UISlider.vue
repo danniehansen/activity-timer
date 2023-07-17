@@ -40,6 +40,7 @@ export default defineComponent({
       required: true
     }
   },
+  emits: ['update:modelValue'],
   setup(props, context) {
     const fieldValue = ref(props.modelValue);
 
