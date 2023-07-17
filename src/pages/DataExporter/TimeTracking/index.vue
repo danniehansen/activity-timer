@@ -166,7 +166,7 @@ interface Settings {
 }
 
 const isAuthorized = ref(false);
-const memberOptions = ref<Option[]>();
+const memberOptions = ref<Option[]>([]);
 const members = ref<string[]>([]);
 const labels = ref<string[]>([]);
 const columns = ref<string[]>([]);

@@ -69,7 +69,8 @@ export default defineComponent({
   props: {
     modelValue: {
       type: [String, Array],
-      required: true
+      required: false,
+      default: undefined
     },
     label: {
       type: String,
