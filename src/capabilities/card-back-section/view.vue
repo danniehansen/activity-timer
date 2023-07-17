@@ -243,3 +243,9 @@ trelloTick();
 // Force clock to update once a minute
 setInterval(trelloTick, 1000 * 60);
 </script>
+
+<style scoped>
+html[data-color-mode='dark'] .row {
+  background-color: #313940;
+}
+</style>

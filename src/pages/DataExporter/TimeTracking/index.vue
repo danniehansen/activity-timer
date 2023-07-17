@@ -826,9 +826,9 @@ table {
   left: 0;
   bottom: 0;
   width: 100%;
-  border-top: 2px solid #dfe1e6;
+  border-top: 2px solid var(--ds-border);
   padding: 14px;
-  background-color: #fff;
+  background-color: var(--ds-surface, #fff);
   z-index: 10;
   display: flex;
   justify-content: space-between;

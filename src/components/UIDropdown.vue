@@ -263,15 +263,17 @@ label {
     height: 38px;
     line-height: 38px;
     padding: 0 30px 0 14px;
-    box-shadow: inset 0 0 0 2px #dfe1e6;
     border-radius: 4px;
     cursor: pointer;
     position: relative;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #172b4d;
-    background-color: #fafbfc;
+
+    background-color: var(--ds-background-input, #fafbfc);
+    border: none;
+    box-shadow: inset 0 0 0 2px var(--ds-border-input, #dfe1e6);
+    color: var(--ds-text, #172b4d);
 
     &-clear {
       position: absolute;
@@ -289,19 +291,19 @@ label {
     left: 0;
     top: 100%;
     width: 100%;
-    border: 1px solid #dfe1e6;
+    border: 1px solid var(--ds-border-input, #dfe1e6);
     border-top: none;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     z-index: 10;
-    background-color: #fff;
+    background-color: var(--ds-background-input, #fafbfc);
     max-height: 175px;
     overflow: auto;
 
     &--top {
       top: auto;
       bottom: 100%;
-      border: 1px solid #dfe1e6;
+      border: 1px solid var(--ds-border-input, #dfe1e6);
       border-bottom: none;
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
@@ -329,15 +331,23 @@ label {
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
-    color: #5e6c84;
+    color: var(--ds-text, #172b4d);
 
     &:hover {
       background-color: #dfe1e6;
+
+      html[data-color-mode='dark'] & {
+        color: #000;
+      }
     }
 
     &--selected {
       background-color: #a1a3a7 !important;
       color: #fff !important;
+
+      html[data-color-mode='dark'] & {
+        color: #000;
+      }
     }
   }
 }

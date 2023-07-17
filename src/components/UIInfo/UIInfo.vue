@@ -40,6 +40,10 @@ export default defineComponent({
   position: relative;
   padding: 0 12px;
 
+  html[data-color-mode='dark'] & {
+    background-color: rgba(9, 30, 66, 0.25);
+  }
+
   .icon {
     padding-right: 10px;
     font-size: 15px;
