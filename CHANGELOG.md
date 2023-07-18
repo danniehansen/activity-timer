@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.5.1] - 2023-07-18
+
+### Changed
+ - Changed sorting of labels both in the dropdown & table column under data exporter to be alphabetically https://github.com/danniehansen/activity-timer/issues/114
+
+### Added
+ - Added new contextmenu item under board button to display the current Activity timer version. This is useful for debugging purposes to ensure users run the latest version.
+
 ## [2.5.0] - 2023-07-17
 
 ### Security

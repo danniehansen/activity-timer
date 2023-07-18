@@ -106,6 +106,10 @@ export async function getBoardButtons(): Promise<
           });
         }
 
+        items.push({
+          text: 'Version: 2.5.1'
+        });
+
         await t.popup({
           title: 'Activity timer',
           items

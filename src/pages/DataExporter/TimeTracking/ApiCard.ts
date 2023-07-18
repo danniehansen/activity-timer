@@ -165,7 +165,10 @@ export class ApiCard {
         'card.id': this._data.id,
         'card.title': this._data.name,
         'card.description': this._data.desc,
-        'card.labels': this._data.labels.map((label) => label.name).join(', '),
+        'card.labels': this._data.labels
+          .map((label) => label.name)
+          .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+          .join(', '),
         'list.id': this._data.idList,
         'list.name': this._listById[this._data.idList]?.name ?? 'N/A',
         start_datetime: furthestBack

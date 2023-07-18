@@ -567,12 +567,14 @@ const tableBody = computed<ApiCardRowData[]>(() => {
 });
 
 const labelOptions = computed<Option[]>(() => {
-  return uniqueLabels.value.map<Option>((label) => {
-    return {
-      text: label.name,
-      value: label.id
-    };
-  });
+  return uniqueLabels.value
+    .map<Option>((label) => {
+      return {
+        text: label.name,
+        value: label.id
+      };
+    })
+    .sort((a, b) => a.text.toLowerCase().localeCompare(b.text.toLowerCase()));
 });
 
 async function trelloTick() {
