@@ -92,9 +92,19 @@ export class Card {
     );
   }
 
-  async getTimeSpent(): Promise<number> {
+  async getTimeSpent(memberId?: string): Promise<number> {
     const timers = await this.getTimers();
     const ranges = await this.getRanges();
+
+    if (memberId) {
+      const memberTimer = timers.getByMemberId(memberId);
+      const memberRanges = ranges.filter((range) => {
+        return range.memberId === memberId;
+      });
+
+      return memberRanges.timeSpent + (memberTimer?.timeInSecond ?? 0);
+    }
+
     return timers.timeSpent + ranges.timeSpent;
   }
 

@@ -73,11 +73,7 @@ export async function canTriggerNotification(t: Trello.PowerUp.IFrame) {
 
   const memberId = await getMemberId();
   const card = await Card.getFromContext(t);
-  const ranges = await card.getRanges();
-
-  const timeSpent = ranges.items
-    .filter((item) => item.memberId === memberId)
-    .reduce((a, b) => a + b.diff, 0);
+  const timeSpent = await card.getTimeSpent(memberId);
 
   if (timeSpent === 0) {
     return false;

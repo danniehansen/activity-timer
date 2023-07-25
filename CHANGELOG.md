@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.5.2] - 2023-07-25
+
+### Fixed
+ - Fixed time spent calculation for notification feature. Timers currently running was not considered in the total time spent that was used to see if notification should be sent.
+
 ## [2.5.1] - 2023-07-18
 
 ### Changed
