@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.6.1] - 2023-08-28
+
+### Fixed
+
+- Fixed an issue causing time spent & estimate to become the same on the data exporter.
+
 ## [2.6.0] - 2023-08-28
 
 ### Added
