@@ -7,53 +7,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.6.0] - 2023-08-28
+
+### Added
+
+- Added time spent fields on data exporter for estimates (Pro feature).
+
+### Security
+
+- Updated Lambda functions node version from 14 -> 18.
+
 ## [2.5.2] - 2023-07-25
 
 ### Fixed
- - Fixed time spent calculation for notification feature. Timers currently running was not considered in the total time spent that was used to see if notification should be sent.
+
+- Fixed time spent calculation for notification feature. Timers currently running was not considered in the total time spent that was used to see if notification should be sent.
 
 ## [2.5.1] - 2023-07-18
 
 ### Changed
- - Changed sorting of labels both in the dropdown & table column under data exporter to be alphabetically https://github.com/danniehansen/activity-timer/issues/114
+
+- Changed sorting of labels both in the dropdown & table column under data exporter to be alphabetically https://github.com/danniehansen/activity-timer/issues/114
 
 ### Added
- - Added new contextmenu item under board button to display the current Activity timer version. This is useful for debugging purposes to ensure users run the latest version.
+
+- Added new contextmenu item under board button to display the current Activity timer version. This is useful for debugging purposes to ensure users run the latest version.
 
 ## [2.5.0] - 2023-07-17
 
 ### Security
- - Updated packages to latest version matching selectors in package.json
+
+- Updated packages to latest version matching selectors in package.json
 
 ### Changed
- - Changed Cache-Control headers of deployment so that browsers never cache the assets. This will help with pushing new releases out.
+
+- Changed Cache-Control headers of deployment so that browsers never cache the assets. This will help with pushing new releases out.
 
 ### Added
- - Added new board contextmenu item that indicates if an active timer is running. https://github.com/danniehansen/activity-timer/issues/101
- - Added support for Trello's new theme mode. Dark mode now actually looks OK & board button in light mode is no longer black.
+
+- Added new board contextmenu item that indicates if an active timer is running. https://github.com/danniehansen/activity-timer/issues/101
+- Added support for Trello's new theme mode. Dark mode now actually looks OK & board button in light mode is no longer black.
 
 ## [2.4.1] - 2023-05-09
 
 ### Security
- - Updated packages to latest version matching selectors in package.json
+
+- Updated packages to latest version matching selectors in package.json
 
 ### Fixed
- - Fixed developer documentation mentioning yarn instead of npm
- - Fixed an issue where timezone wasn't properly handled when filtering time ranges in data exporter
+
+- Fixed developer documentation mentioning yarn instead of npm
+- Fixed an issue where timezone wasn't properly handled when filtering time ranges in data exporter
 
 ## [2.4.0] - 2023-02-01
 
 ### Security
- - Updated dependencies (including major version of CDK)
+
+- Updated dependencies (including major version of CDK)
 
 ### Removed
- - Removed Google Analytics since it's not GDPR compliant by default
+
+- Removed Google Analytics since it's not GDPR compliant by default
 
 ### Changed
- - Changed yarn out with npm
+
+- Changed yarn out with npm
 
 ### Added
- - Made export page remember your choice of columns
+
+- Made export page remember your choice of columns
 
 ## [2.3.0] - 2022-12-16
 
