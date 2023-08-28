@@ -267,6 +267,14 @@ const columnOptions = ref<Option[]>([
   {
     text: 'Estimate (formatted)',
     value: 'estimate_formatted'
+  },
+  {
+    text: 'Time (seconds)',
+    value: 'time_seconds'
+  },
+  {
+    text: 'Time (formatted)',
+    value: 'time_formatted'
   }
 ]);
 
@@ -362,13 +370,21 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
         estimates.items.forEach((item) => {
           if (item.time > 0) {
             rowCounter++;
+
+            const ranges = card.ranges.filter(
+              (rangeItem) => rangeItem.memberId === item.memberId
+            );
+            const timeSpent = ranges.timeSpent;
+
             rowData.push({
               ...rowDataItem,
               id: rowCounter,
               'member.id': item.memberId,
               'member.name': formatMemberName(memberById[item.memberId]),
               estimate_seconds: item.time,
-              estimate_formatted: formatTime(item.time, true)
+              estimate_formatted: formatTime(item.time, true),
+              time_seconds: timeSpent,
+              time_formatted: formatTime(timeSpent, true)
             });
           }
         });
