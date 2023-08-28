@@ -176,7 +176,7 @@ export class InfrastructureStack extends cdk.Stack {
     });
 
     const apiLambda = new lambda.Function(this, 'api-lambda', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'index.main',
       code: lambda.Code.fromAsset(path.join(__dirname, '/../../src/api/http')),
       environment: {
@@ -191,7 +191,7 @@ export class InfrastructureStack extends cdk.Stack {
     table.grantReadWriteData(apiLambda);
 
     const websocketLambda = new lambda.Function(this, 'api-websocket-lambda', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'index.main',
       code: lambda.Code.fromAsset(
         path.join(__dirname, '/../../src/api/websocket')
