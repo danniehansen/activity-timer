@@ -363,8 +363,8 @@ const rowDataList = computed<ApiCardRowData[]>(() => {
           'member.name': membersInEstimates
             .map((memberId) => formatMemberName(memberById[memberId]))
             .join(', '),
-          time_seconds: totalEstimate,
-          time_formatted: formatTime(totalEstimate, true)
+          estimate_seconds: totalEstimate,
+          estimate_formatted: formatTime(totalEstimate, true)
         });
       } else {
         estimates.items.forEach((item) => {
