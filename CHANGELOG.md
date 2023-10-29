@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.7.0] - 2023-10-29
 
+### Added
+
+- Added sortable columns on data trackings/estimates exporter.
+- Added pagination on data trackings/estimates exporter.
+
+### Changed
+
+- Changed up entire UI by adding [Primevue](https://primevue.org/).
+
 ### Security
 
 - Updated packages to latest version matching version selectors.

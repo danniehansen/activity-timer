@@ -43,9 +43,3 @@ if (page === 'enable-notifications') {
     });
 }
 </script>
-
-<style lang="scss">
-* {
-  box-sizing: border-box;
-}
-</style>

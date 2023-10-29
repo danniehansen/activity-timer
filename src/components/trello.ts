@@ -39,7 +39,7 @@ export function getTrelloCard(): Trello.PowerUp.IFrame {
 
 export function resizeTrelloFrame(): void {
   if (trelloInstance && 'sizeTo' in trelloInstance) {
-    trelloInstance.sizeTo(document.documentElement.offsetHeight);
+    trelloInstance.sizeTo(document.documentElement.offsetHeight + 10);
   }
 }
 

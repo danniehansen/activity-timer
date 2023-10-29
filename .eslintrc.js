@@ -14,6 +14,8 @@ module.exports = {
   plugins: ['@typescript-eslint', 'prettier', 'unused-imports'],
   rules: {
     'prettier/prettier': 'error',
+    'vue/component-definition-name-casing': 'off',
+
     // not needed for vue 3
     'vue/no-multiple-template-root': 'off',
     'no-unused-vars': 'off',
