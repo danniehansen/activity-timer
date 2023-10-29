@@ -30,7 +30,6 @@ import Row from 'primevue/row';
 import './scss/base.scss';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-import 'primevue/resources/themes/bootstrap4-dark-blue/theme.css';
 
 let incognito = false;
 

@@ -29,8 +29,8 @@ export function setTrelloInstance(t: TrelloInstance) {
   trelloInstance = t;
 }
 
-export function getTrelloInstance(): TrelloInstance {
-  return trelloInstance as TrelloInstance;
+export function getTrelloInstance<T = TrelloInstance>(): T {
+  return trelloInstance as T;
 }
 
 export function getTrelloCard(): Trello.PowerUp.IFrame {
