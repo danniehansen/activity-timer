@@ -1,18 +1,29 @@
 <template>
-  <button v-if="!enabled" class="mod-primary" @click="enable()">
-    Enable notifications
-  </button>
-  <button v-else class="mod-danger" @click="disable()">
-    Disable notifications
-  </button>
+  <div class="flex flex-column gap-5 pr-3 pl-3">
+    <Button v-if="!enabled" label="Enable notifications" @click="enable()" />
+    <Button
+      v-else
+      label="Disable notifications"
+      severity="danger"
+      @click="disable()"
+    />
 
-  <UISlider
-    v-if="enabled"
-    v-model="percentage"
-    :min="1"
-    :max="100"
-    label="Percentage of estimate spent to trigger notification"
-  />
+    <div v-if="enabled" class="flex flex-column gap-3">
+      <span class="p-float-label">
+        <InputNumber
+          id="f-percentage"
+          v-model="percentage"
+          placeholder="0"
+          class="w-full"
+        />
+        <label for="f-percentage"
+          >Percentage of estimate spent to trigger</label
+        >
+      </span>
+
+      <Slider v-model="percentage" :min="1" :max="100" />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -26,7 +37,6 @@ import {
   hasNotificationsFeature,
   setNotificationPercentage
 } from '../utils/notifications';
-import UISlider from '../components/UISlider.vue';
 
 const percentage = ref(80);
 const enabled = ref(false);

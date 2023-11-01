@@ -532,10 +532,13 @@ export namespace Trello {
         organization: Permissions;
       };
       version: string;
+      theme: null | 'light' | 'dark';
+      initialTheme: 'light' | 'dark';
     }
 
     interface HostHandlers extends AnonymousHostHandlers {
       getContext(): Context;
+      subscribeToThemeChanges: (e: (theme: 'light' | 'dark') => void) => void;
       isMemberSignedIn(): boolean;
       memberCanWriteToModel(modelType: Model): boolean;
       arg(name: string, defaultValue?: any): any;

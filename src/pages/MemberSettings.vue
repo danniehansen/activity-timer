@@ -1,20 +1,23 @@
 <template>
-  <UIOptroStatus />
+  <div class="flex flex-column gap-3">
+    <UIOptroStatus />
 
-  <UICheckbox
-    id="stop-on-move"
-    v-model="stopOnMove"
-    label="Stop active tracking when card moves"
-  />
+    <div class="flex align-items-center">
+      <Checkbox v-model="stopOnMove" input-id="f-stop-on-move" :binary="true" />
+      <label for="f-stop-on-move" class="ml-2"
+        >Stop active tracking when card moves</label
+      >
+    </div>
 
-  <i
-    >Other power-up settings exists for administrators on the power-up settings
-    page</i
-  >
+    <i
+      >Other power-up settings exists for administrators on the power-up
+      settings page</i
+    >
 
-  <a v-if="subscribeForNews" :href="subscribeForNews" target="_blank"
-    >Subscribe to updates about Activity timer</a
-  >
+    <a v-if="subscribeForNews" :href="subscribeForNews" target="_blank"
+      >Subscribe to updates about Activity timer</a
+    >
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -24,7 +27,6 @@ import {
   setSettingStopOnMove
 } from '../components/settings';
 import { resizeTrelloFrame } from '../components/trello';
-import UICheckbox from '../components/UICheckbox.vue';
 import UIOptroStatus from '../components/UIOptroStatus.vue';
 
 const subscribeForNews = ref('');

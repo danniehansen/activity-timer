@@ -1,43 +1,52 @@
 <template>
-  <UIRow v-if="canWrite && visible">
-    <div>
-      <UIButton v-if="!isTracking" @click="startTracking">Start timer</UIButton>
-      <UIButton v-else :danger="true" @click="stopTracking"
-        >Stop timer</UIButton
-      >
+  <div
+    v-if="canWrite && visible"
+    class="flex flex-row justify-content-between gap-3"
+  >
+    <div class="flex flex-row gap-3">
+      <Button v-if="!isTracking" label="Start timer" @click="startTracking" />
+      <Button
+        v-else
+        label="Stop timer"
+        severity="danger"
+        @click="stopTracking"
+      />
 
-      <UIInfo icon="clock">{{ timeSpentDisplay }}</UIInfo>
+      <Button
+        :label="timeSpentDisplay"
+        icon="pi pi-clock"
+        severity="secondary"
+        style="pointer-events: none"
+      />
     </div>
 
-    <div v-if="hasEstimates">
-      <UIInfo style="cursor: pointer" @click="changeEstimate"
-        >Estimate: {{ ownEstimateDisplay }}</UIInfo
-      >
-      <UIInfo
+    <div v-if="hasEstimates" class="flex flex-row gap-3">
+      <Button
+        :label="`Estimate: ${ownEstimateDisplay}`"
+        severity="secondary"
+        @click="changeEstimate"
+      />
+
+      <Button
         v-if="ownEstimate != totalEstimate"
-        style="cursor: pointer"
+        :label="`Total estimate: ${totalEstimateDisplay}`"
+        severity="secondary"
         @click="viewEstimates"
-        >Total estimate: {{ totalEstimateDisplay }}</UIInfo
-      >
+      />
     </div>
-  </UIRow>
+  </div>
 
-  <UIRow v-else-if="hasEstimates && totalEstimate && visible">
-    <div>
-      <UIInfo v-if="ownEstimate != totalEstimate"
-        >Total estimate: {{ totalEstimateDisplay }}</UIInfo
-      >
-    </div>
-  </UIRow>
+  <Button
+    v-else-if="hasEstimates && totalEstimate && visible"
+    :label="`Total estimate: ${totalEstimateDisplay}`"
+    severity="secondary"
+  />
 
   <p v-else>No options available.</p>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import UIInfo from '../../components/UIInfo/UIInfo.vue';
-import UIRow from '../../components/UIRow.vue';
-import UIButton from '../../components/UIButton.vue';
 import { getMemberId, getTrelloCard } from '../../components/trello';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';

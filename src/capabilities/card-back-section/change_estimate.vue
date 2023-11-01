@@ -1,15 +1,23 @@
 <template>
-  <label>Estimate (in hours):</label>
-  <input v-model="estimate" type="text" placeholder="0" />
+  <div class="flex flex-column gap-3 align-items-start pt-4">
+    <span class="p-float-label">
+      <InputNumber
+        id="f-estimate"
+        v-model="estimate"
+        placeholder="0"
+        class="w-full"
+      />
+      <label for="f-estimate">Estimate (in hours)</label>
+    </span>
 
-  <UIButton @click="save">Save estimate</UIButton>
+    <Button label="Save estimate" @click="save" />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Card } from '../../components/card';
 import { Estimate } from '../../components/estimate';
-import UIButton from '../../components/UIButton.vue';
 import {
   getMemberId,
   getTrelloCard,

@@ -1,62 +1,108 @@
 <template>
-  <transition name="fade">
-    <UILoader v-if="loading" />
+  <transition v-if="loading" name="fade" appear>
+    <UILoader />
   </transition>
 
-  <template v-if="!loading">
+  <div v-if="!loading" class="flex flex-column gap-3 pr-3 pl-3">
     <UIOptroStatus />
 
-    <UICheckbox
-      id="disable-estimate"
-      v-model="disableEstimate"
-      label="Disable estimate feature"
-    />
-    <hr />
-    <UISlider
-      v-model="threshold"
-      label="Threshold in seconds for accepting trackings"
-      :min="1"
-      :max="180"
-    />
-    <hr />
-    <UIButton v-if="!autoStartTimerEnabled" @click="enableAutoStartTimer()"
-      >Enable auto start timer</UIButton
-    >
-    <UIButton
-      v-if="autoStartTimerEnabled"
-      :danger="true"
-      @click="disableAutoStartTimer()"
-      >Disable auto start timer</UIButton
-    >
-    <div>
-      <i v-if="autoStartTimerEnabled"
-        >(Requires browser reload after enabling)</i
+    <div class="flex align-items-center">
+      <Checkbox
+        v-model="disableEstimate"
+        input-id="f-disable-estimate"
+        :binary="true"
+      />
+      <label for="f-disable-estimate" class="ml-2"
+        >Disable estimate feature</label
       >
     </div>
 
-    <UIDropdown
-      v-if="autoStartTimerEnabled"
-      v-model="autoListId"
-      label="List to auto-start tracking"
-      :options="listOptions"
-    />
-    <hr />
-    <UIDropdown
-      v-model="visibility"
-      label="Visibility"
-      :options="visibilityOptions"
-      placeholder="Visible to all"
-    />
+    <div class="flex flex-column gap-1">
+      <label for="f-threshold"
+        >Threshold in seconds for accepting trackings</label
+      >
 
-    <UIDropdown
+      <div class="flex flex-column">
+        <InputNumber id="f-threshold" v-model="threshold" placeholder="0" />
+
+        <Slider v-model="threshold" :min="1" :max="180" />
+      </div>
+    </div>
+
+    <div>
+      <Button
+        v-if="!autoStartTimerEnabled"
+        label="Enable auto start timer"
+        class="w-full"
+        @click="enableAutoStartTimer()"
+      />
+
+      <Button
+        v-else
+        label="Disable auto start timer"
+        severity="danger"
+        class="w-full"
+        @click="disableAutoStartTimer()"
+      />
+
+      <div>
+        <i v-if="autoStartTimerEnabled"
+          >(Requires browser reload after enabling)</i
+        >
+      </div>
+    </div>
+
+    <div v-if="autoStartTimerEnabled" class="flex flex-column gap-1">
+      <label for="f-auto-start-list">List to auto-start tracking</label>
+
+      <Dropdown
+        v-model="autoListId"
+        input-id="f-auto-start-list"
+        :options="listOptions"
+        option-label="text"
+        option-value="value"
+        placeholder="Select list"
+        class="w-full"
+        :filter="listOptions.length > 10"
+        :show-clear="!!autoListId"
+      />
+    </div>
+
+    <div class="flex flex-column gap-1">
+      <label for="f-visibility">Visibility</label>
+
+      <Dropdown
+        v-model="visibility"
+        input-id="f-visibility"
+        :options="visibilityOptions"
+        option-label="text"
+        option-value="value"
+        placeholder="Visible to all"
+        class="w-full"
+        :filter="visibilityOptions.length > 10"
+        :show-clear="!!visibility"
+      />
+    </div>
+
+    <div
       v-if="visibility === 'specific-members'"
-      v-model="visibilityMembers"
-      label="Visibility members"
-      :multiple="true"
-      :options="visibilityMembersOptions"
-      placeholder="Visible to all"
-    />
-  </template>
+      class="flex flex-column gap-1"
+    >
+      <label for="f-visibility-members">Visibility members</label>
+
+      <MultiSelect
+        v-model="visibilityMembers"
+        input-id="f-visibility-members"
+        :options="visibilityMembersOptions"
+        option-label="text"
+        option-value="value"
+        placeholder="Visible to all"
+        class="w-full"
+        :filter="visibilityMembersOptions.length > 10"
+        :show-clear="visibilityMembers.length > 0"
+      />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -68,10 +114,6 @@ import {
   prepareWriteAuth,
   resizeTrelloFrame
 } from '../components/trello';
-import UISlider from '../components/UISlider.vue';
-import UICheckbox from '../components/UICheckbox.vue';
-import UIButton from '../components/UIButton.vue';
-import UIDropdown, { Option } from '../components/UIDropdown.vue';
 import {
   disableEstimateFeature,
   enableEstimateFeature,
@@ -98,6 +140,7 @@ import {
   Visibility
 } from '../utils/visibility';
 import { formatMemberName } from '../utils/formatting';
+import { Option } from '../types/dropdown';
 
 const autoStartTimerEnabled = ref(false);
 const disableEstimate = ref(false);

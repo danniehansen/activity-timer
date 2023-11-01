@@ -27,7 +27,8 @@
       To access tracking data you need to allow Activity timer to read this
       data. Click the button below to allow this.
     </p>
-    <UIButton @click="authorize()">Authorize</UIButton>
+
+    <Button label="Authorize" @click="authorize()" />
 
     <p v-if="rejectedAuth">
       You rejected Activity timer's request for accessing the data. If you
@@ -35,53 +36,101 @@
     </p>
   </div>
 
-  <div v-else-if="ready && isAuthorized" class="authorized">
-    <div v-if="hasSubscription" class="header">
-      <div class="header__filters">
-        <UIDropdown
+  <div
+    v-else-if="ready && isAuthorized"
+    class="authorized flex flex-column gap-3"
+  >
+    <div v-if="hasSubscription" class="flex flex-wrap column-gap-3 row-gap-4">
+      <div class="p-float-label">
+        <MultiSelect
           v-model="members"
-          label="Members"
-          placeholder="All"
-          :multiple="true"
+          input-id="f-members"
           :options="memberOptions"
-        />
-
-        <UIDropdown
-          v-model="lists"
-          label="Lists"
+          option-label="text"
+          option-value="value"
           placeholder="All"
-          :multiple="true"
-          :options="listOptions"
+          class="w-full md:w-14rem"
+          :filter="memberOptions.length > 10"
         />
-
-        <UIDropdown
-          v-model="labels"
-          label="Labels"
-          placeholder="All"
-          :multiple="true"
-          :options="labelOptions"
-        />
-
-        <UIDropdown
-          v-model="columns"
-          label="Columns"
-          placeholder="Default"
-          :multiple="true"
-          :options="columnOptions"
-        />
-
-        <UIDateInput v-model="dateFrom" label="Date from" />
-
-        <UIDateInput v-model="dateTo" label="Date to" />
+        <label for="f-members">Members</label>
       </div>
 
-      <UIDropdown
-        v-model="groupBy"
-        label="Group by"
-        help="No grouping = each time tracking is on a separate row"
-        placeholder="No grouping"
-        :options="groupByOptions"
-      />
+      <div class="p-float-label">
+        <MultiSelect
+          v-model="lists"
+          input-id="f-members"
+          :options="listOptions"
+          option-label="text"
+          option-value="value"
+          placeholder="All"
+          class="w-full md:w-14rem"
+          :filter="listOptions.length > 10"
+        />
+        <label for="f-members">Lists</label>
+      </div>
+
+      <div class="p-float-label">
+        <MultiSelect
+          v-model="labels"
+          input-id="f-members"
+          :options="labelOptions"
+          option-label="text"
+          option-value="value"
+          placeholder="All"
+          class="w-full md:w-14rem"
+          :filter="labelOptions.length > 10"
+        />
+        <label for="f-members">Labels</label>
+      </div>
+
+      <div class="p-float-label">
+        <MultiSelect
+          v-model="columns"
+          input-id="f-members"
+          :options="columnOptions"
+          option-label="text"
+          option-value="value"
+          placeholder="Default"
+          class="w-full md:w-14rem"
+          :filter="columnOptions.length > 10"
+        />
+        <label for="f-members">Columns</label>
+      </div>
+
+      <span class="p-float-label">
+        <InputText
+          id="f-date-from"
+          v-model="dateFrom"
+          type="date"
+          class="p-filled"
+        />
+        <label for="f-date-from">Date from</label>
+      </span>
+
+      <span class="p-float-label">
+        <InputText
+          id="f-date-to"
+          v-model="dateTo"
+          type="date"
+          class="p-filled"
+        />
+        <label for="f-date-to">Date to</label>
+      </span>
+
+      <div class="p-float-label">
+        <Dropdown
+          v-model="groupBy"
+          input-id="f-group-by"
+          :options="groupByOptions"
+          option-label="text"
+          option-value="value"
+          placeholder="No grouping"
+          class="w-full md:w-14rem"
+          :filter="groupByOptions.length > 10"
+          show-clear
+        />
+        <label for="f-group-by">Group by</label>
+      </div>
     </div>
 
     <div v-else class="requires-pro">
@@ -97,41 +146,50 @@
       </p>
     </div>
 
-    <table v-if="tableBody.length > 0" class="body">
-      <thead>
-        <tr>
-          <th v-for="headItem in tableHead" :key="headItem.value">
-            {{ headItem.text }}
-          </th>
-        </tr>
-      </thead>
+    <DataTable
+      v-if="rowDataList.length > 0"
+      :value="rowDataList"
+      paginator
+      :rows="10"
+      :rows-per-page-options="[10, 20, 30, 50, 100]"
+    >
+      <Column
+        v-for="column in tableHead"
+        :key="column.value"
+        :field="column.value"
+        :header="column.text"
+        :style="columnStyle[column.value]"
+        sortable
+      />
 
-      <tbody>
-        <tr v-for="tableRow in tableBody" :key="tableRow.id">
-          <td
-            v-for="columnItem in tableHead"
-            :key="columnItem.value"
-            :style="columnStyle[columnItem.value] ?? {}"
-          >
-            {{ tableRow[columnItem.value] ?? '' }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <ColumnGroup type="footer">
+        <Row v-if="tableHead.length > 1">
+          <Column v-if="tableHead.length > 2" :colspan="tableHead.length - 2" />
+          <Column :footer="`Total seconds: ${totalTimeSeconds}`" />
+          <Column :footer="`Total time: ${totalTimeFormatted}`" />
+        </Row>
+        <Row v-else>
+          <Column
+            :footer="`Total time (seconds): ${totalTimeSeconds}. Total time (formatted): ${totalTimeFormatted}`"
+          />
+        </Row>
+      </ColumnGroup>
+
+      <template #paginatorstart>
+        <Button type="button" icon="pi pi-refresh" text @click="getData()" />
+      </template>
+
+      <template #paginatorend>
+        <Button
+          type="button"
+          :icon="exported ? 'pi pi-check' : 'pi pi-download'"
+          text
+          @click="exportData()"
+        />
+      </template>
+    </DataTable>
 
     <p v-else>No cards found with trackings matching your filter</p>
-
-    <div class="footer">
-      <div>
-        <UIButton @click="exportData()">Export to CSV</UIButton>
-        <UIButton @click="getData()">Refresh</UIButton>
-      </div>
-
-      <div class="footer__info">
-        <span>Total time (seconds): {{ totalTimeSeconds }}</span>
-        <span>Total time (formatted): {{ totalTimeFormatted }}</span>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -144,8 +202,6 @@ import {
   getTrelloCard,
   getTrelloInstance
 } from '../../../components/trello';
-import UIButton from '../../../components/UIButton.vue';
-import UIDropdown, { Option } from '../../../components/UIDropdown.vue';
 import { Trello } from '../../../types/trello';
 import {
   formatDate,
@@ -153,13 +209,13 @@ import {
   formatTime
 } from '../../../utils/formatting';
 import { ApiCard, ApiCardRowData } from './ApiCard';
-import UIDateInput from '../../../components/UIDateInput.vue';
 import { Ranges } from '../../../components/ranges';
 import { ExportToCsv } from 'export-to-csv';
 import UILoader from '../../../components/UILoader.vue';
 import { getSubscriptionStatus } from '../../../components/optro';
 import UIOptroStatus from '../../../components/UIOptroStatus.vue';
 import { setStorage, getStorage } from '../../../utils/local-storage';
+import { Option } from '../../../types/dropdown';
 
 interface Settings {
   columns: string[];
@@ -190,6 +246,7 @@ const groupByOptions = ref<Option[]>([
 const groupBy = ref<'card' | 'card_and_member' | undefined>();
 const loading = ref(true);
 const ready = ref(false);
+const exported = ref(false);
 const hasSubscription = ref(false);
 const uniqueLabels = ref<Trello.PowerUp.Label[]>([]);
 const defaultColumns: (keyof ApiCardRowData)[] = [
@@ -236,10 +293,10 @@ const columnStyle: { [key: keyof ApiCardRowData]: CSSProperties } = {
     whiteSpace: 'nowrap'
   },
   time_seconds: {
-    width: '135px'
+    width: '200px'
   },
   time_formatted: {
-    width: '135px'
+    width: '200px'
   }
 };
 
@@ -562,10 +619,6 @@ const totalTimeFormatted = computed(() => {
   return formatTime(totalTimeSeconds.value, true);
 });
 
-const tableBody = computed<ApiCardRowData[]>(() => {
-  return rowDataList.value.slice(0, 100);
-});
-
 const labelOptions = computed<Option[]>(() => {
   return uniqueLabels.value
     .map<Option>((label) => {
@@ -732,6 +785,10 @@ async function authorize() {
 }
 
 const exportData = () => {
+  if (exported.value) {
+    return;
+  }
+
   const data: Array<Array<string>> = [];
 
   const csvExporter = new ExportToCsv({
@@ -759,6 +816,12 @@ const exportData = () => {
 
     data.push(row);
   });
+
+  exported.value = true;
+
+  setTimeout(() => {
+    exported.value = false;
+  }, 1500);
 
   csvExporter.generateCsv(data);
 };
@@ -790,67 +853,6 @@ trelloTick().then(() => {
 .authorized {
   padding: 25px;
   padding-bottom: 62px;
-}
-
-.header {
-  &__filters {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-
-    label:first-child {
-      margin-top: 0;
-    }
-
-    .form-element {
-      margin: 0 15px 0 0;
-
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-  }
-
-  .form-element {
-    width: 200px;
-    flex-grow: 0;
-    flex-shrink: 1;
-    min-width: 200px;
-  }
-}
-
-table {
-  margin-top: 25px;
-}
-
-.footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  border-top: 2px solid var(--ds-border);
-  padding: 14px;
-  background-color: var(--ds-surface, #fff);
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  button {
-    margin: 0 0 0 15px;
-
-    &:first-child {
-      margin-left: 0;
-    }
-  }
-
-  span {
-    margin-left: 15px;
-
-    &:first-child {
-      margin-left: 0;
-    }
-  }
 }
 
 p {

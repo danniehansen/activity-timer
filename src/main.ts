@@ -12,6 +12,25 @@ import { initializeOptro } from './components/optro';
 import * as Sentry from '@sentry/vue';
 import { Integrations } from '@sentry/tracing';
 
+// Primevue
+import PrimeVue from 'primevue/config';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
+import MultiSelect from 'primevue/multiselect';
+import Checkbox from 'primevue/checkbox';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import ColumnGroup from 'primevue/columngroup';
+import Slider from 'primevue/slider';
+import Row from 'primevue/row';
+
+// Styling
+import './scss/base.scss';
+import 'primeicons/primeicons.css';
+import 'primeflex/primeflex.css';
+
 let incognito = false;
 
 try {
@@ -56,6 +75,21 @@ initializeOptro();
 
 const app = createApp(Router);
 
+app.use(PrimeVue);
+app.component('DataTable', DataTable);
+app.component('Column', Column);
+app.component('Dropdown', Dropdown);
+app.component('MultiSelect', MultiSelect);
+app.component('Checkbox', Checkbox);
+app.component('InputText', InputText);
+app.component('InputNumber', InputNumber);
+app.component('ColumnGroup', ColumnGroup);
+app.component('Slider', Slider);
+app.component('Row', Row);
+
+// eslint-disable-next-line vue/no-reserved-component-names
+app.component('Button', Button);
+
 if (
   typeof import.meta.env.VITE_SENTRY_DSN === 'string' &&
   typeof import.meta.env.VITE_APP_ORIGIN === 'string'
@@ -68,7 +102,7 @@ if (
         tracingOrigins: ['localhost', import.meta.env.VITE_APP_ORIGIN, /^\//]
       })
     ],
-    tracesSampleRate: 0.01
+    tracesSampleRate: 0.0
   });
 }
 
