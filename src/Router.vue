@@ -1,9 +1,15 @@
 <template>
-  <link v-if="selectedTheme === 'dark'" rel="stylesheet" :href="darkTheme" />
+  <link
+    v-if="selectedTheme === 'dark'"
+    rel="stylesheet"
+    :href="darkTheme"
+    @load="onStyleLoaded"
+  />
   <link
     v-else-if="selectedTheme === 'light'"
     rel="stylesheet"
     :href="lightTheme"
+    @load="onStyleLoaded"
   />
 
   <CapabilityCardBackSection v-if="page === 'card-back-section'" />
@@ -34,7 +40,12 @@ const t = getTrelloInstance();
 const selectedTheme = ref<string | undefined>();
 
 const onThemeChange = (theme: 'light' | 'dark') => {
+  console.log('onThemeChange!');
   selectedTheme.value = theme;
+  setTimeout(resizeTrelloFrame);
+};
+
+const onStyleLoaded = () => {
   setTimeout(resizeTrelloFrame);
 };
 
