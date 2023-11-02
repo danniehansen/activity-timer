@@ -210,7 +210,7 @@ import {
 } from '../../../utils/formatting';
 import { ApiCard, ApiCardRowData } from './ApiCard';
 import { Ranges } from '../../../components/ranges';
-import { ExportToCsv } from 'export-to-csv';
+import { mkConfig, generateCsv, download } from 'export-to-csv';
 import UILoader from '../../../components/UILoader.vue';
 import { getSubscriptionStatus } from '../../../components/optro';
 import UIOptroStatus from '../../../components/UIOptroStatus.vue';
@@ -789,32 +789,20 @@ const exportData = () => {
     return;
   }
 
-  const data: Array<Array<string>> = [];
-
-  const csvExporter = new ExportToCsv({
+  const csvConfig = mkConfig({
     fieldSeparator: ',',
-    quoteStrings: '"',
+    quoteStrings: true,
     decimalSeparator: '.',
-    showLabels: true,
     useTextFile: false,
-    filename: 'activity-timer-trackings',
-    useBom: true
-  });
-
-  data.push(
-    tableHead.value.map((headItem) => {
-      return headItem.text;
-    })
-  );
-
-  rowDataList.value.forEach((rowData) => {
-    const row: Array<string> = [];
-
-    tableHead.value.forEach((headItem) => {
-      row.push((rowData[headItem.value] ?? '').toString());
-    });
-
-    data.push(row);
+    filename: 'activity-timer-estimates',
+    useBom: true,
+    columnHeaders: tableHead.value.map((headItem) => {
+      return {
+        key: headItem.value,
+        displayLabel: headItem.text
+      };
+    }),
+    replaceUndefinedWith: ''
   });
 
   exported.value = true;
@@ -823,7 +811,8 @@ const exportData = () => {
     exported.value = false;
   }, 1500);
 
-  csvExporter.generateCsv(data);
+  const csv = generateCsv(csvConfig)(rowDataList.value);
+  download(csvConfig)(csv);
 };
 
 trelloTick().then(() => {
