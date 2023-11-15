@@ -6,6 +6,11 @@
         v-model="estimate"
         placeholder="0"
         class="w-full"
+        :format="false"
+        :use-grouping="false"
+        :min-fraction-digits="0"
+        :max-fraction-digits="2"
+        thousand-separator=""
       />
       <label for="f-estimate">Estimate (in hours)</label>
     </span>
