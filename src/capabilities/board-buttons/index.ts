@@ -107,7 +107,7 @@ export async function getBoardButtons(): Promise<
         }
 
         items.push({
-          text: 'Version: 2.7.1'
+          text: 'Version: 2.7.3'
         });
 
         await t.popup({
