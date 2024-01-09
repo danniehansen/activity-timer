@@ -40,7 +40,6 @@ const t = getTrelloInstance();
 const selectedTheme = ref<string | undefined>();
 
 const onThemeChange = (theme: 'light' | 'dark') => {
-  console.log('onThemeChange!');
   selectedTheme.value = theme;
   setTimeout(resizeTrelloFrame);
 };

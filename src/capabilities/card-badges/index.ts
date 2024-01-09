@@ -36,7 +36,7 @@ export async function getCardBadges(
   > = [];
 
   const memberId = await getMemberId();
-  const card = await t.card('id', 'idList');
+  const card = await t.card('id');
   const cardModel = new Card(card.id);
 
   // Time badge
@@ -59,7 +59,8 @@ export async function getCardBadges(
         const hasStopOnMove = await hasSettingStopOnMove();
 
         if (hasStopOnMove) {
-          const listId = card.idList;
+          const freshCard = await t.card('idList');
+          const listId = freshCard.idList;
           const timer = timers.getByMemberId(memberId);
 
           if (timer?.listId && timer.listId !== listId) {

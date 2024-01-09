@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed possible performance issues related to auto-start feature. Card badges was registered even when settings for auto-start feature was disabled.
 - Fixed possible performance issues related to card badges for showing other peoples trackings. Badge was set to refresh every 60 second, even though it technically never needs to manually refresh as events are automatically synced across multiple clients. Increased it to 300 to avoid too many updates happening.
+- Fixed auto-start getting cancelled again at next card tick for auto-stop feature
 
 ## [2.7.2] - 2023-11-15
 
