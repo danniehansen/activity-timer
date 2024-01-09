@@ -17,6 +17,7 @@ import {
   getRequestedTimerStart
 } from '../../components/websocket';
 import { isVisible } from '../../utils/visibility';
+import { hasAutoTimer } from '../../utils/auto-timer';
 
 const clockIcon = `${window.location.origin}${ClockImageBlack}`;
 const estimateImage = `${window.location.origin}${EstimateImage}`;
@@ -89,7 +90,8 @@ export async function getCardBadges(
         timers.items.filter((item) => item.memberId !== memberId).length > 0;
 
       const badge: Trello.PowerUp.CardBadge = {
-        refresh: 60
+        // Only refresh every 5 minutes. This should be enough since updates are otherwise streamed to the other clients when they start
+        refresh: 300
       };
 
       if (othersTracking) {
@@ -117,19 +119,23 @@ export async function getCardBadges(
 
   // Auto-start request detection. Here we utilize refreshing to get the card context
   // & check up against if card is requested to be started.
-  badges.push({
-    dynamic: async function () {
-      if (card.id === getRequestedTimerStart()) {
-        clearRequestedTimerStart();
+  const hasAutoTimerFeature = await hasAutoTimer();
 
-        await cardModel.startTracking((await t.card('idList')).idList, t);
+  if (hasAutoTimerFeature) {
+    badges.push({
+      dynamic: async function () {
+        if (card.id === getRequestedTimerStart()) {
+          clearRequestedTimerStart();
+
+          await cardModel.startTracking((await t.card('idList')).idList, t);
+        }
+
+        return {
+          refresh: 1
+        };
       }
-
-      return {
-        refresh: 1
-      };
-    }
-  });
+    });
+  }
 
   return badges;
 }

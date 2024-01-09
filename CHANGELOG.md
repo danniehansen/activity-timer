@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [2.7.1] - 2023-11-15
+## [2.7.3] - 2024-01-09
+
+### Security
+
+- Updated packages to latest version matching version selectors.
+
+### Optimized
+
+- Fixed possible performance issues related to auto-start feature. Card badges was registered even when settings for auto-start feature was disabled.
+- Fixed possible performance issues related to card badges for showing other peoples trackings. Badge was set to refresh every 60 second, even though it technically never needs to manually refresh as events are automatically synced across multiple clients. Increased it to 300 to avoid too many updates happening.
+
+## [2.7.2] - 2023-11-15
 
 ### Fixed
 
