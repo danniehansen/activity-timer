@@ -1,10 +1,10 @@
 {
   "name": "activity_timer",
-  "version": "2.7.3",
+  "version": "2.7.4",
   "author": "Dannie Hansen",
   "license": "MIT",
   "scripts": {
-    "dev": "vite --port 3001 --https",
+    "dev": "vite --port 3001",
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
     "lint": "eslint --ext .js --ext .ts --ext .vue .",
@@ -17,7 +17,7 @@
     "@sentry/tracing": "^6.15.0",
     "@sentry/vue": "^6.15.0",
     "@types/jest": "^27.0.3",
-    "@vitejs/plugin-vue": "^1.9.3",
+    "@vitejs/plugin-vue": "^5.0.3",
     "@vuepic/vue-datepicker": "^3.3.1",
     "export-to-csv": "^1.2.1",
     "jest": "^27.3.1",
@@ -27,7 +27,7 @@
     "sass": "^1.43.4",
     "ts-jest": "^27.0.7",
     "typescript": "^4.4.3",
-    "vite": "^2.6.4",
+    "vite": "^5.0.12",
     "vue": "^3.2.16"
   },
   "devDependencies": {
@@ -41,6 +41,7 @@
     "eslint-plugin-unused-imports": "^3.0.0",
     "eslint-plugin-vue": "^9.15.1",
     "prettier": "2.7.1",
+    "vite-plugin-mkcert": "^1.17.3",
     "vue-eslint-parser": "^9.0.3",
     "vue-tsc": "^0.38.4"
   }
