@@ -11,6 +11,7 @@
         :min-fraction-digits="0"
         :max-fraction-digits="2"
         thousand-separator=""
+        locale="en-GB"
       />
       <label for="f-estimate">Estimate (in hours)</label>
     </span>

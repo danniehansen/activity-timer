@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="canWrite && visible"
-    class="flex flex-row justify-content-between gap-3"
+    class="flex flex-row justify-content-between gap-2"
   >
-    <div class="flex flex-row gap-3">
+    <div class="flex flex-row gap-2">
       <Button v-if="!isTracking" label="Start timer" @click="startTracking" />
       <Button
         v-else
@@ -20,7 +20,7 @@
       />
     </div>
 
-    <div v-if="hasEstimates" class="flex flex-row gap-3">
+    <div v-if="hasEstimates" class="flex flex-row gap-2">
       <Button
         :label="`Estimate: ${ownEstimateDisplay}`"
         severity="secondary"
