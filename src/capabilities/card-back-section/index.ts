@@ -1,5 +1,5 @@
 import { Trello } from '../../types/trello';
-import ClockImageBlack from '../../assets/images/clock_black.svg';
+import ClockImageBlack from '../../assets/images/clock_black.svg?url';
 
 export async function getCardBackSection(
   t: Trello.PowerUp.IFrame

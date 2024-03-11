@@ -1,6 +1,6 @@
 import { Trello } from '../../types/trello';
-import EstimateImage from '../../assets/images/estimate.svg';
-import ClockImageBlack from '../../assets/images/clock_black.svg';
+import EstimateImage from '../../assets/images/estimate.svg?url';
+import ClockImageBlack from '../../assets/images/clock_black.svg?url';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import {

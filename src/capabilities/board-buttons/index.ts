@@ -1,5 +1,5 @@
 import { Trello } from '../../types/trello';
-import ClockImageWhite from '../../assets/images/clock_white.svg';
+import ClockImageWhite from '../../assets/images/clock_white.svg?url';
 import { clearToken, getMemberId } from '../../components/trello';
 import { isVisible } from '../../utils/visibility';
 import { Card } from '../../components/card';
