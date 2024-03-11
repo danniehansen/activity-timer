@@ -1,5 +1,5 @@
 import { Trello } from '../../types/trello';
-import ClockImageWhite from '../../assets/images/clock_white.svg?url';
+import ClockImageWhite from '../../assets/images/clock_white.svg';
 import { clearToken, getMemberId } from '../../components/trello';
 import { isVisible } from '../../utils/visibility';
 import { Card } from '../../components/card';
@@ -16,8 +16,8 @@ export async function getBoardButtons(): Promise<
   return [
     {
       icon: {
-        light: `${window.location.origin}${ClockImageWhite}`,
-        dark: `${window.location.origin}${ClockImageWhite}`
+        light: ClockImageWhite,
+        dark: ClockImageWhite
       },
       text: 'Activity timer',
       callback: async (t) => {

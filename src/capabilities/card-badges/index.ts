@@ -1,6 +1,6 @@
 import { Trello } from '../../types/trello';
-import EstimateImage from '../../assets/images/estimate.svg?url';
-import ClockImageBlack from '../../assets/images/clock_black.svg?url';
+import EstimateImage from '../../assets/images/estimate.svg';
+import ClockImageBlack from '../../assets/images/clock_black.svg';
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import {
@@ -19,8 +19,8 @@ import {
 import { isVisible } from '../../utils/visibility';
 import { hasAutoTimer } from '../../utils/auto-timer';
 
-const clockIcon = `${window.location.origin}${ClockImageBlack}`;
-const estimateImage = `${window.location.origin}${EstimateImage}`;
+const clockIcon = ClockImageBlack;
+const estimateImage = EstimateImage;
 
 export async function getCardBadges(
   t: Trello.PowerUp.IFrame
