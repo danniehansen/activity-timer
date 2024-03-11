@@ -12,11 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Updated packages to latest version matching version selectors.
+- Updated node from 18 -> 20
 
 ### Fixed
 
 - Fixed locale issues with estimation input not always accepting decimals. Now it's statically configured for en-GB locale.
 - Fixed some cases of UI scroll when estimates, time spent and total estimate exceeded the visual limit.
+
+### Removed
+
+. Removed Jest and associated code as there was no actual tests.
 
 ## [2.7.4] - 2024-01-28
 

@@ -1,7 +1,7 @@
 on:
   workflow_run:
-    workflows: ["Code quality"]
-    branches: [ "develop" ]
+    workflows: ['Code quality']
+    branches: ['develop']
     types:
       - completed
 name: Release - develop
@@ -16,7 +16,7 @@ jobs:
           ref: 'develop'
       - uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 20.x
       - name: Install dependencies
         run: npm ci && cd src/api/http && npm ci && cd .. && cd websocket && npm ci
       - name: Build
