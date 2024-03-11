@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.7.4] - 2024-03-11
+
+### Security
+
+- Updated packages to latest version matching version selectors.
+
+### Fixed
+
+- Fixed locale issues with estimation input not always accepting decimals. Now it's statically configured for en-GB locale.
+- Fixed some cases of UI scroll when estimates, time spent and total estimate exceeded the visual limit.
+
 ## [2.7.4] - 2024-01-28
 
 ### Security
