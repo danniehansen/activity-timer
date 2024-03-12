@@ -16,8 +16,12 @@ export async function getBoardButtons(): Promise<
   return [
     {
       icon: {
-        light: ClockImageWhite,
-        dark: ClockImageWhite
+        light: `${
+          !ClockImageWhite.includes('http') ? window.location.origin : ''
+        }${ClockImageWhite}`,
+        dark: `${
+          !ClockImageWhite.includes('http') ? window.location.origin : ''
+        }${ClockImageWhite}`
       },
       text: 'Activity timer',
       callback: async (t) => {

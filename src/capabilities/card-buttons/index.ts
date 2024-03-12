@@ -6,7 +6,9 @@ import { settingsCallback } from './callbacks/Settings';
 import { timeSpentCallback } from './callbacks/TimeSpent';
 import { isVisible } from '../../utils/visibility';
 
-const icon = ClockImageBlack;
+const icon = `${
+  !ClockImageBlack.includes('http') ? window.location.origin : ''
+}${ClockImageBlack}`;
 
 export async function getCardButtons(): Promise<Trello.PowerUp.CardButton[]> {
   const visible = await isVisible();
