@@ -19,8 +19,12 @@ import {
 import { isVisible } from '../../utils/visibility';
 import { hasAutoTimer } from '../../utils/auto-timer';
 
-const clockIcon = `${window.location.origin}${ClockImageBlack}`;
-const estimateImage = `${window.location.origin}${EstimateImage}`;
+const clockIcon = `${
+  !ClockImageBlack.includes('http') ? window.location.origin : ''
+}${ClockImageBlack}`;
+const estimateImage = `${
+  !EstimateImage.includes('http') ? window.location.origin : ''
+}${EstimateImage}`;
 
 export async function getCardBadges(
   t: Trello.PowerUp.IFrame

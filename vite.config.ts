@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [vue(), mkcert()],
   server: { https: true },
   build: {
-    sourcemap: true
+    sourcemap: true,
+    assetsInlineLimit: 0
   }
 });

@@ -16,8 +16,12 @@ export async function getBoardButtons(): Promise<
   return [
     {
       icon: {
-        light: `${window.location.origin}${ClockImageWhite}`,
-        dark: `${window.location.origin}${ClockImageWhite}`
+        light: `${
+          !ClockImageWhite.includes('http') ? window.location.origin : ''
+        }${ClockImageWhite}`,
+        dark: `${
+          !ClockImageWhite.includes('http') ? window.location.origin : ''
+        }${ClockImageWhite}`
       },
       text: 'Activity timer',
       callback: async (t) => {
@@ -107,7 +111,7 @@ export async function getBoardButtons(): Promise<
         }
 
         items.push({
-          text: 'Version: 2.7.3'
+          text: 'Version: 2.7.5'
         });
 
         await t.popup({

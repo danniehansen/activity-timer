@@ -6,7 +6,9 @@ export async function getCardBackSection(
 ): Promise<Trello.PowerUp.CardBackSection> {
   return {
     title: 'Activity timer',
-    icon: `${window.location.origin}${ClockImageBlack}`,
+    icon: `${
+      !ClockImageBlack.includes('http') ? window.location.origin : ''
+    }${ClockImageBlack}`,
     content: {
       type: 'iframe',
       url: t.signUrl('./index.html', {

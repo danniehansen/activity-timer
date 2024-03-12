@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [2.7.4] - 2024-03-11
+## [2.7.5] - 2024-03-12
 
 ### Security
 
@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-. Removed Jest and associated code as there was no actual tests.
+- Removed Jest and associated code as there was no actual tests.
 
 ## [2.7.4] - 2024-01-28
 
