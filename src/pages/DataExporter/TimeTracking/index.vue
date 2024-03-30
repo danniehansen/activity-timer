@@ -793,14 +793,6 @@ trelloTick().then(() => {
 </script>
 
 <style lang="scss" scoped>
-.requires-pro {
-  text-align: center;
-
-  p {
-    margin-top: 0;
-  }
-}
-
 .unauthorized {
   max-width: 475px;
   text-align: center;
