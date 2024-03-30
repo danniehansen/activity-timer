@@ -8,7 +8,6 @@ import { getShowSettings } from './capabilities/show-settings';
 import { setTrelloInstance } from './components/trello';
 import { getAppKey, getAppName } from './components/settings';
 import { initializeWebsocket } from './components/websocket';
-import { initializeOptro } from './components/optro';
 import * as Sentry from '@sentry/vue';
 import { Integrations } from '@sentry/tracing';
 
@@ -70,8 +69,6 @@ if (window.location.hash) {
   setTrelloInstance(t);
   initializeWebsocket();
 }
-
-initializeOptro();
 
 const app = createApp(Router);
 

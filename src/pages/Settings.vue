@@ -4,8 +4,6 @@
   </transition>
 
   <div v-if="!loading" class="flex flex-column gap-3 pr-3 pl-3">
-    <UIOptroStatus />
-
     <div class="flex align-items-center">
       <Checkbox
         v-model="disableEstimate"
@@ -130,7 +128,6 @@ import {
   hasAutoTimer,
   setAutoTimerListId
 } from '../utils/auto-timer';
-import UIOptroStatus from '../components/UIOptroStatus.vue';
 import UILoader from '../components/UILoader.vue';
 import {
   getVisibility,

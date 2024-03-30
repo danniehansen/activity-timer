@@ -1,7 +1,5 @@
 <template>
   <div class="flex flex-column gap-3">
-    <UIOptroStatus />
-
     <div class="flex align-items-center">
       <Checkbox v-model="stopOnMove" input-id="f-stop-on-move" :binary="true" />
       <label for="f-stop-on-move" class="ml-2"
@@ -27,7 +25,6 @@ import {
   setSettingStopOnMove
 } from '../components/settings';
 import { resizeTrelloFrame } from '../components/trello';
-import UIOptroStatus from '../components/UIOptroStatus.vue';
 
 const subscribeForNews = ref('');
 const stopOnMove = ref(false);

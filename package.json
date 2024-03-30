@@ -12,7 +12,6 @@
     "analyze": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@optro/api-client": "^1.0.5",
     "@sentry/tracing": "^6.15.0",
     "@sentry/vue": "^6.15.0",
     "@vitejs/plugin-vue": "^5.0.3",

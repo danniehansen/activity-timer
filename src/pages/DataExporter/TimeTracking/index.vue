@@ -3,8 +3,6 @@
     <UILoader v-if="loading" />
   </transition>
 
-  <UIOptroStatus v-if="ready" style="border-radius: 0" />
-
   <div v-if="isIncognito" class="unauthorized">
     <p>
       It appears that you might be using incognito mode in your browser.
@@ -40,7 +38,7 @@
     v-else-if="ready && isAuthorized"
     class="authorized flex flex-column gap-3"
   >
-    <div v-if="hasSubscription" class="flex flex-wrap column-gap-3 row-gap-4">
+    <div class="flex flex-wrap column-gap-3 row-gap-4">
       <div class="p-float-label">
         <MultiSelect
           v-model="members"
@@ -133,19 +131,6 @@
       </div>
     </div>
 
-    <div v-else class="requires-pro">
-      <p>
-        Filtering in data export is restricted to Pro users only. Free plan can
-        only do full exports.
-        <a
-          :href="`https://www.optro.cloud/app/${powerupId}`"
-          target="_blank"
-          rel="noreferrer"
-          >Read more about the Pro plan here.</a
-        >
-      </p>
-    </div>
-
     <DataTable
       v-if="rowDataList.length > 0"
       :value="rowDataList"
@@ -198,7 +183,6 @@ import { computed, CSSProperties, ref, watch } from 'vue';
 import { getAppKey } from '../../../components/settings';
 import {
   clearToken,
-  getPowerupId,
   getTrelloCard,
   getTrelloInstance
 } from '../../../components/trello';
@@ -212,8 +196,6 @@ import { ApiCard, ApiCardRowData } from './ApiCard';
 import { Ranges } from '../../../components/ranges';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import UILoader from '../../../components/UILoader.vue';
-import { getSubscriptionStatus } from '../../../components/optro';
-import UIOptroStatus from '../../../components/UIOptroStatus.vue';
 import { setStorage, getStorage } from '../../../utils/local-storage';
 import { Option } from '../../../types/dropdown';
 
@@ -247,7 +229,6 @@ const groupBy = ref<'card' | 'card_and_member' | undefined>();
 const loading = ref(true);
 const ready = ref(false);
 const exported = ref(false);
-const hasSubscription = ref(false);
 const uniqueLabels = ref<Trello.PowerUp.Label[]>([]);
 const defaultColumns: (keyof ApiCardRowData)[] = [
   'card.title',
@@ -258,8 +239,6 @@ const defaultColumns: (keyof ApiCardRowData)[] = [
   'time_seconds',
   'time_formatted'
 ];
-
-const powerupId = getPowerupId();
 
 const memberById: {
   [key: string]: Trello.PowerUp.Member;
@@ -709,14 +688,6 @@ async function getData() {
 
 async function initialize() {
   const board = await getTrelloInstance().board('members');
-
-  // Get the initial subscription status
-  hasSubscription.value = await getSubscriptionStatus();
-
-  // Re-fresh subscription status every 5 minute
-  setInterval(async () => {
-    hasSubscription.value = await getSubscriptionStatus();
-  }, 60 * 1000 * 5);
 
   board.members.forEach((member) => {
     memberById[member.id] = member;

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.8.0] - 2024-03-30
+
+### Security
+
+- Updated packages to latest version matching version selectors.
+
+### Removed
+
+- Removed Optro. Now everyone has pro features for free!
+
 ## [2.7.5] - 2024-03-12
 
 ### Security
