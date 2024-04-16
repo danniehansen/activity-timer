@@ -42,8 +42,6 @@ jobs:
       - name: cdk deploy
         env:
           ACT_ENV: 'prod'
-          AWS_ACCESS_KEY_ID: ${{ secrets.V2_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.V2_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: 'eu-west-1'
           TRELLO_SECRET: ${{ secrets.ACT_TRELLO_SECRET }}
         run: cd infrastructure && npm ci && npx cdk bootstrap && npx cdk deploy --require-approval never
