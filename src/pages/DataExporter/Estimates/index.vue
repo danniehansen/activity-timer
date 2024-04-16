@@ -471,11 +471,22 @@ async function getData() {
   const board = await getTrelloInstance().board('id');
 
   try {
-    const data = await fetch(
-      `https://api.trello.com/1/boards/${
-        board.id
-      }/cards/all?pluginData=true&fields=id,idList,name,desc,labels,pluginData,closed&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
-    ).then<Trello.PowerUp.Card[]>((res) => res.json());
+    const data: Trello.PowerUp.Card[] = [];
+    let moreData = true;
+    let page = 0;
+
+    while (moreData) {
+      const rawData = await fetch(
+        `https://api.trello.com/1/boards/${
+          board.id
+        }/cards/all?pluginData=true&limit=1&page=${page}&fields=id,idList,name,desc,labels,pluginData,closed&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
+      ).then<Trello.PowerUp.Card[]>((res) => res.json());
+
+      moreData = rawData.length > 0;
+      page++;
+
+      data.push(...rawData);
+    }
 
     const boardData = await fetch(
       `https://api.trello.com/1/boards/${
