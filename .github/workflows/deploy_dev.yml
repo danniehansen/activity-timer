@@ -4,6 +4,9 @@ on:
     branches: ['develop']
     types:
       - completed
+permissions:
+  id-token: write
+  contents: read
 name: Release - develop
 jobs:
   build-and-deploy:
@@ -11,6 +14,12 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     environment: Develop
     steps:
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::265358888522:role/github-deployment
+          role-session-name: github-main-deployment
+          aws-region: eu-west-1
       - uses: actions/checkout@v4
         with:
           ref: 'develop'
