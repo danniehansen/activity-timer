@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.8.1] - 2024-04-16
+
+### Security
+
+- Updated packages to latest version matching version selectors.
+- Changed IAM based authentication for CDK to use OIDC
+
 ## [2.8.0] - 2024-03-30
 
 ### Security
