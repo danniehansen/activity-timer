@@ -20,6 +20,7 @@ import Dropdown from 'primevue/dropdown';
 import MultiSelect from 'primevue/multiselect';
 import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
+import Message from 'primevue/message';
 import InputNumber from 'primevue/inputnumber';
 import ColumnGroup from 'primevue/columngroup';
 import Slider from 'primevue/slider';
@@ -82,6 +83,7 @@ app.component('InputText', InputText);
 app.component('InputNumber', InputNumber);
 app.component('ColumnGroup', ColumnGroup);
 app.component('Slider', Slider);
+app.component('Message', Message);
 app.component('Row', Row);
 
 // eslint-disable-next-line vue/no-reserved-component-names

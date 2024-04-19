@@ -7,12 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [2.8.1] - 2024-04-16
+## [2.8.1] - 2024-04-19
 
 ### Security
 
 - Updated packages to latest version matching version selectors.
 - Changed IAM based authentication for CDK to use OIDC
+
+### Fixed
+
+- Fixed an issue with time tracking / estiamtes data exporter not being able to pull cards data if the /all API responded with more than 1.000 cards. We will now fall back to fetch closed, open and visible cards one-by-one to try and display as much data as possible. Disclaimer added to both pages when this is happening.
 
 ## [2.8.0] - 2024-03-30
 

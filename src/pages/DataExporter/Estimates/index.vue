@@ -38,6 +38,11 @@
     v-else-if="ready && isAuthorized"
     class="authorized flex flex-column gap-3"
   >
+    <Message v-if="apiDisclaimer" severity="info"
+      >Note: Some Trello cards may be unavailable; we prioritize fetching open,
+      closed, and visible ones for optimal service.</Message
+    >
+
     <div class="flex flex-column gap-3">
       <div class="flex flex-wrap gap-3">
         <div class="p-float-label">
@@ -184,6 +189,7 @@ const columns = ref<string[]>([]);
 const listOptions = ref<Option[]>([]);
 const lists = ref<string[]>([]);
 const isIncognito = ref(false);
+const apiDisclaimer = ref(false);
 const unrecognizedError = ref(false);
 const rejectedAuth = ref(false);
 const groupByCard = ref(false);
@@ -471,22 +477,11 @@ async function getData() {
   const board = await getTrelloInstance().board('id');
 
   try {
-    const data: Trello.PowerUp.Card[] = [];
-    let moreData = true;
-    let page = 0;
-
-    while (moreData) {
-      const rawData = await fetch(
-        `https://api.trello.com/1/boards/${
-          board.id
-        }/cards/all?pluginData=true&limit=1&page=${page}&fields=id,idList,name,desc,labels,pluginData,closed&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
-      ).then<Trello.PowerUp.Card[]>((res) => res.json());
-
-      moreData = rawData.length > 0;
-      page++;
-
-      data.push(...rawData);
-    }
+    const data = await fetch(
+      `https://api.trello.com/1/boards/${
+        board.id
+      }/cards/all?pluginData=true&fields=id,idList,name,desc,labels,idBoard,pluginData,closed&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
+    ).then<Trello.PowerUp.Card[]>((res) => res.json());
 
     const boardData = await fetch(
       `https://api.trello.com/1/boards/${
@@ -494,24 +489,70 @@ async function getData() {
       }?fields=name&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
     ).then<Trello.PowerUp.Board>((res) => res.json());
 
-    cards = data
-      // Remove cards which has been archived
-      .filter((card) => !card.closed)
-      .map<ApiCard>((card) => {
-        return new ApiCard(boardData, card, listById, memberById, members);
-      });
+    cards = data.map<ApiCard>((card) => {
+      return new ApiCard(boardData, card, listById, memberById, members);
+    });
 
     lastDataFetch.value = Date.now();
 
     getUniqueLabels();
   } catch (e) {
-    try {
-      await clearToken();
-    } catch (e) {
-      // Ignore exceptions in case no token exists
+    // Fallback to query the card types one at a time if there is simply too many in /all
+
+    const boardData = await fetch(
+      `https://api.trello.com/1/boards/${
+        board.id
+      }?fields=name&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
+    ).then<Trello.PowerUp.Board>((res) => res.json());
+
+    let failedFetches = 0;
+
+    // Reset cards before we push new items into it
+    cards = [];
+
+    // To avoid duplicates in case of overlapping filters, we keep track of already added cards here
+    const takenCards: string[] = [];
+
+    for (const type of ['closed', 'open', 'visible']) {
+      try {
+        const data = (
+          await fetch(
+            `https://api.trello.com/1/boards/${
+              board.id
+            }/cards/${type}?pluginData=true&fields=id,idList,name,desc,labels,idBoard,pluginData,closed&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
+          ).then<Trello.PowerUp.Card[]>((res) => res.json())
+        ).filter((card) => !takenCards.includes(card.id));
+
+        cards.push(
+          ...data.map<ApiCard>((card) => {
+            return new ApiCard(boardData, card, listById, memberById, members);
+          })
+        );
+
+        takenCards.push(...data.map((card) => card.id));
+
+        apiDisclaimer.value = true;
+      } catch (e) {
+        failedFetches++;
+      }
     }
 
-    await trelloTick();
+    // If all of the fetches fail, then we assume the token is invalid
+    if (failedFetches === 4) {
+      try {
+        await clearToken();
+      } catch (e) {
+        // Ignore exceptions in case no token exists
+      }
+
+      await getTrelloCard().getRestApi().clearToken();
+
+      await trelloTick();
+    } else {
+      lastDataFetch.value = Date.now();
+
+      getUniqueLabels();
+    }
   }
 
   await new Promise((resolve) =>
