@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.8.2] - 2024-10-28
+
+### Security
+
+- Updated packages to latest version matching version selectors.
+
+### Changed
+
+- Changed the behavior of the "Manage Time" card action to first prompt a user selection that leads to individual trackings. This update addresses recent issues in Trello where the popup doesn't provide overflow scrolling for all users. Hopefully, this will reduce the likelihood of this problem recurring.
+
+
 ## [2.8.1] - 2024-04-19
 
 ### Security
