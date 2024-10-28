@@ -197,6 +197,83 @@ function openManuallyAdd(
   });
 }
 
+async function manageTimeForMember(t: Trello.PowerUp.IFrame, memberId: string) {
+  const board = await t.board('members');
+  const member = board.members.find((member) => member.id === memberId);
+
+  return t.popup({
+    title: `Manage time: ${member?.fullName ?? 'N/A'}`,
+    items: async function (t) {
+      const card = await Card.getFromContext(t);
+      const timers = await card.getTimers();
+      const ranges = await card.getRanges();
+
+      const items: Trello.PowerUp.PopupOptionsItem[] = [];
+
+      const memberRanges = ranges.items.filter((range) => {
+        return range.memberId === memberId;
+      });
+
+      const timer = timers.getByMemberId(memberId);
+
+      if (memberRanges.length > 0 || timer) {
+        memberRanges.forEach((range) => {
+          items.push(getManageRow(card, ranges, range));
+        });
+
+        if (timer) {
+          items.push({
+            text: `Running: ${formatDate(
+              new Date(timer.start * 1000)
+            )} (${formatTime(timer.timeInSecond, true)})`,
+            callback: function (t) {
+              return t.popup({
+                title: 'Active timer',
+                items: async function () {
+                  return [
+                    {
+                      text: 'Stop time tracking',
+                      callback: async (t) => {
+                        return t.popup({
+                          type: 'confirm',
+                          title: 'Stop time tracking',
+                          message:
+                            "You're about to stop a time tracking. Are you sure?",
+                          confirmText: 'Yes, stop timer',
+                          onConfirm: async (t) => {
+                            await card.stopTrackingByMemberId(memberId, t);
+                            return t.closePopup();
+                          },
+                          confirmStyle: 'danger',
+                          cancelText: 'No, cancel'
+                        });
+                      }
+                    }
+                  ];
+                }
+              });
+            }
+          });
+        }
+
+        const timeSpent =
+          memberRanges.reduce((a, b) => a + b.diff, 0) +
+          (timer ? timer.timeInSecond : 0);
+
+        items.push({
+          text: '--------'
+        });
+
+        items.push({
+          text: `Time spent: ${formatTime(timeSpent)}`
+        });
+      }
+
+      return items;
+    }
+  });
+}
+
 export async function manageTimeCallback(t: Trello.PowerUp.IFrame) {
   return t.popup({
     title: 'Manage time',
@@ -231,59 +308,13 @@ export async function manageTimeCallback(t: Trello.PowerUp.IFrame) {
           const timer = timers.getByMemberId(member.id);
 
           if (memberRanges.length > 0 || timer) {
-            items.push({
-              text: formatMemberName(member) + ':'
-            });
-
-            memberRanges.forEach((range) => {
-              items.push(getManageRow(card, ranges, range));
-            });
-
-            if (timer) {
-              items.push({
-                text: `Running: ${formatDate(
-                  new Date(timer.start * 1000)
-                )} (${formatTime(timer.timeInSecond, true)})`,
-                callback: function (t) {
-                  return t.popup({
-                    title: 'Active timer',
-                    items: async function () {
-                      return [
-                        {
-                          text: 'Stop time tracking',
-                          callback: async (t) => {
-                            return t.popup({
-                              type: 'confirm',
-                              title: 'Stop time tracking',
-                              message:
-                                "You're about to stop a time tracking. Are you sure?",
-                              confirmText: 'Yes, stop timer',
-                              onConfirm: async (t) => {
-                                await card.stopTrackingByMemberId(member.id, t);
-                                return t.closePopup();
-                              },
-                              confirmStyle: 'danger',
-                              cancelText: 'No, cancel'
-                            });
-                          }
-                        }
-                      ];
-                    }
-                  });
-                }
-              });
-            }
-
             const timeSpent =
               memberRanges.reduce((a, b) => a + b.diff, 0) +
               (timer ? timer.timeInSecond : 0);
 
             items.push({
-              text: `Time spent: ${formatTime(timeSpent)}`
-            });
-
-            items.push({
-              text: '--------'
+              text: `${formatMemberName(member)}: ${formatTime(timeSpent)}`,
+              callback: (t) => manageTimeForMember(t, member.id)
             });
           }
         });
@@ -292,19 +323,10 @@ export async function manageTimeCallback(t: Trello.PowerUp.IFrame) {
         .filter((range) => memberIds.indexOf(range.memberId) === -1)
         .forEach((range) => {
           items.push({
-            text: 'N/A:'
-          });
-
-          items.push(getManageRow(card, ranges, range));
-
-          items.push({
-            text: '--------'
+            text: 'N/A:',
+            callback: (t) => manageTimeForMember(t, range.memberId)
           });
         });
-
-      if (items.length > 0) {
-        items.splice(items.length - 1, 1);
-      }
 
       if (items.length > 0) {
         items.push({
