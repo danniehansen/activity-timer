@@ -659,6 +659,8 @@ const exportData = () => {
     exported.value = false;
   }, 1500);
 
+  // TODO: Improve typings. It works, typing is just not quite right
+  // @ts-ignore
   const csv = generateCsv(csvConfig)(rowDataList.value);
   download(csvConfig)(csv);
 };
