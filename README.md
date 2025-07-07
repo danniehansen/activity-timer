@@ -1,7 +1,19 @@
-# Looking for new maintainer
-Activity timer has been a passion project of mine for a number of years. However, as of late i have had little to no motivation moving the project forward. I've simply had too much happening privately to progressively make Activity timer better.
+# 🚀 The Next Generation is Coming: Limita
 
-For this reason I'm looking for a new maintainer. If you're open to continue maintaining Activity timer, and developer new functionality - please reach out.
+**Activity Timer continues to evolve!** We're building **[Limita](https://limita.org/)** - the next generation time tracking and project management platform from the team behind Activity Timer.
+
+### What's Coming in Limita:
+- 🎯 **Advanced Project Management** - Sprints, Kanban boards, and team collaboration
+- 📊 **Smart Estimation & Alerts** - Get notified when tasks exceed time estimates
+- 🔗 **Seamless Integrations** - Trello, Jira, Slack, Google Calendar, and more
+- 📈 **Advanced Analytics** - JQL-style reporting with powerful query builder
+- 🔄 **Complete Migration Support** - Bring all your Activity Timer data with you
+
+**Activity Timer will continue to be maintained and supported** while we build the future of time tracking.
+
+**[Join the Beta Waitlist at limita.org →](https://limita.org/)**
+
+---
 
 # Activity timer
 
