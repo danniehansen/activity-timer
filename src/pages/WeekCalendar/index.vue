@@ -377,7 +377,14 @@ interface TimeEntry {
   start: Date;
   end: Date;
   memberId: string;
-  range: Range;
+  range: {
+    memberId: string;
+    start: number;
+    end: number;
+    diff: number;
+    rangeId: number;
+    serialize: () => [string, number, number];
+  };
   isStacked: boolean;
   stackOffset: number;
   isMultiDay: boolean;
@@ -1318,7 +1325,7 @@ async function loadTimeEntries() {
                       segmentStart >= weekStart &&
                       segmentStart <= weekEnd
                     ) {
-                      entries.push({
+                      const entry: TimeEntry = {
                         id: `${card.id}-${
                           range.rangeId
                         }-${currentDate.getTime()}`,
@@ -1334,7 +1341,8 @@ async function loadTimeEntries() {
                         originalStart: startDate,
                         originalEnd: endDate,
                         isRunning: false
-                      });
+                      };
+                      entries.push(entry);
                     }
 
                     // Move to next day
@@ -1374,7 +1382,7 @@ async function loadTimeEntries() {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
-          entries.push({
+          const runningEntry: TimeEntry = {
             id: `${card.id}-running-${timer.memberId}`,
             cardId: card.id,
             cardName: card.name,
@@ -1395,7 +1403,8 @@ async function loadTimeEntries() {
             originalStart: startDate,
             originalEnd: now,
             isRunning: true
-          });
+          };
+          entries.push(runningEntry);
         }
       });
     }
