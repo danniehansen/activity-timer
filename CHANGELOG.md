@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.8.3] - 2025-09-30
+
+### Security
+
+- Updated packages to latest version matching version selectors.
+
+### Changed
+
+- Reintroduced sentry for exception logging
+
 ## [2.8.2] - 2024-10-28
 
 ### Security
