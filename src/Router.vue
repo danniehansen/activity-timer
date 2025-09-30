@@ -17,6 +17,7 @@
   <MemberSettings v-else-if="page === 'member-settings'" />
   <NotificationSettings v-else-if="page === 'notification-settings'" />
   <Settings v-else-if="page === 'settings'" />
+  <WeekCalendar v-else-if="page === 'calendar'" />
   <DataExporterTime v-else-if="page === 'time'" />
   <DataExporterEstimates v-else-if="page === 'estimates'" />
   <DatetimePicker v-else-if="page === 'datetime'" />
@@ -29,6 +30,7 @@ import ChangeEstimate from './capabilities/card-back-section/change_estimate.vue
 import MemberSettings from './pages/MemberSettings.vue';
 import NotificationSettings from './pages/NotificationSettings.vue';
 import Settings from './pages/Settings.vue';
+import WeekCalendar from './pages/WeekCalendar/index.vue';
 import DataExporterTime from './pages/DataExporter/TimeTracking/index.vue';
 import DataExporterEstimates from './pages/DataExporter/Estimates/index.vue';
 import DatetimePicker from './components/DatetimePicker.vue';

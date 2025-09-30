@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [2.8.3] - 2025-09-30
+## [2.9.0] - 2025-09-30
 
 ### Security
 
@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Reintroduced sentry for exception logging
+
+### Added
+
+ - Added new calendar view that allows users to get a better idea of their weekly work. It helps them log time, move trackings, resize trackings, locate running trackers and more.
 
 ## [2.8.2] - 2024-10-28
 

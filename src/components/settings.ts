@@ -94,3 +94,35 @@ export function getWebsocket() {
 
   return import.meta.env.VITE_WEBSOCKET;
 }
+
+// Calendar settings
+export interface CalendarSettings {
+  weekStartDay: 0 | 1; // 0 = Sunday, 1 = Monday
+  businessHoursStart: number; // 0-23
+  businessHoursEnd: number; // 0-23
+}
+
+export async function getCalendarSettings(): Promise<CalendarSettings> {
+  const settings = await getTrelloInstance().get<CalendarSettings>(
+    'member',
+    'private',
+    'act-timer-calendar-settings'
+  );
+
+  return {
+    weekStartDay: settings?.weekStartDay ?? 1,
+    businessHoursStart: settings?.businessHoursStart ?? 8,
+    businessHoursEnd: settings?.businessHoursEnd ?? 18
+  };
+}
+
+export async function setCalendarSettings(
+  settings: CalendarSettings
+): Promise<void> {
+  await getTrelloInstance().set(
+    'member',
+    'private',
+    'act-timer-calendar-settings',
+    settings
+  );
+}

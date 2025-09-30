@@ -35,21 +35,31 @@ export async function getBoardButtons(): Promise<
 
         const items: Trello.PowerUp.PopupOptionsItem[] = [
           {
-            text: 'Data exporter - Time tracking',
+            text: 'Week Calendar',
             callback: async (t) => {
               await t.modal({
-                url: t.signUrl('./index.html?page=time'),
-                title: 'Activity timer - Data exporter - Time tracking',
+                url: t.signUrl('./index.html?page=calendar'),
+                title: 'Activity timer - Week Calendar',
                 fullscreen: true
               });
             }
           },
           {
-            text: 'Data exporter - Estimates',
+            text: 'Export Time Tracking',
+            callback: async (t) => {
+              await t.modal({
+                url: t.signUrl('./index.html?page=time'),
+                title: 'Activity timer - Export Time Tracking',
+                fullscreen: true
+              });
+            }
+          },
+          {
+            text: 'Export Estimates',
             callback: async (t) => {
               await t.modal({
                 url: t.signUrl('./index.html?page=estimates'),
-                title: 'Activity timer - Data exporter - Estimates',
+                title: 'Activity timer - Export Estimates',
                 fullscreen: true
               });
             }
@@ -58,24 +68,24 @@ export async function getBoardButtons(): Promise<
 
         if (hasRestApiToken) {
           items.push({
-            text: 'Clear RestApi access',
+            text: 'Reset Connection',
             callback: async (t) => {
               return t.popup({
                 type: 'confirm',
                 title: 'Are you sure?',
                 message:
-                  'This will disrupt the auto tracking start feature if you have it enabled.',
-                confirmText: 'Yes, clear RestApi access',
+                  "This will reset your connection. Use this if features aren't working properly. You'll need to reconnect afterwards.",
+                confirmText: 'Yes, reset',
                 onConfirm: async (t) => {
                   await clearToken(t);
                   await t.closePopup();
                   await t.alert({
-                    message: 'Successfully cleared RestApi access',
+                    message: 'Connection reset successfully',
                     display: 'success'
                   });
                 },
                 confirmStyle: 'danger',
-                cancelText: 'No, cancel'
+                cancelText: 'Cancel'
               });
             }
           });
@@ -98,6 +108,8 @@ export async function getBoardButtons(): Promise<
             items.push({
               text: 'Timer: Running. Click to open card',
               callback: async (t) => {
+                t.closePopup();
+
                 return t.showCard(card.id);
               }
             });
@@ -111,7 +123,7 @@ export async function getBoardButtons(): Promise<
         }
 
         items.push({
-          text: 'Version: 2.8.3'
+          text: 'Version: 2.9.0'
         });
 
         await t.popup({
