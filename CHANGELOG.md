@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - Added new calendar view that allows users to get a better idea of their weekly work. It helps them log time, move trackings, resize trackings, locate running trackers and more.
 
+ - Added estimate vs time spent viewer on card display
+
+ - Reworked card UI and enabled the user to log time entries manually
+
 ## [2.8.2] - 2024-10-28
 
 ### Security

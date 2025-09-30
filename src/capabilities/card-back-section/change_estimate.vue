@@ -1,6 +1,8 @@
 <template>
-  <div class="flex flex-column gap-3 align-items-start pt-4">
-    <span class="p-float-label">
+  <div
+    class="flex flex-column align-items-start pt-4 change-estimate-container"
+  >
+    <span class="p-float-label w-full">
       <InputNumber
         id="f-estimate"
         v-model="estimate"
@@ -16,7 +18,7 @@
       <label for="f-estimate">Estimate (in hours)</label>
     </span>
 
-    <Button label="Save estimate" @click="save" />
+    <Button label="Save estimate" class="w-full" @click="save" />
   </div>
 </template>
 
@@ -64,3 +66,9 @@ fetchEstimate();
 
 setTimeout(resizeTrelloFrame);
 </script>
+
+<style scoped>
+.change-estimate-container {
+  gap: 1.5rem;
+}
+</style>

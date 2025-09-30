@@ -100,6 +100,38 @@
         :show-clear="visibilityMembers.length > 0"
       />
     </div>
+
+    <!-- Support and Limita info -->
+    <div class="support-section">
+      <h3 class="support-heading">🚀 Activity Timer → Limita</h3>
+      <p class="support-text">
+        Activity Timer is evolving into
+        <a
+          href="https://limita.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="support-link"
+          >Limita</a
+        >
+        - the next generation of time tracking and project management.
+      </p>
+      <div class="support-contact">
+        <p class="support-text">
+          <strong>Need help?</strong><br />
+          <a
+            href="https://github.com/danniehansen/activity-timer/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="support-link"
+            >Report issues on GitHub</a
+          >
+          or email
+          <a href="mailto:dannie@limita.org" class="support-link"
+            >dannie@limita.org</a
+          >
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -334,5 +366,69 @@ initialize();
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.support-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+}
+
+html[data-color-mode='dark'] .support-section {
+  background-color: #2d3748;
+  border-color: #4a5568;
+}
+
+.support-heading {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+html[data-color-mode='dark'] .support-heading {
+  color: #e2e8f0;
+}
+
+.support-text {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #495057;
+}
+
+html[data-color-mode='dark'] .support-text {
+  color: #cbd5e0;
+}
+
+.support-contact {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #dee2e6;
+}
+
+html[data-color-mode='dark'] .support-contact {
+  border-top-color: #4a5568;
+}
+
+.support-link {
+  color: #0079bf;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.support-link:hover {
+  color: #005a8c;
+  text-decoration: underline;
+}
+
+html[data-color-mode='dark'] .support-link {
+  color: #4dabf7;
+}
+
+html[data-color-mode='dark'] .support-link:hover {
+  color: #74c0fc;
 }
 </style>

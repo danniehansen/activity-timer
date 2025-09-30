@@ -14,6 +14,7 @@
 
   <CapabilityCardBackSection v-if="page === 'card-back-section'" />
   <ChangeEstimate v-else-if="page === 'change-estimate'" />
+  <AddTimeManually v-else-if="page === 'add-time-manually'" />
   <MemberSettings v-else-if="page === 'member-settings'" />
   <NotificationSettings v-else-if="page === 'notification-settings'" />
   <Settings v-else-if="page === 'settings'" />
@@ -27,6 +28,7 @@
 import { getTrelloInstance, resizeTrelloFrame } from './components/trello';
 import CapabilityCardBackSection from './capabilities/card-back-section/view.vue';
 import ChangeEstimate from './capabilities/card-back-section/change_estimate.vue';
+import AddTimeManually from './capabilities/card-back-section/add_time_manually.vue';
 import MemberSettings from './pages/MemberSettings.vue';
 import NotificationSettings from './pages/NotificationSettings.vue';
 import Settings from './pages/Settings.vue';
