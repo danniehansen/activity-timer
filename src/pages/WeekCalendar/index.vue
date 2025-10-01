@@ -369,6 +369,7 @@ import {
   getCalendarSettings,
   setCalendarSettings
 } from '../../components/settings';
+import * as Sentry from '@sentry/vue';
 
 interface TimeEntry {
   id: string;
@@ -957,6 +958,7 @@ async function createTimeEntry(cardId: string) {
       duration: 3
     });
   } catch (error) {
+    Sentry.captureException(error);
     console.error('Failed to create time entry:', error);
     await getTrelloCard().alert({
       message: 'Failed to create time entry',
@@ -1029,6 +1031,7 @@ async function onDeleteEntry(entry: TimeEntry) {
     // Reload time entries
     await loadTimeEntries();
   } catch (error) {
+    Sentry.captureException(error);
     console.error('Failed to delete time entry:', error);
     alert('Failed to delete time entry. Please try again.');
   } finally {
@@ -1201,6 +1204,7 @@ async function updateTimeEntry(entry: TimeEntry, newStart: Date, newEnd: Date) {
       duration: 2
     });
   } catch (error) {
+    Sentry.captureException(error);
     console.error('Failed to update time entry:', error);
     await getTrelloCard().alert({
       message: 'Failed to update time entry',
@@ -1434,53 +1438,63 @@ async function loadTimeEntries() {
 }
 
 async function initialize() {
-  // Show loader for initialization
-  savingEntry.value = true;
-  loadingText.value = 'Initializing calendar...';
+  try {
+    // Show loader for initialization
+    savingEntry.value = true;
+    loadingText.value = 'Initializing calendar...';
 
-  // Load calendar settings
-  calendarSettings.value = await getCalendarSettings();
+    // Load calendar settings
+    calendarSettings.value = await getCalendarSettings();
 
-  // Initialize week start
-  currentWeekStart.value = getWeekStart(
-    new Date(),
-    calendarSettings.value.weekStartDay
-  );
+    // Initialize week start
+    currentWeekStart.value = getWeekStart(
+      new Date(),
+      calendarSettings.value.weekStartDay
+    );
 
-  // Get board members
-  const board = await getTrelloInstance().board('members', 'memberships');
+    // Get board members
+    const board = await getTrelloInstance().board('members', 'memberships');
 
-  board.members.forEach((member) => {
-    memberById[member.id] = member;
-  });
+    board.members.forEach((member) => {
+      memberById[member.id] = member;
+    });
 
-  // Check if current user is admin
-  const currentMember = await getTrelloInstance().member('id');
-  const membership = board.memberships?.find(
-    (m) => m.idMember === currentMember.id
-  );
-  isAdmin.value = membership?.memberType === 'admin';
+    // Check if current user is admin
+    const currentMember = await getTrelloInstance().member('id');
+    const membership = board.memberships?.find(
+      (m) => m.idMember === currentMember.id
+    );
+    isAdmin.value = membership?.memberType === 'admin';
 
-  memberOptions.value = board.members
-    .sort((a, b) => {
-      const nameA = (a.fullName ?? '').toUpperCase();
-      const nameB = (b.fullName ?? '').toUpperCase();
-      return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
-    })
-    .map((member) => ({
-      value: member.id,
-      text: member.fullName || member.username || 'Unknown'
-    }));
+    memberOptions.value = board.members
+      .sort((a, b) => {
+        const nameA = (a.fullName ?? '').toUpperCase();
+        const nameB = (b.fullName ?? '').toUpperCase();
+        return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+      })
+      .map((member) => ({
+        value: member.id,
+        text: member.fullName || member.username || 'Unknown'
+      }));
 
-  if (isAuthorized.value) {
-    // loadTimeEntries will manage the loader (change text, ensure 2s minimum, then hide)
-    await loadTimeEntries();
-  } else {
-    // If not authorized, just hide the loading spinner
-    savingEntry.value = false;
+    if (isAuthorized.value) {
+      // loadTimeEntries will manage the loader (change text, ensure 2s minimum, then hide)
+      await loadTimeEntries();
+    } else {
+      // If not authorized, just hide the loading spinner
+      savingEntry.value = false;
+    }
+
+    ready.value = true;
+  } catch (e) {
+    Sentry.captureException(e);
+
+    await getTrelloCard().alert({
+      message: 'An error occurred while initializing the calendar',
+      display: 'error',
+      duration: 5
+    });
   }
-
-  ready.value = true;
 }
 
 async function trelloTick() {
@@ -1512,6 +1526,8 @@ async function authorize() {
       rejectedAuth.value = true;
       return;
     }
+
+    Sentry.captureException(e);
 
     await clearToken();
     throw e;

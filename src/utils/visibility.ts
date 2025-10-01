@@ -1,4 +1,5 @@
 import { getTrelloInstance } from '../components/trello';
+import * as Sentry from '@sentry/vue';
 
 export enum Visibility {
   ALL,
@@ -25,25 +26,30 @@ export async function getVisibility(): Promise<Visibility> {
 }
 
 export async function isVisible(): Promise<boolean> {
-  const visibility = await getVisibility();
+  try {
+    const visibility = await getVisibility();
 
-  switch (visibility) {
-    case Visibility.SPECIFIC_MEMBERS: {
-      const members = await getVisibilityMembers();
-      const member = await getTrelloInstance().member('id');
+    switch (visibility) {
+      case Visibility.SPECIFIC_MEMBERS: {
+        const members = await getVisibilityMembers();
+        const member = await getTrelloInstance().member('id');
 
-      return members.length === 0 || members.includes(member.id);
+        return members.length === 0 || members.includes(member.id);
+      }
+
+      case Visibility.MEMBERS_OF_BOARD: {
+        const members = await getTrelloInstance().board('members');
+        const member = await getTrelloInstance().member('id');
+
+        return members.members.map((mem) => mem.id).includes(member.id);
+      }
     }
 
-    case Visibility.MEMBERS_OF_BOARD: {
-      const members = await getTrelloInstance().board('members');
-      const member = await getTrelloInstance().member('id');
-
-      return members.members.map((mem) => mem.id).includes(member.id);
-    }
+    return true;
+  } catch (e) {
+    Sentry.captureException(e);
+    return true;
   }
-
-  return true;
 }
 
 export async function setVisibility(visibility: Visibility): Promise<void> {
