@@ -1,43 +1,33 @@
 <template>
-  <transition name="fade">
-    <UILoader v-if="loading" />
-  </transition>
-
-  <div v-if="isIncognito" class="unauthorized">
-    <p>
-      It appears that you might be using incognito mode in your browser.
-      Unfortunately some internal functionality does not work in Trello that is
-      required for this page to work. If you wan't to use the data exporter tool
-      you will have to jump out of incognito.
-    </p>
+  <!-- Loading Spinner -->
+  <div v-if="savingEntry" class="saving-overlay">
+    <div class="saving-spinner">
+      <div class="spinner"></div>
+      <div class="saving-text">{{ loadingText }}</div>
+    </div>
   </div>
 
-  <div v-else-if="unrecognizedError" class="unauthorized">
-    <p>
-      Woops. An unrecognized error occurred. Our system have automatically
-      logged it & will be looking into the matter. Please try again later or
-      with a different browser.
-    </p>
-  </div>
+  <AuthSplash v-if="isIncognito" type="incognito" feature="exports" />
 
-  <div v-else-if="!isAuthorized" class="unauthorized">
-    <p>
-      To access estimates data you need to allow Activity timer to read this
-      data. Click the button below to allow this.
-    </p>
+  <AuthSplash v-else-if="unrecognizedError" type="error" feature="exports" />
 
-    <Button label="Authorize" @click="authorize()" />
-
-    <p v-if="rejectedAuth">
-      You rejected Activity timer's request for accessing the data. If you
-      change your mind you can always click 'Authorize' again.
-    </p>
-  </div>
+  <AuthSplash
+    v-else-if="!isAuthorized"
+    type="unauthorized"
+    feature="exports"
+    :rejected-auth="rejectedAuth"
+    @authorize="authorize()"
+  />
 
   <div
     v-else-if="ready && isAuthorized"
     class="authorized flex flex-column gap-3"
   >
+    <div class="exporter-header">
+      <h2>Estimates Export</h2>
+      <HelpButton feature="exports" title="Learn about Data Export" />
+    </div>
+
     <Message v-if="apiDisclaimer" severity="info"
       >Note: Some Trello cards may be unavailable; we prioritize fetching open,
       closed, and visible ones for optimal service.</Message
@@ -131,8 +121,7 @@
 
       <ColumnGroup type="footer">
         <Row v-if="tableHead.length > 1">
-          <Column v-if="tableHead.length > 2" :colspan="tableHead.length - 2" />
-          <Column :footer="`Total seconds: ${totalTimeSeconds}`" />
+          <Column v-if="tableHead.length > 2" :colspan="tableHead.length - 1" />
           <Column :footer="`Total time: ${totalTimeFormatted}`" />
         </Row>
         <Row v-else>
@@ -174,10 +163,11 @@ import { Trello } from '../../../types/trello';
 import { formatMemberName, formatTime } from '../../../utils/formatting';
 import { ApiCard, ApiCardRowData } from '../TimeTracking/ApiCard';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
-import UILoader from '../../../components/UILoader.vue';
 import { Estimates } from '../../../components/estimates';
 import { setStorage, getStorage } from '../../../utils/local-storage';
 import { Option } from '../../../types/dropdown';
+import AuthSplash from '../../../components/AuthSplash.vue';
+import HelpButton from '../../../components/HelpButton.vue';
 
 interface Settings {
   columns: string[];
@@ -195,7 +185,8 @@ const apiDisclaimer = ref(false);
 const unrecognizedError = ref(false);
 const rejectedAuth = ref(false);
 const groupByCard = ref(false);
-const loading = ref(true);
+const savingEntry = ref(true);
+const loadingText = ref('Loading export data...');
 const ready = ref(false);
 const exported = ref(false);
 const uniqueLabels = ref<Trello.PowerUp.Label[]>([]);
@@ -473,12 +464,13 @@ function getUniqueLabels() {
 async function getData() {
   const getDataStart = Date.now();
 
-  loading.value = true;
+  savingEntry.value = true;
+  loadingText.value = 'Loading export data...';
 
   const token = await getValidToken();
 
   if (!token) {
-    loading.value = false;
+    savingEntry.value = false;
     return;
   }
 
@@ -568,7 +560,7 @@ async function getData() {
   );
 
   ready.value = true;
-  loading.value = false;
+  savingEntry.value = false;
 }
 
 async function initialize() {
@@ -614,7 +606,7 @@ async function initialize() {
     await getData();
   } else {
     ready.value = true;
-    loading.value = false;
+    savingEntry.value = false;
   }
 }
 
@@ -696,17 +688,67 @@ trelloTick().then(() => {
   padding-bottom: 62px;
 }
 
+.exporter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.exporter-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #172b4d;
+}
+
+html[data-color-mode='dark'] .exporter-header h2 {
+  color: #e2e8f0;
+}
+
 p {
   margin: 25px 0;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
+/* Loading Overlay */
+.saving-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
 }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.saving-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.saving-text {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
 }
 </style>

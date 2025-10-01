@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [2.9.0] - 2025-09-30
+## [2.9.0] - 2025-09-30/2025-09-31/2025-10-01
 
 ### Security
 
@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added estimate vs time spent viewer on card display
 
  - Reworked card UI and enabled the user to log time entries manually
+
+ - Reworked card estimates UI to be a modal with improved UX
 
 ## [2.8.2] - 2024-10-28
 

@@ -13,46 +13,17 @@
     {{ successMessage }}
   </div>
 
-  <div v-if="isIncognito" class="unauthorized">
-    <div class="auth-icon">🔒</div>
-    <h2>Incognito Mode Detected</h2>
-    <p>
-      Unfortunately, some internal functionality required for the Week Calendar
-      doesn't work in incognito mode. Please use a regular browser window to
-      access this feature.
-    </p>
-  </div>
+  <AuthSplash v-if="isIncognito" type="incognito" feature="calendar" />
 
-  <div v-else-if="unrecognizedError" class="unauthorized">
-    <div class="auth-icon">⚠️</div>
-    <h2>Unexpected Error</h2>
-    <p>
-      An unrecognized error occurred. Our system has automatically logged it and
-      we'll look into the matter. Please try again later or with a different
-      browser.
-    </p>
-  </div>
+  <AuthSplash v-else-if="unrecognizedError" type="error" feature="calendar" />
 
-  <div v-else-if="!isAuthorized" class="unauthorized">
-    <div class="auth-icon">🔐</div>
-    <h2>Authorization Required</h2>
-    <p>
-      To access your time tracking data, Activity Timer needs your permission to
-      read and write card information.
-    </p>
-
-    <Button
-      label="Authorize Access"
-      icon="pi pi-unlock"
-      class="auth-button"
-      size="large"
-      @click="authorize()"
-    />
-
-    <p v-if="rejectedAuth" class="auth-error">
-      ❌ Authorization was rejected. Click the button above to try again.
-    </p>
-  </div>
+  <AuthSplash
+    v-else-if="!isAuthorized"
+    type="unauthorized"
+    feature="calendar"
+    :rejected-auth="rejectedAuth"
+    @authorize="authorize()"
+  />
 
   <div v-else-if="ready && isAuthorized" class="calendar-container">
     <!-- Header with controls -->
@@ -84,6 +55,7 @@
           <i class="pi pi-user"></i>
           <span>Viewing: {{ currentMemberName }}</span>
         </div>
+        <HelpButton feature="calendar" title="Learn about Week Calendar" />
         <Button
           icon="pi pi-cog"
           text
@@ -311,7 +283,7 @@
               v-if="canWrite && !entry.isRunning"
               class="delete-entry-btn"
               title="Delete time entry"
-              @click.stop="onDeleteEntry(entry)"
+              @click.stop="onDeleteEntry(entry, $event)"
               @mousedown.stop
             >
               <i class="pi pi-trash"></i>
@@ -393,6 +365,8 @@ import {
   setCalendarSettings
 } from '../../components/settings';
 import * as Sentry from '@sentry/vue';
+import AuthSplash from '../../components/AuthSplash.vue';
+import HelpButton from '../../components/HelpButton.vue';
 
 interface TimeEntry {
   id: string;
@@ -1058,56 +1032,64 @@ function onEntryMouseLeave() {
   hoveringOverEntry.value = false;
 }
 
-async function onDeleteEntry(entry: TimeEntry) {
-  const confirmed = confirm(
-    `Are you sure you want to delete this time entry?\n\nCard: ${
+async function onDeleteEntry(entry: TimeEntry, event: MouseEvent) {
+  const trello = getTrelloInstance<Trello.PowerUp.IFrame>();
+
+  trello.popup({
+    type: 'confirm',
+    title: 'Delete Time Entry',
+    message: `Are you sure you want to delete this time entry?\n\nCard: ${
       entry.cardName
-    }\nTime: ${formatEntryTime(entry)}`
-  );
+    }\nTime: ${formatEntryTime(entry)}`,
+    confirmText: 'Delete',
+    confirmStyle: 'danger',
+    cancelText: 'Cancel',
+    mouseEvent: event,
+    onConfirm: async (t) => {
+      try {
+        savingEntry.value = true;
+        loadingText.value = 'Deleting time entry...';
 
-  if (!confirmed) {
-    return;
-  }
+        // Load the card and its ranges
+        const cardModel = new Card(entry.cardId);
+        const ranges = await cardModel.getRanges();
 
-  try {
-    savingEntry.value = true;
-    loadingText.value = 'Deleting time entry...';
+        // Filter out the range we want to delete by matching the actual data
+        // (memberId, start, and end times from the original range)
+        const filteredRanges = ranges.filter(
+          (range) =>
+            !(
+              range.memberId === entry.range.memberId &&
+              range.start === entry.range.start &&
+              range.end === entry.range.end
+            )
+        );
 
-    // Load the card and its ranges
-    const cardModel = new Card(entry.cardId);
-    const ranges = await cardModel.getRanges();
+        // Save the updated ranges
+        await trello.set(
+          entry.cardId,
+          'shared',
+          'act-timer-ranges',
+          filteredRanges.serialize()
+        );
 
-    // Filter out the range we want to delete by matching the actual data
-    // (memberId, start, and end times from the original range)
-    const filteredRanges = ranges.filter(
-      (range) =>
-        !(
-          range.memberId === entry.range.memberId &&
-          range.start === entry.range.start &&
-          range.end === entry.range.end
-        )
-    );
+        // Wait a bit to ensure the data is saved
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Save the updated ranges
-    await getTrelloInstance().set(
-      entry.cardId,
-      'shared',
-      'act-timer-ranges',
-      filteredRanges.serialize()
-    );
+        // Reload time entries
+        await loadTimeEntries();
+      } catch (error) {
+        Sentry.captureException(error);
+        console.debug('Failed to delete time entry:', error);
+        alert('Failed to delete time entry. Please try again.');
+      } finally {
+        savingEntry.value = false;
+      }
 
-    // Wait a bit to ensure the data is saved
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Reload time entries
-    await loadTimeEntries();
-  } catch (error) {
-    Sentry.captureException(error);
-    console.error('Failed to delete time entry:', error);
-    alert('Failed to delete time entry. Please try again.');
-  } finally {
-    savingEntry.value = false;
-  }
+      return t.closePopup();
+    },
+    onCancel: (t) => t.closePopup()
+  });
 }
 
 // Resize handlers
@@ -1613,86 +1595,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.unauthorized {
-  max-width: 500px;
-  text-align: center;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  padding: 40px;
-  background: var(--surface-card);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-
-  h2 {
-    margin: 20px 0 16px;
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--text-color);
-  }
-
-  p {
-    color: var(--text-color-secondary);
-    line-height: 1.6;
-    margin: 16px 0 24px;
-  }
-}
-
-.auth-icon {
-  font-size: 64px;
-  margin-bottom: 8px;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-.auth-button {
-  font-size: 16px;
-  padding: 14px 32px;
-  border-radius: 8px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-.auth-error {
-  color: var(--red-500);
-  font-weight: 500;
-  margin-top: 16px;
-  animation: shake 0.5s;
-}
-
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-10px);
-  }
-  75% {
-    transform: translateX(10px);
-  }
-}
-
 .calendar-container {
   height: 100vh;
   display: flex;

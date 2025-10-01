@@ -1,5 +1,25 @@
 <template>
   <div v-if="visible" class="activity-timer-card-section">
+    <!-- Header with help button and settings icon -->
+    <div class="section-header">
+      <h3 class="section-title">Activity Timer</h3>
+      <div class="header-actions">
+        <Button
+          v-if="canWrite"
+          icon="pi pi-cog"
+          text
+          rounded
+          size="small"
+          title="Quick Settings"
+          @click="openQuickSettings"
+        />
+        <HelpButton
+          feature="cardBackSection"
+          title="Learn how to use Activity Timer"
+        />
+      </div>
+    </div>
+
     <!-- Main actions row -->
     <div v-if="canWrite" class="actions-container">
       <div class="flex flex-row gap-2 flex-wrap">
@@ -76,6 +96,49 @@
       </div>
     </div>
 
+    <!-- Member Summary Section -->
+    <div v-if="memberSummary.length > 0" class="member-summary">
+      <div class="member-summary-header">
+        <span class="member-summary-label">
+          <i class="pi pi-users"></i>
+          Time by Member
+        </span>
+        <Button
+          v-if="memberSummary.length > 3"
+          :icon="showAllMembers ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+          :label="
+            showAllMembers ? 'Show less' : `Show all (${memberSummary.length})`
+          "
+          text
+          size="small"
+          severity="secondary"
+          @click="toggleShowAllMembers"
+        />
+      </div>
+      <div class="member-list">
+        <div
+          v-for="member in displayedMembers"
+          :key="member.id"
+          class="member-row"
+        >
+          <span class="member-name">{{ member.name }}</span>
+          <div class="member-right">
+            <span class="member-time">{{ member.timeSpent }}</span>
+            <Button
+              v-if="canWrite"
+              icon="pi pi-pencil"
+              text
+              rounded
+              size="small"
+              severity="secondary"
+              title="Manage time"
+              @click="openManageMemberTime(member.id)"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Limita announcement footer -->
     <div class="limita-footer">
       <span class="limita-emoji">🚀</span>
@@ -112,9 +175,10 @@ import {
   resizeTrelloFrame
 } from '../../components/trello';
 import { Card } from '../../components/card';
-import { formatTime } from '../../utils/formatting';
+import { formatTime, formatMemberName } from '../../utils/formatting';
 import { hasEstimateFeature } from '../../components/settings';
 import { isVisible } from '../../utils/visibility';
+import HelpButton from '../../components/HelpButton.vue';
 
 const isTracking = ref(false);
 const trackedTime = ref(0);
@@ -123,6 +187,12 @@ const ownEstimate = ref(0);
 const hasEstimates = ref(false);
 const canWrite = ref(false);
 const visible = ref(false);
+const showAllMembers = ref(false);
+const boardMembers = ref<any[]>([]);
+const memberSummary = ref<
+  Array<{ id: string; name: string; timeSpent: string; timeInSeconds: number }>
+>([]);
+
 let cardId: string | null = null;
 
 const timeSpentDisplay = computed(() => {
@@ -163,10 +233,8 @@ const progressPercentageClass = computed(() => {
 
 const estimateButtonLabel = computed(() => {
   if (ownEstimate.value !== totalEstimate.value) {
-    // Multiple people have estimates
     return `Est: ${ownEstimateDisplay.value} / ${totalEstimateDisplay.value}`;
   }
-  // Only current user has estimate
   return `Estimate: ${ownEstimateDisplay.value}`;
 });
 
@@ -175,6 +243,13 @@ const estimateButtonTitle = computed(() => {
     return `Your estimate: ${ownEstimateDisplay.value}, Total: ${totalEstimateDisplay.value}. Click to view all estimates.`;
   }
   return 'Click to change your estimate';
+});
+
+const displayedMembers = computed(() => {
+  if (showAllMembers.value || memberSummary.value.length <= 3) {
+    return memberSummary.value;
+  }
+  return memberSummary.value.slice(0, 3);
 });
 
 const trelloTick = async () => {
@@ -203,22 +278,69 @@ const trelloTick = async () => {
     ownEstimate.value = 0;
   }
 
+  // Load member summary
+  await loadMemberSummary();
+
   // Resize iframe after data changes
   await nextTick();
   setTimeout(resizeTrelloFrame, 100);
 };
 
+const loadMemberSummary = async () => {
+  const card = getCardModel();
+  const ranges = await card.getRanges();
+  const timers = await card.getTimers();
+  const board = await getTrelloCard().board('members');
+  boardMembers.value = board.members;
+
+  const summary: Array<{
+    id: string;
+    name: string;
+    timeSpent: string;
+    timeInSeconds: number;
+  }> = [];
+
+  board.members
+    .sort((a, b) => {
+      const nameA = (a.fullName ?? '').toUpperCase();
+      const nameB = (b.fullName ?? '').toUpperCase();
+      if (nameA < nameB) return -1;
+      if (nameA > nameB) return 1;
+      return 0;
+    })
+    .forEach((member) => {
+      const timer = timers.getByMemberId(member.id);
+      const timeInSeconds =
+        ranges.items
+          .filter((item) => item.memberId === member.id)
+          .reduce((a, b) => a + b.diff, 0) + (timer ? timer.timeInSecond : 0);
+
+      if (timeInSeconds !== 0) {
+        summary.push({
+          id: member.id,
+          name: formatMemberName(member),
+          timeSpent: formatTime(timeInSeconds),
+          timeInSeconds
+        });
+      }
+    });
+
+  memberSummary.value = summary;
+};
+
 // Watch for changes that affect layout height
-watch([hasEstimates, totalEstimate, visible, canWrite], async () => {
-  await nextTick();
-  setTimeout(resizeTrelloFrame, 100);
-});
+watch(
+  [hasEstimates, totalEstimate, visible, canWrite, showAllMembers],
+  async () => {
+    await nextTick();
+    setTimeout(resizeTrelloFrame, 100);
+  }
+);
 
 const getCardModel = () => {
   if (!cardId) {
     throw new Error('Unable to locate cardId');
   }
-
   return new Card(cardId);
 };
 
@@ -244,7 +366,7 @@ const handleEstimateClick = async () => {
   });
 };
 
-const addTimeManually = async (e: MouseEvent) => {
+const addTimeManually = async (e?: MouseEvent) => {
   const trelloInstance = getTrelloCard();
 
   await trelloInstance.popup({
@@ -252,6 +374,32 @@ const addTimeManually = async (e: MouseEvent) => {
     url: './index.html?page=add-time-manually',
     height: 180,
     mouseEvent: e
+  });
+};
+
+const toggleShowAllMembers = async () => {
+  showAllMembers.value = !showAllMembers.value;
+};
+
+const openQuickSettings = async () => {
+  const trelloInstance = getTrelloCard();
+
+  await trelloInstance.modal({
+    title: 'Quick Settings',
+    url: './index.html?page=quick-settings',
+    fullscreen: false,
+    height: 500
+  });
+};
+
+const openManageMemberTime = async (memberId: string) => {
+  const trelloInstance = getTrelloCard();
+
+  await trelloInstance.modal({
+    title: 'Manage Time',
+    url: `./index.html?page=manage-member-time&memberId=${memberId}`,
+    fullscreen: false,
+    height: 700
   });
 };
 
@@ -273,6 +421,30 @@ html[data-color-mode='dark'] .row {
   gap: 0.75rem;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #172b4d;
+}
+
+html[data-color-mode='dark'] .section-title {
+  color: #b6c2cf;
+}
+
 .actions-container {
   display: flex;
   flex-direction: row;
@@ -282,68 +454,97 @@ html[data-color-mode='dark'] .row {
   flex-wrap: wrap;
 }
 
-.limita-footer {
+/* Member Summary Styles */
+.member-summary {
+  border-top: 1px solid #e9ecef;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+html[data-color-mode='dark'] .member-summary {
+  border-top-color: #4a5568;
+}
+
+.member-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.member-summary-label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e9ecef;
   font-size: 11px;
+  font-weight: 600;
   color: #6c757d;
-  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-html[data-color-mode='dark'] .limita-footer {
-  border-top-color: #495057;
+html[data-color-mode='dark'] .member-summary-label {
+  color: #a0aec0;
 }
 
-.limita-emoji {
+.member-summary-label i {
   font-size: 12px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
 }
 
-.limita-text {
-  line-height: 1.2;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
+.member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.limita-link,
-.support-link {
-  color: #0079bf;
-  text-decoration: none;
+.member-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.member-row:hover {
+  background: #e9ecef;
+}
+
+html[data-color-mode='dark'] .member-row {
+  background: #2d3748;
+}
+
+html[data-color-mode='dark'] .member-row:hover {
+  background: #374151;
+}
+
+.member-name {
+  font-size: 13px;
   font-weight: 500;
-  transition: color 0.2s;
+  color: #172b4d;
+  flex: 1;
 }
 
-.limita-link:hover,
-.support-link:hover {
-  color: #005a8c;
-  text-decoration: underline;
+html[data-color-mode='dark'] .member-name {
+  color: #e2e8f0;
 }
 
-html[data-color-mode='dark'] .limita-link,
-html[data-color-mode='dark'] .support-link {
-  color: #4dabf7;
-}
-
-html[data-color-mode='dark'] .limita-link:hover,
-html[data-color-mode='dark'] .support-link:hover {
-  color: #74c0fc;
-}
-
-.limita-separator {
-  color: #dee2e6;
-  line-height: 1;
-  display: inline-flex;
+.member-right {
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
 }
 
-html[data-color-mode='dark'] .limita-separator {
-  color: #495057;
+.member-time {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c757d;
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-color-mode='dark'] .member-time {
+  color: #cbd5e0;
 }
 
 /* Progress bar styles */
@@ -436,5 +637,70 @@ html[data-color-mode='dark'] .progress-warning {
 
 html[data-color-mode='dark'] .progress-over {
   background-color: #fc8181;
+}
+
+/* Limita Footer */
+.limita-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e9ecef;
+  font-size: 11px;
+  color: #6c757d;
+  line-height: 1.2;
+}
+
+html[data-color-mode='dark'] .limita-footer {
+  border-top-color: #495057;
+}
+
+.limita-emoji {
+  font-size: 12px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.limita-text {
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.limita-link,
+.support-link {
+  color: #0079bf;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.limita-link:hover,
+.support-link:hover {
+  color: #005a8c;
+  text-decoration: underline;
+}
+
+html[data-color-mode='dark'] .limita-link,
+html[data-color-mode='dark'] .support-link {
+  color: #4dabf7;
+}
+
+html[data-color-mode='dark'] .limita-link:hover,
+html[data-color-mode='dark'] .support-link:hover {
+  color: #74c0fc;
+}
+
+.limita-separator {
+  color: #dee2e6;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+html[data-color-mode='dark'] .limita-separator {
+  color: #495057;
 }
 </style>

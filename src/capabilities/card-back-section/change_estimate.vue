@@ -1,6 +1,11 @@
 <template>
   <div class="estimates-wrapper">
     <div class="flex flex-column align-items-start estimates-container">
+      <!-- Header with help button -->
+      <div class="estimate-header w-full">
+        <HelpButton feature="estimates" title="Learn about estimates" />
+      </div>
+
       <!-- Your Estimate Input -->
       <div class="estimate-input-section w-full">
         <h3 class="section-title">Your Estimate</h3>
@@ -80,6 +85,7 @@ import {
 } from '../../components/trello';
 import { formatTime } from '../../utils/formatting';
 import { Trello } from '../../types/trello';
+import HelpButton from '../../components/HelpButton.vue';
 
 interface EstimateDisplay {
   memberId: string;
@@ -369,5 +375,11 @@ html[data-color-mode='dark'] .estimate-time {
 html[data-color-mode='dark'] .total-estimate {
   background-color: #1d2125;
   color: #b6c2cf;
+}
+
+.estimate-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
 }
 </style>

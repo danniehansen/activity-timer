@@ -1,5 +1,13 @@
 <template>
   <div class="flex flex-column align-items-start pt-4 add-time-container">
+    <!-- Help button -->
+    <div class="w-full flex justify-content-end">
+      <HelpButton
+        feature="manualTime"
+        title="Learn about adding time manually"
+      />
+    </div>
+
     <span class="p-float-label w-full">
       <InputNumber
         id="f-hours"
@@ -48,6 +56,7 @@ import {
   getTrelloCard,
   resizeTrelloFrame
 } from '../../components/trello';
+import HelpButton from '../../components/HelpButton.vue';
 
 const hours = ref<number>(0);
 const minutes = ref<number>(0);

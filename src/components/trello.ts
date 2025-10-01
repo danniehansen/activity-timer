@@ -177,3 +177,48 @@ export async function getTokenDetails(): Promise<TrelloToken | undefined> {
 
   return undefined;
 }
+
+/**
+ * Shows a native Trello confirmation popup.
+ * Returns a promise that resolves to true if confirmed, false if cancelled.
+ *
+ * @param title - The title of the confirmation dialog
+ * @param message - The message/body text
+ * @param options - Optional configuration
+ * @param options.confirmText - Text for the confirm button (default: "Confirm")
+ * @param options.confirmStyle - Style of the confirm button: 'primary' | 'danger' (default: 'primary')
+ * @param options.cancelText - Text for the cancel button (default: "Cancel")
+ * @param options.mouseEvent - Mouse event for positioning the popup
+ */
+export function showConfirm(
+  title: string,
+  message: string,
+  options?: {
+    confirmText?: string;
+    confirmStyle?: 'primary' | 'danger';
+    cancelText?: string;
+    mouseEvent?: MouseEvent;
+  }
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    const t = getTrelloCard();
+
+    t.popup({
+      type: 'confirm',
+      title,
+      message,
+      confirmText: options?.confirmText ?? 'Confirm',
+      confirmStyle: options?.confirmStyle ?? 'primary',
+      cancelText: options?.cancelText ?? 'Cancel',
+      mouseEvent: options?.mouseEvent,
+      onConfirm: () => {
+        resolve(true);
+        return Promise.resolve();
+      },
+      onCancel: () => {
+        resolve(false);
+        return Promise.resolve();
+      }
+    });
+  });
+}

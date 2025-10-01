@@ -629,6 +629,32 @@ npm run build          # Production build
 
 ---
 
+## User Onboarding System
+
+Activity Timer includes a comprehensive onboarding system that helps users discover features without being intrusive.
+
+### Key Points
+
+- **Adaptive Help Buttons**: Prominent for new users (0-2 days), subtle for active users (2+ days)
+- **Trello Native Modals**: Uses Trello's modal system for help content (no external UI libraries)
+- **Centralized Content**: All help text in `src/utils/help-content.ts`
+- **Private Tracking**: User's help interaction stored in Trello member private storage
+- **AuthSplash Component**: Unified authorization screens for premium features with integrated help
+
+### Components
+
+- `src/components/HelpButton.vue` - Adaptive help button
+- `src/components/AuthSplash.vue` - Authorization splash with help
+- `src/components/onboarding.ts` - State tracking
+- `src/pages/HelpPage.vue` - Help content display (in Trello modal)
+- `src/utils/help-content.ts` - All help content
+
+### Documentation
+
+For complete implementation details, see `docs/onboarding.md`.
+
+---
+
 ## Related Resources
 
 - **Trello Power-Up Docs**: https://developer.atlassian.com/cloud/trello/power-ups/

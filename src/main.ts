@@ -3,7 +3,6 @@ import Router from './Router.vue';
 import { getBoardButtons } from './capabilities/board-buttons';
 import { getCardBackSection } from './capabilities/card-back-section';
 import { getCardBadges } from './capabilities/card-badges';
-import { getCardButtons } from './capabilities/card-buttons';
 import { getShowSettings } from './capabilities/show-settings';
 import { setTrelloInstance } from './components/trello';
 import { getAppKey, getAppName } from './components/settings';
@@ -25,6 +24,8 @@ import InputNumber from 'primevue/inputnumber';
 import ColumnGroup from 'primevue/columngroup';
 import Slider from 'primevue/slider';
 import Row from 'primevue/row';
+import InputSwitch from 'primevue/inputswitch';
+import Divider from 'primevue/divider';
 
 // Styling
 import './scss/base.scss';
@@ -101,7 +102,6 @@ if (window.location.hash) {
   const t = window.TrelloPowerUp.initialize(
     {
       'card-badges': getCardBadges,
-      'card-buttons': getCardButtons,
       'card-back-section': getCardBackSection,
       'board-buttons': getBoardButtons,
       'show-settings': getShowSettings
@@ -147,6 +147,8 @@ app.component('ColumnGroup', ColumnGroup);
 app.component('Slider', Slider);
 app.component('Message', Message);
 app.component('Row', Row);
+app.component('InputSwitch', InputSwitch);
+app.component('Divider', Divider);
 
 // eslint-disable-next-line vue/no-reserved-component-names
 app.component('Button', Button);

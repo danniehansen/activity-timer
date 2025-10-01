@@ -5,7 +5,7 @@ export async function getCardBackSection(
   t: Trello.PowerUp.IFrame
 ): Promise<Trello.PowerUp.CardBackSection> {
   return {
-    title: 'Activity Timer → Limita',
+    title: '',
     icon: `${
       !ClockImageBlack.includes('http') ? window.location.origin : ''
     }${ClockImageBlack}`,

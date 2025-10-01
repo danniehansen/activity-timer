@@ -4,6 +4,16 @@
   </transition>
 
   <div v-if="!loading" class="flex flex-column gap-3 pr-3 pl-3">
+    <!-- Header with help button -->
+    <div class="settings-header">
+      <h2 class="settings-title">Board Settings</h2>
+      <HelpButton
+        feature="settings"
+        title="Learn about board settings"
+        :show-label="true"
+      />
+    </div>
+
     <div class="flex align-items-center">
       <Checkbox
         v-model="disableEstimate"
@@ -171,6 +181,7 @@ import {
 } from '../utils/visibility';
 import { formatMemberName } from '../utils/formatting';
 import { Option } from '../types/dropdown';
+import HelpButton from '../components/HelpButton.vue';
 
 const autoStartTimerEnabled = ref(false);
 const disableEstimate = ref(false);
@@ -178,6 +189,7 @@ const threshold = ref(1);
 const autoListId = ref('');
 const loading = ref(true);
 const visibility = ref('');
+
 const visibilityOptions = ref<Option[]>([
   {
     text: 'Visible to all',
@@ -433,5 +445,23 @@ html[data-color-mode='dark'] .support-link {
 
 html[data-color-mode='dark'] .support-link:hover {
   color: #74c0fc;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.settings-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #172b4d;
+}
+
+html[data-color-mode='dark'] .settings-title {
+  color: #e2e8f0;
 }
 </style>

@@ -53,6 +53,16 @@ export async function getBoardButtons(): Promise<
       callback: async (t) => {
         const items: Trello.PowerUp.PopupOptionsItem[] = [
           {
+            text: 'Help',
+            callback: async (t) => {
+              await t.modal({
+                url: t.signUrl('./index.html?page=help'),
+                args: { feature: 'general' },
+                height: 600
+              });
+            }
+          },
+          {
             text: 'Week Calendar',
             callback: async (t) => {
               await t.modal({
