@@ -89,13 +89,13 @@ app.component('Row', Row);
 // eslint-disable-next-line vue/no-reserved-component-names
 app.component('Button', Button);
 
-if (typeof import.meta.env.VITE_APP_ORIGIN === 'string') {
+if (typeof import.meta.env.VITE_MAILCHIMP_LINK === 'string') {
   Sentry.init({
     app,
     dsn: 'https://7ce44ae05ff4b7e894b0de51fec56ff9@o4510110410407936.ingest.de.sentry.io/4510110416568400',
     integrations: [
       new Integrations.BrowserTracing({
-        tracingOrigins: ['localhost', import.meta.env.VITE_APP_ORIGIN, /^\//]
+        tracingOrigins: ['localhost', 'powerup.activity-timer.com', /^\//]
       })
     ],
     tracesSampleRate: 0.0

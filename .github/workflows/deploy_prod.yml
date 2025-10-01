@@ -36,7 +36,6 @@ jobs:
           VITE_API_HOST: ${{ secrets.ACT_API_HOST }}
           VITE_WEBSOCKET: ${{ secrets.ACT_WEBSOCKET }}
           VITE_POWERUP_ID: ${{ secrets.ACT_POWERUP_ID }}
-          VITE_APP_ORIGIN: ${{ secrets.ACT_APP_ORIGIN }}
           VITE_MAILCHIMP_LINK: ${{ secrets.ACT_MAILCHIMP_LINK }}
       - name: cdk deploy
         env:
