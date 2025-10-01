@@ -59,9 +59,38 @@ export function getPowerupId() {
   return import.meta.env.VITE_POWERUP_ID;
 }
 
+/**
+ * Gets the REST API token and returns it only if it's valid.
+ * Returns undefined if the token contains an error (e.g., when user denies authorization).
+ * Trello returns tokens with &error= when authorization is rejected.
+ */
+export async function getValidToken(
+  t?: Trello.PowerUp.IFrame
+): Promise<string | undefined> {
+  const token = await (t ?? getTrelloCard()).getRestApi().getToken();
+
+  if (token && token.includes('&error=')) {
+    return undefined;
+  }
+
+  return token;
+}
+
+/**
+ * Checks if the user is truly authorized by validating the token.
+ * This is more reliable than getRestApi().isAuthorized() which can return true
+ * even when the user denies authorization.
+ */
+export async function isAuthorized(
+  t?: Trello.PowerUp.IFrame
+): Promise<boolean> {
+  const token = await getValidToken(t);
+  return token !== undefined;
+}
+
 export async function clearToken(t?: Trello.PowerUp.IFrame) {
   try {
-    const token = await (t ?? getTrelloCard()).getRestApi().getToken();
+    const token = await getValidToken(t);
 
     if (token) {
       // When token get's cleared - so do webhooks. Making it no longer functional. Better UI to disable auto timer then.
@@ -128,7 +157,7 @@ export async function prepareWriteAuth() {
 }
 
 export async function getTokenDetails(): Promise<TrelloToken | undefined> {
-  const token = await getTrelloCard().getRestApi().getToken();
+  const token = await getValidToken();
 
   if (token) {
     try {

@@ -141,6 +141,7 @@ import {
   clearToken,
   getTrelloCard,
   getTrelloInstance,
+  getValidToken,
   prepareWriteAuth,
   resizeTrelloFrame
 } from '../components/trello';
@@ -241,6 +242,8 @@ async function initialize() {
 
 async function enableAutoStartTimer() {
   try {
+    await getTrelloCard().getRestApi().clearToken();
+
     await getTrelloCard().getRestApi().authorize({
       scope: 'read,write',
       expiration: 'never'
@@ -254,7 +257,7 @@ async function enableAutoStartTimer() {
     throw e;
   }
 
-  const token = await getTrelloCard().getRestApi().getToken();
+  const token = await getValidToken();
 
   if (token) {
     const board = await getTrelloCard().board('id');

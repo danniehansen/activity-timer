@@ -1,7 +1,7 @@
 import { Trello } from '../../types/trello';
 import ClockImageWhite from '../../assets/images/clock_white.svg';
 import CalendarImageWhite from '../../assets/images/calendar_white.svg';
-import { clearToken, getMemberId } from '../../components/trello';
+import { clearToken, getMemberId, isAuthorized } from '../../components/trello';
 import { isVisible } from '../../utils/visibility';
 import { Card } from '../../components/card';
 import * as Sentry from '@sentry/vue';
@@ -82,7 +82,7 @@ export async function getBoardButtons(): Promise<
               let hasRestApiToken = false;
 
               try {
-                hasRestApiToken = await t.getRestApi().isAuthorized();
+                hasRestApiToken = await isAuthorized(t);
               } catch (e) {
                 // Ignore RestApi errors. Most likely due to incognito.
               }

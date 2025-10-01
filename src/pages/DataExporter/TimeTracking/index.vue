@@ -189,7 +189,9 @@ import { getAppKey } from '../../../components/settings';
 import {
   clearToken,
   getTrelloCard,
-  getTrelloInstance
+  getTrelloInstance,
+  getValidToken,
+  isAuthorized as checkAuthorization
 } from '../../../components/trello';
 import { Trello } from '../../../types/trello';
 import {
@@ -617,7 +619,7 @@ const labelOptions = computed<Option[]>(() => {
 
 async function trelloTick() {
   try {
-    isAuthorized.value = await getTrelloCard().getRestApi().isAuthorized();
+    isAuthorized.value = await checkAuthorization();
   } catch (e) {
     if (e instanceof Error && e.name === 'restApi::ApiNotConfiguredError') {
       isIncognito.value = true;
@@ -649,7 +651,13 @@ async function getData() {
 
   loading.value = true;
 
-  const token = await getTrelloCard().getRestApi().getToken();
+  const token = await getValidToken();
+
+  if (!token) {
+    loading.value = false;
+    return;
+  }
+
   const board = await getTrelloInstance().board('id');
 
   try {
@@ -790,6 +798,8 @@ async function authorize() {
   rejectedAuth.value = false;
 
   try {
+    await getTrelloCard().getRestApi().clearToken();
+
     await getTrelloCard().getRestApi().authorize({
       scope: 'read',
       expiration: 'never'
