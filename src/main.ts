@@ -95,7 +95,7 @@ if (typeof import.meta.env.VITE_MAILCHIMP_LINK === 'string') {
     dsn: 'https://7ce44ae05ff4b7e894b0de51fec56ff9@o4510110410407936.ingest.de.sentry.io/4510110416568400',
     integrations: [
       new Integrations.BrowserTracing({
-        tracingOrigins: ['localhost', 'powerup.activity-timer.com', /^\//]
+        // tracingOrigins: ['localhost', 'powerup.activity-timer.com', /^\//]
       })
     ],
     tracesSampleRate: 0.0,
