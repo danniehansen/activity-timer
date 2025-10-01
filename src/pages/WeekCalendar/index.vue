@@ -203,12 +203,12 @@
         <div
           class="day-content"
           @click="onDayClick($event, day.date)"
-          @mousedown="onDayMouseDown($event, day.date)"
-          @mousemove="onDayMouseMove($event, day.date)"
-          @mouseup="onDayMouseUp($event, day.date)"
-          @mouseleave="onDayMouseLeave"
-          @drop="onDrop($event, day.date)"
-          @dragover="onDragOver"
+          @mousedown="canWrite ? onDayMouseDown($event, day.date) : undefined"
+          @mousemove="canWrite ? onDayMouseMove($event, day.date) : undefined"
+          @mouseup="canWrite ? onDayMouseUp($event, day.date) : undefined"
+          @mouseleave="canWrite ? onDayMouseLeave : undefined"
+          @drop="canWrite ? onDrop($event, day.date) : undefined"
+          @dragover="canWrite ? onDragOver : undefined"
         >
           <!-- Hour slots for grid lines -->
           <div
@@ -262,14 +262,15 @@
               stacked: entry.isStacked,
               dragging: draggedEntry?.id === entry.id,
               'multi-day': entry.isMultiDay,
-              'running-timer': entry.isRunning
+              'running-timer': entry.isRunning,
+              'read-only': !canWrite
             }"
             :style="getEntryStyle(entry)"
-            :draggable="!entry.isMultiDay && !entry.isRunning"
-            @dragstart="onDragStart($event, entry)"
-            @dragend="onDragEnd"
+            :draggable="canWrite && !entry.isMultiDay && !entry.isRunning"
+            @dragstart="canWrite ? onDragStart($event, entry) : undefined"
+            @dragend="canWrite ? onDragEnd : undefined"
             @click.stop="onEntryClick(entry)"
-            @mousedown="onEntryMouseDown($event, entry)"
+            @mousedown="canWrite ? onEntryMouseDown($event, entry) : undefined"
           >
             <div class="entry-content">
               <div class="entry-title">
@@ -286,7 +287,7 @@
               </div>
             </div>
             <button
-              v-if="!entry.isRunning"
+              v-if="canWrite && !entry.isRunning"
               class="delete-entry-btn"
               title="Delete time entry"
               @click.stop="onDeleteEntry(entry)"
@@ -295,12 +296,12 @@
               <i class="pi pi-trash"></i>
             </button>
             <div
-              v-if="!entry.isMultiDay && !entry.isRunning"
+              v-if="canWrite && !entry.isMultiDay && !entry.isRunning"
               class="resize-handle resize-top"
               @mousedown.stop="onResizeStart($event, entry, 'top')"
             ></div>
             <div
-              v-if="!entry.isMultiDay && !entry.isRunning"
+              v-if="canWrite && !entry.isMultiDay && !entry.isRunning"
               class="resize-handle resize-bottom"
               @mousedown.stop="onResizeStart($event, entry, 'bottom')"
             ></div>
@@ -408,6 +409,7 @@ const rejectedAuth = ref(false);
 const ready = ref(false);
 const showSettings = ref(false);
 const isAdmin = ref(false);
+const canWrite = ref(false);
 const selectedMember = ref<string | null>(null);
 const currentWeekStart = ref(new Date());
 const calendarGridRef = ref<HTMLElement | null>(null);
@@ -1456,6 +1458,9 @@ async function initialize() {
     );
     isAdmin.value = membership?.memberType === 'admin';
 
+    // Check if current user can write to the board
+    canWrite.value = await getTrelloCard().memberCanWriteToModel('card');
+
     memberOptions.value = board.members
       .sort((a, b) => {
         const nameA = (a.fullName ?? '').toUpperCase();
@@ -1915,6 +1920,16 @@ onUnmounted(() => {
     &:hover {
       background: #ef4444;
       box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+    }
+  }
+
+  &.read-only {
+    cursor: pointer;
+    opacity: 0.9;
+
+    &:hover {
+      cursor: pointer;
+      background: var(--primary-color);
     }
   }
 }
