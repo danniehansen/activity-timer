@@ -5,6 +5,12 @@ import { clearToken, getMemberId, isAuthorized } from '../../components/trello';
 import { isVisible } from '../../utils/visibility';
 import { Card } from '../../components/card';
 import * as Sentry from '@sentry/vue';
+import {
+  getConnectionState,
+  reconnectWebsocket,
+  ConnectionState
+} from '../../components/websocket';
+import { hasAutoTimer } from '../../utils/auto-timer';
 
 export async function getBoardButtons(): Promise<
   Trello.PowerUp.BoardButtonCallback[]
@@ -152,6 +158,57 @@ export async function getBoardButtons(): Promise<
             }
           }
         });
+
+        // Add menu item to check auto-timer connection status
+        const autoTimerEnabled = await hasAutoTimer();
+        if (autoTimerEnabled) {
+          items.push({
+            text: 'Check Auto-Timer Connection',
+            callback: async (t) => {
+              const state = getConnectionState();
+              const stateMessages: Record<ConnectionState, string> = {
+                [ConnectionState.DISCONNECTED]:
+                  '🔴 Disconnected - Auto-timer is not active',
+                [ConnectionState.CONNECTING]:
+                  '🟡 Connecting to auto-timer service...',
+                [ConnectionState.CONNECTED]:
+                  '🟢 Connected - Auto-timer is working',
+                [ConnectionState.RECONNECTING]:
+                  '🟡 Reconnecting to auto-timer service...',
+                [ConnectionState.FAILED]:
+                  '🔴 Connection failed - Auto-timer may not work'
+              };
+
+              const message = stateMessages[state];
+
+              if (
+                state === ConnectionState.FAILED ||
+                state === ConnectionState.DISCONNECTED
+              ) {
+                return t.popup({
+                  type: 'confirm',
+                  title: 'Auto-Timer Connection Status',
+                  message: `${message}\n\nWould you like to try reconnecting?`,
+                  confirmText: 'Reconnect',
+                  onConfirm: async (t) => {
+                    await reconnectWebsocket();
+                    await t.closePopup();
+                    await t.alert({
+                      message: 'Attempting to reconnect...',
+                      display: 'info'
+                    });
+                  },
+                  cancelText: 'Close'
+                });
+              } else {
+                await t.alert({
+                  message,
+                  display: 'info'
+                });
+              }
+            }
+          });
+        }
 
         items.push({
           text: 'Version: 2.9.0'

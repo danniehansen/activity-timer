@@ -204,11 +204,12 @@
           class="day-content"
           @click="onDayClick($event, day.date)"
           @mousedown="canWrite ? onDayMouseDown($event, day.date) : undefined"
-          @mousemove="canWrite ? onDayMouseMove($event, day.date) : undefined"
+          @mousemove="onDayMouseMove($event, day.date)"
           @mouseup="canWrite ? onDayMouseUp($event, day.date) : undefined"
-          @mouseleave="canWrite ? onDayMouseLeave : undefined"
+          @mouseleave="onDayMouseLeave"
+          @mouseenter="onDayMouseEnter(day.date)"
           @drop="canWrite ? onDrop($event, day.date) : undefined"
-          @dragover="canWrite ? onDragOver : undefined"
+          @dragover="canWrite ? onDragOver($event) : undefined"
         >
           <!-- Hour slots for grid lines -->
           <div
@@ -221,6 +222,24 @@
                 hour - 1 < calendarSettings.businessHoursEnd
             }"
           ></div>
+
+          <!-- Cursor time indicator -->
+          <div
+            v-if="
+              hoverDate &&
+              isSameDay(hoverDate, day.date) &&
+              hoverTime !== null &&
+              !creatingEntry &&
+              !hoveringOverEntry &&
+              !draggedEntry &&
+              !resizingEntry
+            "
+            class="cursor-time-indicator"
+            :style="getCursorIndicatorStyle()"
+          >
+            <div class="cursor-time-line"></div>
+            <div class="cursor-time-label">{{ formatCursorTime() }}</div>
+          </div>
 
           <!-- Drag preview -->
           <div
@@ -271,6 +290,8 @@
             @dragend="canWrite ? onDragEnd : undefined"
             @click.stop="onEntryClick(entry)"
             @mousedown="canWrite ? onEntryMouseDown($event, entry) : undefined"
+            @mouseenter="onEntryMouseEnter"
+            @mouseleave="onEntryMouseLeave"
           >
             <div class="entry-content">
               <div class="entry-title">
@@ -453,6 +474,11 @@ const newEntryEnd = ref<Date | null>(null);
 const newEntryDate = ref<Date | null>(null);
 const newEntryHoverY = ref(0);
 const creationStartTime = ref(0);
+
+// Cursor time indicator state
+const hoverDate = ref<Date | null>(null);
+const hoverTime = ref<number | null>(null); // Minutes from midnight
+const hoveringOverEntry = ref(false);
 
 // Card picker state
 const showCardPicker = ref(false);
@@ -817,30 +843,36 @@ function onDayMouseDown(event: MouseEvent, date: Date) {
 }
 
 function onDayMouseMove(event: MouseEvent, date: Date) {
-  if (!creatingEntry.value || !newEntryStart.value) return;
-
   const container = event.currentTarget as HTMLElement;
   const rect = container.getBoundingClientRect();
   const y = event.clientY - rect.top;
   const percentY = Math.max(0, Math.min(1, y / rect.height));
   const totalMinutes = percentY * 24 * 60;
   const roundedMinutes = Math.round(totalMinutes / 15) * 15;
-  const hours = Math.floor(roundedMinutes / 60);
-  const minutes = roundedMinutes % 60;
 
-  const currentTime = new Date(date);
-  currentTime.setHours(hours, minutes, 0, 0);
+  // Update cursor indicator
+  hoverDate.value = date;
+  hoverTime.value = roundedMinutes;
 
-  // Update end time based on cursor position
-  if (currentTime > newEntryStart.value) {
-    newEntryEnd.value = currentTime;
-  } else {
-    // If dragging upwards, adjust start instead
-    newEntryEnd.value = newEntryStart.value;
-    newEntryStart.value = currentTime;
+  // Handle creation entry dragging
+  if (creatingEntry.value && newEntryStart.value) {
+    const hours = Math.floor(roundedMinutes / 60);
+    const minutes = roundedMinutes % 60;
+
+    const currentTime = new Date(date);
+    currentTime.setHours(hours, minutes, 0, 0);
+
+    // Update end time based on cursor position
+    if (currentTime > newEntryStart.value) {
+      newEntryEnd.value = currentTime;
+    } else {
+      // If dragging upwards, adjust start instead
+      newEntryEnd.value = newEntryStart.value;
+      newEntryStart.value = currentTime;
+    }
+
+    newEntryHoverY.value = y;
   }
-
-  newEntryHoverY.value = y;
 }
 
 function onDayMouseUp(_event: MouseEvent, _date: Date) {
@@ -875,7 +907,15 @@ function onDayMouseUp(_event: MouseEvent, _date: Date) {
   }
 }
 
+function onDayMouseEnter(date: Date) {
+  hoverDate.value = date;
+}
+
 function onDayMouseLeave() {
+  // Clear cursor indicator
+  hoverDate.value = null;
+  hoverTime.value = null;
+
   // Cancel creation if mouse leaves
   if (creatingEntry.value) {
     creatingEntry.value = false;
@@ -900,6 +940,26 @@ function getNewEntryStyle(): Record<string, string> {
     top: `${topPx}px`,
     height: `${heightPx}px`
   };
+}
+
+function getCursorIndicatorStyle(): Record<string, string> {
+  if (hoverTime.value === null) return {};
+
+  return {
+    top: `${hoverTime.value}px`
+  };
+}
+
+function formatCursorTime(): string {
+  if (hoverTime.value === null) return '';
+
+  const hours = Math.floor(hoverTime.value / 60);
+  const minutes = hoverTime.value % 60;
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const displayHour = hours % 12 || 12;
+  const displayMinutes = minutes.toString().padStart(2, '0');
+
+  return `${displayHour}:${displayMinutes} ${ampm}`;
 }
 
 async function promptForCard() {
@@ -988,6 +1048,14 @@ function onEntryClick(entry: TimeEntry) {
   }
   // Open the card
   getTrelloCard().showCard(entry.cardId);
+}
+
+function onEntryMouseEnter() {
+  hoveringOverEntry.value = true;
+}
+
+function onEntryMouseLeave() {
+  hoveringOverEntry.value = false;
 }
 
 async function onDeleteEntry(entry: TimeEntry) {
@@ -1630,6 +1698,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  user-select: none;
 }
 
 .calendar-header {
@@ -1857,6 +1926,52 @@ onUnmounted(() => {
   &.business-hours {
     background: var(--surface-hover);
   }
+}
+
+.cursor-time-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 4;
+  height: 0;
+}
+
+.cursor-time-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary-color);
+  opacity: 0.4;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    opacity: 0.6;
+  }
+}
+
+.cursor-time-label {
+  position: absolute;
+  left: 12px;
+  top: -10px;
+  background: var(--primary-color);
+  color: var(--primary-color-text);
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.85;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .time-entry {
