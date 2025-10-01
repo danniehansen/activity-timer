@@ -1,10 +1,7 @@
 <template>
   <div v-if="visible" class="activity-timer-card-section">
     <!-- Main actions row -->
-    <div
-      v-if="canWrite"
-      class="flex flex-row justify-content-between gap-2 align-items-center"
-    >
+    <div v-if="canWrite" class="actions-container">
       <div class="flex flex-row gap-2 flex-wrap">
         <Button
           v-if="!isTracking"
@@ -39,16 +36,11 @@
 
       <div v-if="hasEstimates" class="flex flex-row gap-2 flex-wrap">
         <Button
-          :label="`Estimate: ${ownEstimateDisplay}`"
+          :label="estimateButtonLabel"
+          :icon="ownEstimate != totalEstimate ? 'pi pi-users' : 'pi pi-flag'"
+          :title="estimateButtonTitle"
           severity="secondary"
-          @click="changeEstimate"
-        />
-
-        <Button
-          v-if="ownEstimate != totalEstimate"
-          :label="`Total: ${totalEstimateDisplay}`"
-          severity="secondary"
-          @click="viewEstimates"
+          @click="handleEstimateClick"
         />
       </div>
     </div>
@@ -122,7 +114,6 @@ import {
 import { Card } from '../../components/card';
 import { formatTime } from '../../utils/formatting';
 import { hasEstimateFeature } from '../../components/settings';
-import { Trello } from '../../types/trello';
 import { isVisible } from '../../utils/visibility';
 
 const isTracking = ref(false);
@@ -168,6 +159,22 @@ const progressPercentageClass = computed(() => {
   if (percentage >= 100) return 'percentage-over';
   if (percentage >= 80) return 'percentage-warning';
   return 'percentage-good';
+});
+
+const estimateButtonLabel = computed(() => {
+  if (ownEstimate.value !== totalEstimate.value) {
+    // Multiple people have estimates
+    return `Est: ${ownEstimateDisplay.value} / ${totalEstimateDisplay.value}`;
+  }
+  // Only current user has estimate
+  return `Estimate: ${ownEstimateDisplay.value}`;
+});
+
+const estimateButtonTitle = computed(() => {
+  if (ownEstimate.value !== totalEstimate.value) {
+    return `Your estimate: ${ownEstimateDisplay.value}, Total: ${totalEstimateDisplay.value}. Click to view all estimates.`;
+  }
+  return 'Click to change your estimate';
 });
 
 const trelloTick = async () => {
@@ -226,14 +233,14 @@ const stopTracking = async () => {
   await cardModel.stopTracking(getTrelloCard());
 };
 
-const changeEstimate = async (e: MouseEvent) => {
+const handleEstimateClick = async () => {
   const trelloInstance = getTrelloCard();
 
-  await trelloInstance.popup({
-    title: 'Change estimate',
+  await trelloInstance.modal({
+    title: 'Estimates',
     url: './index.html?page=change-estimate',
-    height: 120,
-    mouseEvent: e
+    fullscreen: false,
+    height: 600
   });
 };
 
@@ -245,120 +252,6 @@ const addTimeManually = async (e: MouseEvent) => {
     url: './index.html?page=add-time-manually',
     height: 180,
     mouseEvent: e
-  });
-};
-
-const viewEstimates = async (e: MouseEvent) => {
-  const trelloInstance = getTrelloCard();
-
-  trelloInstance.popup({
-    mouseEvent: e,
-    title: 'Estimates',
-    items: async function (t) {
-      const cardModel = getCardModel();
-      const items: Trello.PowerUp.PopupOptionsItem[] = [];
-      const estimates = await cardModel.getEstimates();
-      const board = await t.board('members');
-
-      const membersFound = board.members.map((member) => member.id);
-
-      board.members
-        .sort((a, b) => {
-          const nameA = (a.fullName ?? '').toUpperCase();
-          const nameB = (b.fullName ?? '').toUpperCase();
-
-          if (nameA < nameB) {
-            return -1;
-          }
-          if (nameA > nameB) {
-            return 1;
-          }
-
-          return 0;
-        })
-        .forEach((member) => {
-          const memberEstimates = estimates.items.filter((estimate) => {
-            return estimate.memberId === member.id;
-          });
-
-          let memberEstimate = 0;
-
-          memberEstimates.forEach((estimate) => {
-            memberEstimate += estimate.time;
-          });
-
-          if (memberEstimate > 0) {
-            items.push({
-              text:
-                member.fullName +
-                (member.fullName !== member.username
-                  ? ' (' + member.username + ')'
-                  : '') +
-                ': ' +
-                formatTime(memberEstimate),
-              callback: async (t: Trello.PowerUp.IFrame) => {
-                return t.popup({
-                  type: 'confirm',
-                  title: 'Delete estimate?',
-                  message: 'Are you sure you wish to delete this estimate?',
-                  confirmText: 'Yes, delete',
-                  onConfirm: async (t) => {
-                    estimates.removeByMemberId(member.id);
-                    await estimates.save();
-                    return t.closePopup();
-                  },
-                  confirmStyle: 'danger',
-                  cancelText: 'No, cancel'
-                });
-              }
-            });
-          }
-        });
-
-      estimates.items.forEach((estimate) => {
-        if (!membersFound.includes(estimate.memberId)) {
-          items.push({
-            text: 'N/A: ' + formatTime(estimate.time),
-            callback: async (t) => {
-              return t.popup({
-                type: 'confirm',
-                title: 'Delete estimate?',
-                message: 'Are you sure you wish to delete this estimate?',
-                confirmText: 'Yes, delete',
-                onConfirm: async (t) => {
-                  estimates.removeByMemberId(estimate.memberId);
-                  await estimates.save();
-                  return t.closePopup();
-                },
-                confirmStyle: 'danger',
-                cancelText: 'No, cancel'
-              });
-            }
-          });
-        }
-      });
-
-      items.push({
-        text: 'Clear estimates',
-        callback: async (t: Trello.PowerUp.IFrame) => {
-          return t.popup({
-            type: 'confirm',
-            title: 'Are you sure?',
-            message: '',
-            confirmText: 'Yes, clear estimates',
-            onConfirm: async (t) => {
-              estimates.clear();
-              await estimates.save();
-              return t.closePopup();
-            },
-            confirmStyle: 'danger',
-            cancelText: 'No, cancel'
-          });
-        }
-      });
-
-      return items;
-    }
   });
 };
 
@@ -378,6 +271,15 @@ html[data-color-mode='dark'] .row {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.actions-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .limita-footer {

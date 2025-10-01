@@ -353,19 +353,18 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-import { getAppKey } from '../../components/settings';
 import {
   clearToken,
   getMemberId,
   getTrelloCard,
   getTrelloInstance,
-  getValidToken,
   isAuthorized as checkAuthorization
 } from '../../components/trello';
 import { Trello } from '../../types/trello';
 import { formatTime } from '../../utils/formatting';
 import { Range } from '../../components/range';
 import { Card } from '../../components/card';
+import { Timer } from '../../components/timer';
 import {
   CalendarSettings,
   getCalendarSettings,
@@ -1261,20 +1260,8 @@ async function loadTimeEntries() {
   loadingText.value = 'Loading time entries...';
 
   try {
-    const token = await getValidToken();
-
-    if (!token) {
-      savingEntry.value = false;
-      return;
-    }
-
-    const board = await getTrelloInstance().board('id');
-
-    const data = await fetch(
-      `https://api.trello.com/1/boards/${
-        board.id
-      }/cards/all?pluginData=true&fields=id,name,pluginData&key=${getAppKey()}&token=${token}&r=${new Date().getTime()}`
-    ).then<Trello.PowerUp.Card[]>((res) => res.json());
+    // Get cards directly from the board (only active cards, not archived)
+    const data = await getTrelloInstance().cards('id', 'name');
 
     const entries: TimeEntry[] = [];
 
@@ -1282,109 +1269,103 @@ async function loadTimeEntries() {
     const weekEnd = new Date(weekDays.value[6].date);
     weekEnd.setHours(23, 59, 59, 999);
 
-    data.forEach((card) => {
+    // Process each card to get time ranges
+    for (const card of data) {
       cardById[card.id] = card;
 
-      const pluginData = card.pluginData?.find(
-        (pd) => pd.value && pd.value.includes('act-timer-ranges')
-      );
+      const cardModel = new Card(card.id);
+      const ranges = await cardModel.getRanges();
 
-      if (pluginData) {
-        const parsedData = JSON.parse(pluginData.value);
+      ranges.items.forEach((range) => {
+        // Filter by member if specified
+        if (
+          !isAdmin.value ||
+          !selectedMember.value ||
+          range.memberId === selectedMember.value
+        ) {
+          const startDate = new Date(range.start * 1000);
+          const endDate = new Date(range.end * 1000);
 
-        if (parsedData['act-timer-ranges']) {
-          parsedData['act-timer-ranges'].forEach(
-            (rangeData: [string, number, number]) => {
-              const [memberId, start, end] = rangeData;
+          // Only include entries in current week
+          if (startDate >= weekStart && startDate <= weekEnd) {
+            // Split entries that span multiple days
+            const currentDate = new Date(startDate);
+            currentDate.setHours(0, 0, 0, 0);
 
-              // Filter by member if specified
+            const isMultiDay =
+              startDate.getDate() !== endDate.getDate() ||
+              startDate.getMonth() !== endDate.getMonth() ||
+              startDate.getFullYear() !== endDate.getFullYear();
+
+            while (currentDate <= endDate) {
+              const dayStart = new Date(currentDate);
+              const dayEnd = new Date(currentDate);
+              dayEnd.setHours(23, 59, 59, 999);
+
+              const segmentStart =
+                currentDate.getTime() === dayStart.getTime() &&
+                startDate > dayStart
+                  ? startDate
+                  : dayStart;
+              const segmentEnd = endDate < dayEnd ? endDate : dayEnd;
+
+              // Only add if segment has actual duration and is within week
               if (
-                !isAdmin.value ||
-                !selectedMember.value ||
-                memberId === selectedMember.value
+                segmentStart < segmentEnd &&
+                segmentStart >= weekStart &&
+                segmentStart <= weekEnd
               ) {
-                const startDate = new Date(start * 1000);
-                const endDate = new Date(end * 1000);
-
-                // Only include entries in current week
-                if (startDate >= weekStart && startDate <= weekEnd) {
-                  const range = new Range(memberId, start, end);
-
-                  // Split entries that span multiple days
-                  const currentDate = new Date(startDate);
-                  currentDate.setHours(0, 0, 0, 0);
-
-                  const isMultiDay =
-                    startDate.getDate() !== endDate.getDate() ||
-                    startDate.getMonth() !== endDate.getMonth() ||
-                    startDate.getFullYear() !== endDate.getFullYear();
-
-                  while (currentDate <= endDate) {
-                    const dayStart = new Date(currentDate);
-                    const dayEnd = new Date(currentDate);
-                    dayEnd.setHours(23, 59, 59, 999);
-
-                    const segmentStart =
-                      currentDate.getTime() === dayStart.getTime() &&
-                      startDate > dayStart
-                        ? startDate
-                        : dayStart;
-                    const segmentEnd = endDate < dayEnd ? endDate : dayEnd;
-
-                    // Only add if segment has actual duration and is within week
-                    if (
-                      segmentStart < segmentEnd &&
-                      segmentStart >= weekStart &&
-                      segmentStart <= weekEnd
-                    ) {
-                      const entry: TimeEntry = {
-                        id: `${card.id}-${
-                          range.rangeId
-                        }-${currentDate.getTime()}`,
-                        cardId: card.id,
-                        cardName: card.name,
-                        start: new Date(segmentStart),
-                        end: new Date(segmentEnd),
-                        memberId: memberId,
-                        range: range,
-                        isStacked: false,
-                        stackOffset: 0,
-                        isMultiDay: isMultiDay,
-                        originalStart: startDate,
-                        originalEnd: endDate,
-                        isRunning: false
-                      };
-                      entries.push(entry);
-                    }
-
-                    // Move to next day
-                    currentDate.setDate(currentDate.getDate() + 1);
-                    currentDate.setHours(0, 0, 0, 0);
-                  }
-                }
+                const entry: TimeEntry = {
+                  id: `${card.id}-${range.rangeId}-${currentDate.getTime()}`,
+                  cardId: card.id,
+                  cardName: card.name,
+                  start: new Date(segmentStart),
+                  end: new Date(segmentEnd),
+                  memberId: range.memberId,
+                  range: range,
+                  isStacked: false,
+                  stackOffset: 0,
+                  isMultiDay: isMultiDay,
+                  originalStart: startDate,
+                  originalEnd: endDate,
+                  isRunning: false
+                };
+                entries.push(entry);
               }
+
+              // Move to next day
+              currentDate.setDate(currentDate.getDate() + 1);
+              currentDate.setHours(0, 0, 0, 0);
             }
-          );
+          }
         }
-      }
-    });
+      });
+    }
 
     // Query active running timers and add them to the entries
+    const currentMemberId = await getMemberId();
+
     for (const card of data) {
       const cardModel = new Card(card.id);
       const cardTimers = await cardModel.getTimers();
 
-      // Filter timers based on member selection
-      const relevantTimers = cardTimers.items.filter((timer) => {
-        // If admin selected a specific member, show only that member's timer
-        if (isAdmin.value && selectedMember.value) {
-          return timer.memberId === selectedMember.value;
-        }
-        // Otherwise show all timers (default behavior)
-        return true;
-      });
+      // Determine which member(s) to check for running timers
+      let timersToCheck: Timer[] = [];
 
-      relevantTimers.forEach((timer) => {
+      if (isAdmin.value && selectedMember.value) {
+        // Admin viewing a specific member: check only that member's timer
+        const timer = cardTimers.getByMemberId(selectedMember.value);
+        if (timer) timersToCheck.push(timer);
+      } else if (isAdmin.value && !selectedMember.value) {
+        // Admin viewing all members: check all timers
+        timersToCheck = cardTimers.items;
+      } else {
+        // Regular user: check only their own timer
+        const timer = cardTimers.getByMemberId(currentMemberId);
+        if (timer) timersToCheck.push(timer);
+      }
+
+      timersToCheck.forEach((timer) => {
         const startDate = new Date(timer.start * 1000);
         const now = new Date();
 
