@@ -1262,7 +1262,6 @@ async function loadTimeEntries() {
 
   try {
     const token = await getValidToken();
-    console.log('token', token);
 
     if (!token) {
       savingEntry.value = false;
@@ -1432,6 +1431,7 @@ async function loadTimeEntries() {
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
     }
   } catch (e) {
+    Sentry.captureException(e);
     console.error('Failed to load time entries:', e);
 
     // Ensure loading shows for at least 2 seconds even on error
