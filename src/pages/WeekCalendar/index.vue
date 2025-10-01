@@ -1459,7 +1459,7 @@ async function initialize() {
     isAdmin.value = membership?.memberType === 'admin';
 
     // Check if current user can write to the board
-    canWrite.value = await getTrelloCard().memberCanWriteToModel('card');
+    canWrite.value = await getTrelloCard().memberCanWriteToModel('board');
 
     memberOptions.value = board.members
       .sort((a, b) => {
