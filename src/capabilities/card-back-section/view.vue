@@ -253,37 +253,64 @@ const displayedMembers = computed(() => {
 });
 
 const trelloTick = async () => {
-  if (!cardId) {
-    cardId = (await getTrelloCard().card('id')).id;
+  try {
+    // Check if we have valid board context before proceeding
+    const context = getTrelloCard().getContext();
+    if (!context.board) {
+      console.debug(
+        '[activity-timer] Board context missing, skipping trelloTick'
+      );
+      return;
+    }
+
+    if (!cardId) {
+      cardId = (await getTrelloCard().card('id')).id;
+    }
+
+    canWrite.value = await getTrelloCard().memberCanWriteToModel('card');
+    visible.value = await isVisible();
+    hasEstimates.value = await hasEstimateFeature();
+
+    const memberId = await getMemberId();
+    const card = getCardModel();
+
+    isTracking.value = await card.isRunning();
+    trackedTime.value = await card.getTimeSpent();
+
+    const estimates = await card.getEstimates();
+    totalEstimate.value = estimates.totalEstimate;
+
+    const ownEstimateItem = estimates.getByMemberId(memberId);
+
+    if (ownEstimateItem) {
+      ownEstimate.value = ownEstimateItem.time;
+    } else {
+      ownEstimate.value = 0;
+    }
+
+    // Load member summary
+    await loadMemberSummary();
+
+    // Resize iframe after data changes
+    await nextTick();
+    setTimeout(resizeTrelloFrame, 100);
+  } catch (e) {
+    // Silently handle context errors when board is no longer available
+    // This commonly occurs when the card is closed or user navigates away
+    const errorStr = String(e);
+    if (
+      errorStr.includes('Invalid context') ||
+      errorStr.includes('missing board')
+    ) {
+      console.debug(
+        '[activity-timer] Board context lost during trelloTick, ignoring'
+      );
+      return;
+    }
+
+    // Re-throw unexpected errors
+    throw e;
   }
-
-  canWrite.value = await getTrelloCard().memberCanWriteToModel('card');
-  visible.value = await isVisible();
-  hasEstimates.value = await hasEstimateFeature();
-
-  const memberId = await getMemberId();
-  const card = getCardModel();
-
-  isTracking.value = await card.isRunning();
-  trackedTime.value = await card.getTimeSpent();
-
-  const estimates = await card.getEstimates();
-  totalEstimate.value = estimates.totalEstimate;
-
-  const ownEstimateItem = estimates.getByMemberId(memberId);
-
-  if (ownEstimateItem) {
-    ownEstimate.value = ownEstimateItem.time;
-  } else {
-    ownEstimate.value = 0;
-  }
-
-  // Load member summary
-  await loadMemberSummary();
-
-  // Resize iframe after data changes
-  await nextTick();
-  setTimeout(resizeTrelloFrame, 100);
 };
 
 const loadMemberSummary = async () => {
