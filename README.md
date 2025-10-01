@@ -69,7 +69,6 @@ Stay ahead of scope creep with smart notifications. Configure custom thresholds 
 ### 🔔 Smart Notifications
 - **Custom thresholds** - Set alerts at your preferred percentage (e.g., 80% of estimate)
 - **Desktop notifications** - Native browser alerts when you approach time limits
-- **Per-card configuration** - Enable notifications on cards that matter most
 - **Proactive alerts** - Catch scope creep before it becomes a problem
 
 ### 📊 Data & Export (Premium)
