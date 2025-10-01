@@ -1,5 +1,6 @@
 import { Trello } from '../../types/trello';
 import ClockImageWhite from '../../assets/images/clock_white.svg';
+import CalendarImageWhite from '../../assets/images/calendar_white.svg';
 import { clearToken, getMemberId } from '../../components/trello';
 import { isVisible } from '../../utils/visibility';
 import { Card } from '../../components/card';
@@ -14,6 +15,24 @@ export async function getBoardButtons(): Promise<
   }
 
   return [
+    {
+      icon: {
+        light: `${
+          !CalendarImageWhite.includes('http') ? window.location.origin : ''
+        }${CalendarImageWhite}`,
+        dark: `${
+          !CalendarImageWhite.includes('http') ? window.location.origin : ''
+        }${CalendarImageWhite}`
+      },
+      text: 'Week Calendar',
+      callback: async (t) => {
+        await t.modal({
+          url: t.signUrl('./index.html?page=calendar'),
+          title: 'Activity timer - Week Calendar',
+          fullscreen: true
+        });
+      }
+    },
     {
       icon: {
         light: `${
