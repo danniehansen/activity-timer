@@ -98,7 +98,40 @@ if (typeof import.meta.env.VITE_MAILCHIMP_LINK === 'string') {
         tracingOrigins: ['localhost', 'powerup.activity-timer.com', /^\//]
       })
     ],
-    tracesSampleRate: 0.0
+    tracesSampleRate: 0.0,
+    beforeSend(event, hint?) {
+      // Ignore "Plugin disabled on board" errors
+      const error = hint?.originalException;
+      if (
+        error &&
+        typeof error === 'string' &&
+        error.includes('PostMessageIO:PluginDisabled')
+      ) {
+        return null;
+      }
+
+      // Also check error messages
+      if (
+        event.message &&
+        event.message.includes('PostMessageIO:PluginDisabled')
+      ) {
+        return null;
+      }
+
+      // Check exception values
+      if (event.exception?.values) {
+        for (const exception of event.exception.values) {
+          if (
+            exception.value?.includes('PostMessageIO:PluginDisabled') ||
+            exception.value?.includes('Plugin disabled on board')
+          ) {
+            return null;
+          }
+        }
+      }
+
+      return event;
+    }
   });
 }
 
