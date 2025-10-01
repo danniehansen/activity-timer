@@ -55,7 +55,7 @@ const onStyleLoaded = () => {
 if ('getContext' in t) {
   const context = t.getContext();
 
-  if (context.theme) {
+  if (context?.theme) {
     onThemeChange(context.theme);
   }
 

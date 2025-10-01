@@ -44,14 +44,6 @@ export async function getBoardButtons(): Promise<
       },
       text: 'Activity timer',
       callback: async (t) => {
-        let hasRestApiToken = false;
-
-        try {
-          hasRestApiToken = await t.getRestApi().isAuthorized();
-        } catch (e) {
-          // Ignore RestApi errors. Most likely due to incognito.
-        }
-
         const items: Trello.PowerUp.PopupOptionsItem[] = [
           {
             text: 'Week Calendar',
@@ -82,13 +74,26 @@ export async function getBoardButtons(): Promise<
                 fullscreen: true
               });
             }
-          }
-        ];
-
-        if (hasRestApiToken) {
-          items.push({
+          },
+          {
             text: 'Reset Connection',
             callback: async (t) => {
+              let hasRestApiToken = false;
+
+              try {
+                hasRestApiToken = await t.getRestApi().isAuthorized();
+              } catch (e) {
+                // Ignore RestApi errors. Most likely due to incognito.
+              }
+
+              if (!hasRestApiToken) {
+                return t.alert({
+                  message:
+                    'No connection to reset. Connect first by using a feature that requires authentication.',
+                  display: 'info'
+                });
+              }
+
               return t.popup({
                 type: 'confirm',
                 title: 'Are you sure?',
@@ -107,39 +112,35 @@ export async function getBoardButtons(): Promise<
                 cancelText: 'Cancel'
               });
             }
-          });
-        }
+          }
+        ];
 
-        // Check if active timer is running
-        let running = false;
+        // Add menu item to find and go to running timer
+        items.push({
+          text: 'Go to Running Timer',
+          callback: async (t) => {
+            const cards = await t.cards('id');
+            const memberId = await getMemberId();
 
-        const cards = await t.cards('id');
-        const memberId = await getMemberId();
+            for (const card of cards) {
+              const cardModel = new Card(card.id);
+              const cardTimers = await cardModel.getTimers();
+              const timer = cardTimers.getByMemberId(memberId);
 
-        for (const card of cards) {
-          const cardModel = new Card(card.id);
-          const cardTimers = await cardModel.getTimers();
-          const timer = cardTimers.getByMemberId(memberId);
-
-          if (timer) {
-            running = true;
-
-            items.push({
-              text: 'Timer: Running. Click to open card',
-              callback: async (t) => {
+              if (timer) {
+                // Found a running timer, close popup and open the card
                 t.closePopup();
-
                 return t.showCard(card.id);
               }
+            }
+
+            // No running timer found
+            await t.alert({
+              message: 'No running timer found',
+              display: 'info'
             });
           }
-        }
-
-        if (!running) {
-          items.push({
-            text: 'Timer: Not running'
-          });
-        }
+        });
 
         items.push({
           text: 'Version: 2.9.0'
