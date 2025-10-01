@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - Added estimate vs time spent viewer on card display
 
- - Reworked card UI and enabled the user to log time entries manually
+ - Reworked card UI and enabled the user to log time entries manually, incorporated card button functionality into card UI.
 
  - Reworked card estimates UI to be a modal with improved UX
 
