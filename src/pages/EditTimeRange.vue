@@ -57,7 +57,7 @@
 
       <div class="new-duration" :class="{ 'has-error': hasError }">
         <div class="duration-content">
-          <span class="duration-label">New Duration:</span>
+          <span class="duration-lendDateabel">New Duration:</span>
           <span class="duration-value" :class="{ error: hasError }">
             {{ formatTime(newDuration) }}
           </span>
@@ -114,16 +114,19 @@ const currentDuration = computed(() => {
 });
 
 const newDuration = computed(() => {
+  if (!startDate.value || !endDate.value) return 0;
   const start = Math.floor(startDate.value.getTime() / 1000);
   const end = Math.floor(endDate.value.getTime() / 1000);
   return Math.max(0, end - start);
 });
 
 const hasError = computed(() => {
+  if (!startDate.value || !endDate.value) return false;
   return startDate.value >= endDate.value;
 });
 
 const errorMessage = computed(() => {
+  if (!startDate.value || !endDate.value) return '';
   if (startDate.value >= endDate.value) {
     return 'End time must be after start time';
   }

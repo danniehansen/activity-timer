@@ -103,16 +103,19 @@ const isDarkMode = computed(() => {
 });
 
 const duration = computed(() => {
+  if (!startDate.value || !endDate.value) return 0;
   const start = Math.floor(startDate.value.getTime() / 1000);
   const end = Math.floor(endDate.value.getTime() / 1000);
   return Math.max(0, end - start);
 });
 
 const hasError = computed(() => {
+  if (!startDate.value || !endDate.value) return false;
   return startDate.value >= endDate.value;
 });
 
 const errorMessage = computed(() => {
+  if (!startDate.value || !endDate.value) return '';
   if (startDate.value >= endDate.value) {
     return 'End time must be after start time';
   }
@@ -146,7 +149,7 @@ const onDateChange = () => {
 };
 
 const addTime = async () => {
-  if (hasError.value) return;
+  if (hasError.value || !startDate.value || !endDate.value) return;
 
   const card = new Card(cardId.value);
   const ranges = await card.getRanges();
