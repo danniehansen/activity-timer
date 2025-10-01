@@ -1,83 +1,143 @@
-# 🚀 The Next Generation is Coming: Limita
+# Activity Timer - Time Tracking Built Into Trello
 
-**Activity Timer continues to evolve!** We're building **[Limita](https://limita.org/)** - the next generation time tracking and project management platform from the team behind Activity Timer.
+**Trusted by 27,000+ teams worldwide.** Activity Timer is a Trello Power-Up that eliminates context-switching by bringing time tracking directly into your Trello cards. Track time spent on work, set estimates, receive smart notifications, and export comprehensive reports - all without leaving Trello.
 
-### What's Coming in Limita:
-- 🎯 **Advanced Project Management** - Sprints, Kanban boards, and team collaboration
-- 📊 **Smart Estimation & Alerts** - Get notified when tasks exceed time estimates
-- 🔗 **Seamless Integrations** - Trello, Jira, Slack, Google Calendar, and more
-- 📈 **Advanced Analytics** - JQL-style reporting with powerful query builder
-- 🔄 **Complete Migration Support** - Bring all your Activity Timer data with you
+### ⚡ What Activity Timer Does:
+- ⏱️ **One-Click Time Tracking** - Start/stop timers directly on Trello cards
+- 🎯 **Time Estimation** - Set individual or team estimates and track progress
+- 🔔 **Smart Notifications** - Get alerted when approaching estimate thresholds
+- 👥 **Team Visibility** - See time spent by all members on shared cards
+- 📊 **Data Export** - Export time tracking data to CSV with advanced filtering
+- 📅 **Calendar View** - Visualize your week of time tracking
+- 🔌 **API Access** - All data stored in Trello's native storage, accessible via REST API
 
-**Activity Timer will continue to be maintained and supported** while we build the future of time tracking.
-
-**[Join the Beta Waitlist at limita.org →](https://limita.org/)**
+**Open source, privacy-first, and actively maintained.**
 
 ---
 
-# Activity timer
+## ⚡ Quick Start
 
-[![Code quality](https://github.com/danniehansen/activity-timer/actions/workflows/code_quality.yml/badge.svg?branch=master)](https://github.com/danniehansen/activity-timer/actions/workflows/code_quality.yml)
-
-[![Deployment](https://github.com/danniehansen/activity-timer/actions/workflows/deploy_prod.yml/badge.svg?branch=master)](https://github.com/danniehansen/activity-timer/actions/workflows/deploy_prod.yml)
-
-Time is precious, this we know. Keeping track of this precious time is hard. Activity timer solves just that! With Activity timer you can now keep track on your time spent working with cards.
-
-
-## Explained
-
-To start tracking your time you need to manually start timer. This you do up top of your card as simple as clicking "Start timer". Once timer has started you will be able to see total time spent right next to the button you clicked. 
+Track time with one click. Simply open any Trello card and click **"Start timer"** in the Activity Timer section. Your time spent appears in real-time next to the button.
 
 ![alt text](assets/screenshot1.png "Start timer & time spent")
 
-Once timer has started "Start timer" will switch over to a "Stop timer" button. Clicking this will stop the timer and register your time slot in the logs.
+Click **"Stop timer"** to end your tracking session and automatically log the time range.
 
 ![alt text](assets/screenshot2.png "Stop timer & time spent")
 
-At any given time you can in the card "Power-ups" section manage time and even see a list over time spent by every team member for this card.
+### 📊 Powerful Time Management
 
-![alt text](assets/screenshot3.png "Clear data, manage time and time spent")
-![alt text](assets/screenshot5.png "Manage time")
+Access comprehensive time management tools through the Activity Timer section on any card. View detailed breakdowns of time spent by every team member, manually add time entries for past work, edit existing trackings, or clear data as needed. All changes are instantly visible to your entire team.
 
-In addition to this you'll be able to quickly peak at the total time spent for a card when viewing the board.
+### 👀 Board-Level Visibility
+
+See total time spent on any card directly from the board view - no need to open individual cards.
 
 ![alt text](assets/screenshot4.png "Time spent")
 
-Activity timer also provides you with the ability to put estimates on your cards.
+### 🎯 Smart Estimation & Progress Tracking
+
+Set time estimates for realistic planning and progress tracking. Each team member can set their own estimate, and Activity Timer automatically calculates team totals.
 
 ![alt text](assets/screenshot7.png "Estimate")
 
-Clicking the estimate box will show a popup where you can create/update your estimate.
+Estimates display prominently on both board and card views with visual progress bars showing how actual time compares to your estimates. When multiple team members set estimates, you can view the combined total as well as individual breakdowns - perfect for collaborative work. Update estimates anytime as project scope evolves.
 
-![alt text](assets/screenshot10.png "Change estimate")
+### 🔔 Intelligent Notifications
 
-Once an estimate have been saved it will show on the board view & also when on the card. If multiple members have set an estimate another box will appear with the total estimate across members. Clicking this will open a popup showing which member estimated what on the task. Very useful for when members collaborate on the same cards.
+Stay ahead of scope creep with smart notifications. Configure custom thresholds to receive desktop alerts when you've spent a specific percentage of your estimated time (e.g., get notified at 80% or 90%). Enable notifications per-card to focus on your most important work, and react quickly to any drift in estimates before it becomes a problem.
 
-![alt text](assets/screenshot9.png "Estimate")
-![alt text](assets/screenshot8.png "Estimates")
+## ✨ Key Features
 
-Next up there are notifications! Notification allows you to get notified after spent x percent of your estimated time. Allowing you to react quickly to any drift in estimates.
+### ⏱️ Time Tracking
+- **One-click start/stop** - Click "Start timer" on any card to begin tracking
+- **Automatic stop on card move** - Optionally stop timers when moving cards between lists
+- **Manual time entry** - Add time entries manually for past work
+- **Edit time entries** - Modify or delete existing time trackings
+- **Real-time display** - See time accumulate live as you work
+- **Team visibility** - View time spent by all members on shared cards
+- **Minimum duration threshold** - Prevent accidental short entries (configurable)
 
-![alt text](assets/screenshot11.png "Estimates")
-![alt text](assets/screenshot12.png "Estimates")
+### 🎯 Estimation & Progress
+- **Per-member estimates** - Each team member can set their own time estimate
+- **Team estimate totals** - View combined estimates across all members
+- **Visual progress bars** - See at-a-glance how actual time compares to estimates
+- **Percentage indicators** - Know exactly how much of your estimate is used
+- **Board-level badges** - See time and estimates directly on cards in board view
+- **Estimate management** - Update or remove estimates anytime
 
-## Highlights
+### 🔔 Smart Notifications
+- **Custom thresholds** - Set alerts at your preferred percentage (e.g., 80% of estimate)
+- **Desktop notifications** - Native browser alerts when you approach time limits
+- **Per-card configuration** - Enable notifications on cards that matter most
+- **Proactive alerts** - Catch scope creep before it becomes a problem
 
-1. Easy access to start / stop of timer.
-2. Powerful time management editor to edit previous recordings.
-3. When you move card from one list to another it will automatically stop the timer.
-4. All data on a card is stored in a compressed format that's easy to access through REST API.
-5. Estimation functionality.
-6. Desktop notifications when nearing estimate.
-7. **(Premium)** Exporting tool for exporting powerup data into CSV. This powerful tool allows you to filter Activity timer trackings and control which columns to include in the CSV.
+### 📊 Data & Export (Premium)
+- **CSV export** - Export all time tracking data with advanced filtering
+- **Filter by members** - Focus on specific team members
+- **Filter by lists** - Export data from specific Trello lists
+- **Filter by labels** - Export based on card labels
+- **Date range selection** - Choose custom time periods
+- **Custom column selection** - Include only the data you need
+- **Week calendar view** - Visualize all time entries in a calendar format
 
-## Card data (REST API)
+### 🔌 Developer Features
+- **REST API access** - All data stored in Trello's native storage via plugin data
+- **Compressed format** - Efficient array structure maximizes Trello's 4KB limit
+- **No external database** - Everything lives in Trello for simplicity and security
+- **Open source** - Full codebase available on GitHub
+- **Well documented** - Comprehensive technical documentation
 
-Want to extract logged time and process it in another system? No problem! Activity timer keeps recordings in the shared data of the card. This means you can query the logged time for a card using Trello's own REST API. All the time ranges saved by Activity timer is saved within key `act-timer-ranges` in shared card data. `act-timer-ranges` consists of an array where each item's index equals to:
+## 🔌 API Access & Data Structure
 
-- 0: Member id
-- 1: Start time (unix timestamp)
-- 2: End time (unix timestamp)
+**Built for integration.** Activity Timer stores all time tracking data directly in Trello's native storage, making it accessible through Trello's REST API. Perfect for building custom reports, integrating with other systems, or migrating to new platforms.
 
-## Docs
-You can read more about the internals of Activity timer in [our docs](docs/README.md). This will walk you through the infrastructure as well as how to setup the local development workspace.
+### Data Structure
+
+All time ranges are stored under the key `act-timer-ranges` in the card's shared data. Each entry is a compact array:
+
+```javascript
+[
+  ["memberId", startTimestamp, endTimestamp],
+  ["5f1a2b3c4d5e6f7a8b9c0d1e", 1633024800, 1633028400],  // Example: 1 hour session
+  ["5f1a2b3c4d5e6f7a8b9c0d1e", 1633032000, 1633035600]   // Another session
+]
+```
+
+**Array indices:**
+- `[0]` - Trello member ID
+- `[1]` - Start time (Unix timestamp)
+- `[2]` - End time (Unix timestamp)
+
+Access via Trello REST API: `GET /1/cards/{cardId}/pluginData`
+
+---
+
+## 📚 Documentation & Development
+
+Want to contribute or set up a local development environment? Check out our comprehensive technical documentation:
+
+- **[Technical Overview](https://github.com/danniehansen/activity-timer/blob/master/AGENT.md)** - Architecture, data models, and system design
+
+---
+
+## 🚀 Why Teams Choose Activity Timer
+
+✅ **Zero context switching** - Track time without leaving Trello
+✅ **Trusted by 27,000+ teams** - Proven reliability since 2020
+✅ **Open source** - Full transparency, [view the code on GitHub](https://github.com/danniehansen/activity-timer)
+✅ **Privacy-first** - Your data stays in Trello's secure storage
+✅ **No external database** - Simple architecture, no additional services to maintain
+✅ **Free core features** - Essential time tracking at no cost
+✅ **Developer-friendly** - REST API access and comprehensive documentation
+✅ **Active maintenance** - Regular updates and responsive support
+
+---
+
+## 📄 License & Support
+
+Activity Timer is open source and free to use. Licensed under [MIT](https://github.com/danniehansen/activity-timer/blob/master/LICENSE).
+
+- **GitHub Issues** - [Report bugs or request features](https://github.com/danniehansen/activity-timer/issues)
+- **Documentation** - Comprehensive guides in the [docs folder](https://github.com/danniehansen/activity-timer/tree/master/docs)
+- **Community** - Join 27,000+ teams using Activity Timer
