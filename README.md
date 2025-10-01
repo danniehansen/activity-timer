@@ -123,14 +123,14 @@ Want to contribute or set up a local development environment? Check out our comp
 
 ## 🚀 Why Teams Choose Activity Timer
 
-✅ **Zero context switching** - Track time without leaving Trello
-✅ **Trusted by 27,000+ teams** - Proven reliability since 2020
-✅ **Open source** - Full transparency, [view the code on GitHub](https://github.com/danniehansen/activity-timer)
-✅ **Privacy-first** - Your data stays in Trello's secure storage
-✅ **No external database** - Simple architecture, no additional services to maintain
-✅ **Free core features** - Essential time tracking at no cost
-✅ **Developer-friendly** - REST API access and comprehensive documentation
-✅ **Active maintenance** - Regular updates and responsive support
+* ✅ **Zero context switching** - Track time without leaving Trello
+* ✅ **Trusted by 27,000+ teams** - Proven reliability since 2020
+* ✅ **Open source** - Full transparency, [view the code on GitHub](https://github.com/danniehansen/activity-timer)
+* ✅ **Privacy-first** - Your data stays in Trello's secure storage
+* ✅ **No external database** - Simple architecture, no additional services to maintain
+* ✅ **Free core features** - Essential time tracking at no cost
+* ✅ **Developer-friendly** - REST API access and comprehensive documentation
+* ✅ **Active maintenance** - Regular updates and responsive support
 
 ---
 
