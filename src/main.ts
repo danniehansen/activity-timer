@@ -31,67 +31,10 @@ import './scss/base.scss';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 
-let incognito = false;
-
-try {
-  window.localStorage.getItem('incognito-test');
-} catch (e) {
-  incognito = true;
-}
-
-if (window.location.hash) {
-  const t = window.TrelloPowerUp.iframe(
-    !incognito
-      ? {
-          appKey: getAppKey(),
-          appName: getAppName()
-        }
-      : undefined
-  );
-
-  setTrelloInstance(t);
-} else {
-  const t = window.TrelloPowerUp.initialize(
-    {
-      'card-badges': getCardBadges,
-      'card-buttons': getCardButtons,
-      'card-back-section': getCardBackSection,
-      'board-buttons': getBoardButtons,
-      'show-settings': getShowSettings
-    },
-    !incognito
-      ? {
-          appKey: getAppKey(),
-          appName: getAppName()
-        }
-      : undefined
-  );
-
-  setTrelloInstance(t);
-  initializeWebsocket();
-}
-
-const app = createApp(Router);
-
-app.use(PrimeVue);
-app.component('DataTable', DataTable);
-app.component('Column', Column);
-app.component('Dropdown', Dropdown);
-app.component('MultiSelect', MultiSelect);
-app.component('Checkbox', Checkbox);
-app.component('InputText', InputText);
-app.component('InputNumber', InputNumber);
-app.component('ColumnGroup', ColumnGroup);
-app.component('Slider', Slider);
-app.component('Message', Message);
-app.component('Row', Row);
-
-// eslint-disable-next-line vue/no-reserved-component-names
-app.component('Button', Button);
-
+// Initialize Sentry early to catch errors from Trello initialization
+// Will be fully configured with Vue app later
 if (typeof import.meta.env.VITE_MAILCHIMP_LINK === 'string') {
   Sentry.init({
-    app,
     dsn: 'https://7ce44ae05ff4b7e894b0de51fec56ff9@o4510110410407936.ingest.de.sentry.io/4510110416568400',
     integrations: [
       new Integrations.BrowserTracing({
@@ -134,5 +77,78 @@ if (typeof import.meta.env.VITE_MAILCHIMP_LINK === 'string') {
     }
   });
 }
+
+let incognito = false;
+
+try {
+  window.localStorage.getItem('incognito-test');
+} catch (e) {
+  incognito = true;
+}
+
+if (window.location.hash) {
+  const t = window.TrelloPowerUp.iframe(
+    !incognito
+      ? {
+          appKey: getAppKey(),
+          appName: getAppName()
+        }
+      : undefined
+  );
+
+  setTrelloInstance(t);
+} else {
+  const t = window.TrelloPowerUp.initialize(
+    {
+      'card-badges': getCardBadges,
+      'card-buttons': getCardButtons,
+      'card-back-section': getCardBackSection,
+      'board-buttons': getBoardButtons,
+      'show-settings': getShowSettings
+    },
+    !incognito
+      ? {
+          appKey: getAppKey(),
+          appName: getAppName()
+        }
+      : undefined
+  );
+
+  setTrelloInstance(t);
+  initializeWebsocket();
+}
+
+const app = createApp(Router);
+
+// Configure Sentry with Vue app for Vue-specific error handling
+if (typeof import.meta.env.VITE_MAILCHIMP_LINK === 'string') {
+  app.config.errorHandler = (err, instance, info) => {
+    Sentry.captureException(err, {
+      contexts: {
+        vue: {
+          componentName: instance?.$options?.name,
+          propsData: instance?.$options?.propsData,
+          lifecycleHook: info
+        }
+      }
+    });
+  };
+}
+
+app.use(PrimeVue);
+app.component('DataTable', DataTable);
+app.component('Column', Column);
+app.component('Dropdown', Dropdown);
+app.component('MultiSelect', MultiSelect);
+app.component('Checkbox', Checkbox);
+app.component('InputText', InputText);
+app.component('InputNumber', InputNumber);
+app.component('ColumnGroup', ColumnGroup);
+app.component('Slider', Slider);
+app.component('Message', Message);
+app.component('Row', Row);
+
+// eslint-disable-next-line vue/no-reserved-component-names
+app.component('Button', Button);
 
 app.mount('#app');
