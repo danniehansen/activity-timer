@@ -19,11 +19,11 @@
 
 Track time with one click. Simply open any Trello card and click **"Start timer"** in the Activity Timer section. Your time spent appears in real-time next to the button.
 
-![alt text](assets/screenshot1.png "Start timer & time spent")
+![alt text](assets/_screenshot1.png "Start timer & time spent")
 
 Click **"Stop timer"** to end your tracking session and automatically log the time range.
 
-![alt text](assets/screenshot2.png "Stop timer & time spent")
+![alt text](assets/_screenshot2.png "Stop timer & time spent")
 
 ### 📊 Powerful Time Management
 
@@ -33,13 +33,13 @@ Access comprehensive time management tools through the Activity Timer section on
 
 See total time spent on any card directly from the board view - no need to open individual cards.
 
-![alt text](assets/screenshot4.png "Time spent")
+![alt text](assets/_screenshot4.png "Time spent")
 
 ### 🎯 Smart Estimation & Progress Tracking
 
 Set time estimates for realistic planning and progress tracking. Each team member can set their own estimate, and Activity Timer automatically calculates team totals.
 
-![alt text](assets/screenshot7.png "Estimate")
+![alt text](assets/_screenshot7.png "Estimate")
 
 Estimates display prominently on both board and card views with visual progress bars showing how actual time compares to your estimates. When multiple team members set estimates, you can view the combined total as well as individual breakdowns - perfect for collaborative work. Update estimates anytime as project scope evolves.
 
