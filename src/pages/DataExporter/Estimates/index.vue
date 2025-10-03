@@ -121,7 +121,8 @@
 
       <ColumnGroup type="footer">
         <Row v-if="tableHead.length > 1">
-          <Column v-if="tableHead.length > 2" :colspan="tableHead.length - 1" />
+          <Column v-if="tableHead.length > 2" :colspan="tableHead.length - 2" />
+          <Column :footer="`Total seconds: ${totalTimeSeconds}`" />
           <Column :footer="`Total time: ${totalTimeFormatted}`" />
         </Row>
         <Row v-else>
