@@ -63,7 +63,7 @@
 
         <div v-else class="entries-list">
           <div
-            v-for="range in sortedRanges"
+            v-for="range in visibleRanges"
             :key="range.rangeId"
             class="entry-card"
           >
@@ -94,6 +94,35 @@
                 title="Delete"
                 @click="confirmDeleteRange(range, $event)"
               />
+            </div>
+          </div>
+
+          <!-- Collapsed entries summary -->
+          <div
+            v-if="hasCollapsedEntries"
+            class="collapsed-entry-card"
+            @click="toggleShowAll"
+          >
+            <div class="collapsed-main">
+              <div class="collapsed-icon">
+                <i
+                  :class="
+                    showAllEntries ? 'pi pi-chevron-up' : 'pi pi-chevron-down'
+                  "
+                ></i>
+              </div>
+              <div class="collapsed-details">
+                <span class="collapsed-label">
+                  {{
+                    showAllEntries
+                      ? 'Show Less'
+                      : `${collapsedRanges.length} More Entries`
+                  }}
+                </span>
+                <span v-if="!showAllEntries" class="collapsed-duration">
+                  {{ formatTime(collapsedTotalTime, false) }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -142,6 +171,8 @@ const memberId = ref('');
 const memberName = ref('');
 const timeRanges = ref<Range[]>([]);
 const activeTimer = ref<any>(null);
+const showAllEntries = ref(false);
+const MAX_VISIBLE_ENTRIES = 5;
 let cardId = '';
 
 const hasAnyTime = computed(() => {
@@ -152,6 +183,34 @@ const sortedRanges = computed(() => {
   return [...timeRanges.value].sort((a, b) => b.start - a.start);
 });
 
+const visibleRanges = computed(() => {
+  if (
+    showAllEntries.value ||
+    sortedRanges.value.length <= MAX_VISIBLE_ENTRIES
+  ) {
+    return sortedRanges.value;
+  }
+  return sortedRanges.value.slice(0, MAX_VISIBLE_ENTRIES);
+});
+
+const collapsedRanges = computed(() => {
+  if (
+    showAllEntries.value ||
+    sortedRanges.value.length <= MAX_VISIBLE_ENTRIES
+  ) {
+    return [];
+  }
+  return sortedRanges.value.slice(MAX_VISIBLE_ENTRIES);
+});
+
+const collapsedTotalTime = computed(() => {
+  return collapsedRanges.value.reduce((sum, range) => sum + range.diff, 0);
+});
+
+const hasCollapsedEntries = computed(() => {
+  return sortedRanges.value.length > MAX_VISIBLE_ENTRIES;
+});
+
 const totalTime = computed(() => {
   const rangesTime = timeRanges.value.reduce(
     (sum, range) => sum + range.diff,
@@ -160,6 +219,11 @@ const totalTime = computed(() => {
   const timerTime = activeTimer.value ? activeTimer.value.timeInSecond : 0;
   return rangesTime + timerTime;
 });
+
+const toggleShowAll = () => {
+  showAllEntries.value = !showAllEntries.value;
+  setTimeout(resizeTrelloFrame, 100);
+};
 
 onMounted(async () => {
   const params = new URLSearchParams(window.location.search);
@@ -363,7 +427,7 @@ const openAddManualTime = async () => {
     title: 'Add Time Manually',
     url: `./index.html?page=add-time-range&memberId=${memberId.value}&cardId=${cardId}`,
     fullscreen: false,
-    height: 600
+    height: 650
   });
 
   // Reload data after modal closes
@@ -596,6 +660,69 @@ html[data-color-mode='dark'] .entry-duration {
 .entry-actions {
   display: flex;
   gap: 0.25rem;
+}
+
+/* Collapsed Entry Card */
+.collapsed-entry-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  user-select: none;
+}
+
+.collapsed-entry-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.collapsed-entry-card:active {
+  transform: translateY(0);
+}
+
+html[data-color-mode='dark'] .collapsed-entry-card {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+html[data-color-mode='dark'] .collapsed-entry-card:hover {
+  box-shadow: 0 4px 12px rgba(90, 103, 216, 0.4);
+}
+
+.collapsed-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.collapsed-icon {
+  font-size: 1.25rem;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.collapsed-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.collapsed-label {
+  font-size: 0.9375rem;
+  color: white;
+  font-weight: 600;
+}
+
+.collapsed-duration {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
 }
 
 /* Total Section */

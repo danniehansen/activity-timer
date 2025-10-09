@@ -1,47 +1,57 @@
 <template>
   <div class="flex flex-column align-items-start pt-4 add-time-container">
-    <!-- Help button -->
-    <div class="w-full flex justify-content-end">
+    <!-- Header with button and help -->
+    <div class="w-full flex justify-content-between align-items-center">
+      <Button
+        label="Log Exact Times"
+        icon="pi pi-calendar-clock"
+        outlined
+        size="small"
+        @click="openAddTimeRange"
+      />
       <HelpButton
         feature="manualTime"
         title="Learn about adding time manually"
       />
     </div>
 
-    <span class="p-float-label w-full">
-      <InputNumber
-        id="f-hours"
-        v-model="hours"
-        placeholder="0"
-        class="w-full"
-        :format="false"
-        :use-grouping="false"
-        :min-fraction-digits="0"
-        :max-fraction-digits="2"
-        :min="0"
-        thousand-separator=""
-        locale="en-GB"
-      />
-      <label for="f-hours">Hours</label>
-    </span>
+    <!-- Hours and Minutes inputs side by side -->
+    <div class="w-full flex flex-row input-row">
+      <span class="p-float-label input-half">
+        <InputNumber
+          id="f-hours"
+          v-model="hours"
+          placeholder="0"
+          class="w-full"
+          :format="false"
+          :use-grouping="false"
+          :min-fraction-digits="0"
+          :max-fraction-digits="2"
+          :min="0"
+          thousand-separator=""
+          locale="en-GB"
+        />
+        <label for="f-hours">Hours</label>
+      </span>
 
-    <span class="p-float-label w-full">
-      <InputNumber
-        id="f-minutes"
-        v-model="minutes"
-        placeholder="0"
-        class="w-full"
-        :format="false"
-        :use-grouping="false"
-        :min-fraction-digits="0"
-        :max-fraction-digits="0"
-        :min="0"
-        :max="59"
-        thousand-separator=""
-        locale="en-GB"
-      />
-      <label for="f-minutes">Minutes</label>
-    </span>
+      <span class="p-float-label input-half">
+        <InputNumber
+          id="f-minutes"
+          v-model="minutes"
+          placeholder="0"
+          class="w-full"
+          :format="false"
+          :use-grouping="false"
+          :min-fraction-digits="0"
+          :max-fraction-digits="0"
+          :min="0"
+          :max="59"
+          thousand-separator=""
+          locale="en-GB"
+        />
+        <label for="f-minutes">Minutes</label>
+      </span>
+    </div>
 
     <Button label="Add time" class="w-full" @click="save" />
   </div>
@@ -63,11 +73,30 @@ const minutes = ref<number>(0);
 
 onMounted(() => {
   // Auto-focus the hours input field
-  const hoursInput = document.getElementById('f-hours');
-  if (hoursInput) {
-    hoursInput.focus();
-  }
+  setTimeout(() => {
+    const hoursInput = document.querySelector('#f-hours input');
+    if (hoursInput) {
+      (hoursInput as HTMLInputElement).focus();
+    }
+  }, 100);
 });
+
+const openAddTimeRange = async () => {
+  const trello = getTrelloCard();
+  const memberId = await getMemberId();
+  const card = await trello.card('id');
+
+  await trello.modal({
+    title: 'Add Time Range',
+    url: `./index.html?page=add-time-range&memberId=${memberId}&cardId=${card.id}`,
+    fullscreen: false,
+    height: 650
+  });
+
+  // Close the popup after the modal is closed
+  // This refreshes the data in the parent view
+  await trello.closePopup();
+};
 
 const save = async () => {
   if (!hours.value && !minutes.value) {
@@ -98,6 +127,30 @@ setTimeout(resizeTrelloFrame);
 
 <style scoped>
 .add-time-container {
-  gap: 2rem;
+  gap: 1.5rem;
+}
+
+/* Ensure button has proper spacing */
+.add-time-container > div:first-child {
+  margin-bottom: 0.5rem;
+}
+
+/* Input row with gap */
+.input-row {
+  gap: 1rem;
+}
+
+/* Input fields at 50% width each with gap accounted for */
+.input-half {
+  flex: 1;
+  min-width: 0;
+}
+
+.input-half :deep(.p-inputnumber) {
+  width: 100%;
+}
+
+.input-half :deep(.p-inputtext) {
+  width: 100%;
 }
 </style>
