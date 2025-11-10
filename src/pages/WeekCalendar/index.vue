@@ -346,7 +346,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import {
   clearToken,
   getMemberId,
@@ -412,13 +412,56 @@ const calendarGridRef = ref<HTMLElement | null>(null);
 const memberOptions = ref<{ text: string; value: string }[]>([]);
 const memberById: { [key: string]: Trello.PowerUp.Member } = {};
 const cardById: { [key: string]: Trello.PowerUp.Card } = {};
-const timeEntries = ref<TimeEntry[]>([]);
+const timeEntries = ref<TimeEntry[]>([]); // All entries, unfiltered
 
 const calendarSettings = ref<CalendarSettings>({
   weekStartDay: 1,
   businessHoursStart: 8,
   businessHoursEnd: 18
 });
+
+// Computed property that filters entries by week and member
+const timeEntriesFiltered = computed(() => {
+  // Compute week start/end directly to avoid initialization order issues
+  const d = new Date(currentWeekStart.value);
+  const day = d.getDay();
+  const startDay = calendarSettings.value.weekStartDay;
+  const diff = day < startDay ? 7 - startDay + day : day - startDay;
+  d.setDate(d.getDate() - diff);
+  d.setHours(0, 0, 0, 0);
+  const weekStart = d;
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
+
+  return timeEntries.value.filter((entry) => {
+    // Filter by member if specified
+    if (
+      isAdmin.value &&
+      selectedMember.value &&
+      entry.memberId !== selectedMember.value
+    ) {
+      return false;
+    }
+
+    // Filter by week - include entries that overlap with the current week
+    const entryStart = new Date(entry.start);
+    const entryEnd = new Date(entry.end);
+
+    // Entry overlaps with week if it starts before week ends and ends after week starts
+    return entryStart <= weekEnd && entryEnd >= weekStart;
+  });
+});
+
+// Watch for changes to filtered entries and recalculate overlaps
+watch(
+  timeEntriesFiltered,
+  () => {
+    detectOverlaps();
+  },
+  { immediate: true }
+);
 
 const weekStartOptions = [
   { text: 'Sunday', value: 0 },
@@ -604,7 +647,7 @@ async function saveSettingsAndClose() {
 }
 
 function getEntriesForDay(date: Date): TimeEntry[] {
-  return timeEntries.value.filter((entry) => {
+  return timeEntriesFiltered.value.filter((entry) => {
     const entryDate = new Date(entry.start);
     return (
       entryDate.getDate() === date.getDate() &&
@@ -664,14 +707,14 @@ function formatDayTotal(date: Date): string {
 }
 
 const totalWeekFormatted = computed(() => {
-  const total = timeEntries.value.reduce((sum, entry) => {
+  const total = timeEntriesFiltered.value.reduce((sum, entry) => {
     return sum + (entry.end.getTime() - entry.start.getTime()) / 1000;
   }, 0);
   return formatTime(Math.floor(total), true);
 });
 
 const averageDayFormatted = computed(() => {
-  const total = timeEntries.value.reduce((sum, entry) => {
+  const total = timeEntriesFiltered.value.reduce((sum, entry) => {
     return sum + (entry.end.getTime() - entry.start.getTime()) / 1000;
   }, 0);
   const average = total / 7;
@@ -1273,7 +1316,7 @@ function detectOverlaps() {
   // Group entries by day
   const entriesByDay = new Map<string, TimeEntry[]>();
 
-  timeEntries.value.forEach((entry) => {
+  timeEntriesFiltered.value.forEach((entry) => {
     const key = `${entry.start.getFullYear()}-${entry.start.getMonth()}-${entry.start.getDate()}`;
     if (!entriesByDay.has(key)) {
       entriesByDay.set(key, []);
@@ -1317,11 +1360,7 @@ async function loadTimeEntries() {
 
     const entries: TimeEntry[] = [];
 
-    const weekStart = weekDays.value[0].date;
-    const weekEnd = new Date(weekDays.value[6].date);
-    weekEnd.setHours(23, 59, 59, 999);
-
-    // Process each card to get time ranges
+    // Process each card to get time ranges - load ALL entries, no filtering
     for (const card of data) {
       cardById[card.id] = card;
 
@@ -1329,67 +1368,52 @@ async function loadTimeEntries() {
       const ranges = await cardModel.getRanges();
 
       ranges.items.forEach((range) => {
-        // Filter by member if specified
-        if (
-          !isAdmin.value ||
-          !selectedMember.value ||
-          range.memberId === selectedMember.value
-        ) {
-          const startDate = new Date(range.start * 1000);
-          const endDate = new Date(range.end * 1000);
+        const startDate = new Date(range.start * 1000);
+        const endDate = new Date(range.end * 1000);
 
-          // Only include entries in current week
-          if (startDate >= weekStart && startDate <= weekEnd) {
-            // Split entries that span multiple days
-            const currentDate = new Date(startDate);
-            currentDate.setHours(0, 0, 0, 0);
+        // Split entries that span multiple days
+        const currentDate = new Date(startDate);
+        currentDate.setHours(0, 0, 0, 0);
 
-            const isMultiDay =
-              startDate.getDate() !== endDate.getDate() ||
-              startDate.getMonth() !== endDate.getMonth() ||
-              startDate.getFullYear() !== endDate.getFullYear();
+        const isMultiDay =
+          startDate.getDate() !== endDate.getDate() ||
+          startDate.getMonth() !== endDate.getMonth() ||
+          startDate.getFullYear() !== endDate.getFullYear();
 
-            while (currentDate <= endDate) {
-              const dayStart = new Date(currentDate);
-              const dayEnd = new Date(currentDate);
-              dayEnd.setHours(23, 59, 59, 999);
+        while (currentDate <= endDate) {
+          const dayStart = new Date(currentDate);
+          const dayEnd = new Date(currentDate);
+          dayEnd.setHours(23, 59, 59, 999);
 
-              const segmentStart =
-                currentDate.getTime() === dayStart.getTime() &&
-                startDate > dayStart
-                  ? startDate
-                  : dayStart;
-              const segmentEnd = endDate < dayEnd ? endDate : dayEnd;
+          const segmentStart =
+            currentDate.getTime() === dayStart.getTime() && startDate > dayStart
+              ? startDate
+              : dayStart;
+          const segmentEnd = endDate < dayEnd ? endDate : dayEnd;
 
-              // Only add if segment has actual duration and is within week
-              if (
-                segmentStart < segmentEnd &&
-                segmentStart >= weekStart &&
-                segmentStart <= weekEnd
-              ) {
-                const entry: TimeEntry = {
-                  id: `${card.id}-${range.rangeId}-${currentDate.getTime()}`,
-                  cardId: card.id,
-                  cardName: card.name,
-                  start: new Date(segmentStart),
-                  end: new Date(segmentEnd),
-                  memberId: range.memberId,
-                  range: range,
-                  isStacked: false,
-                  stackOffset: 0,
-                  isMultiDay: isMultiDay,
-                  originalStart: startDate,
-                  originalEnd: endDate,
-                  isRunning: false
-                };
-                entries.push(entry);
-              }
-
-              // Move to next day
-              currentDate.setDate(currentDate.getDate() + 1);
-              currentDate.setHours(0, 0, 0, 0);
-            }
+          // Only add if segment has actual duration
+          if (segmentStart < segmentEnd) {
+            const entry: TimeEntry = {
+              id: `${card.id}-${range.rangeId}-${currentDate.getTime()}`,
+              cardId: card.id,
+              cardName: card.name,
+              start: new Date(segmentStart),
+              end: new Date(segmentEnd),
+              memberId: range.memberId,
+              range: range,
+              isStacked: false,
+              stackOffset: 0,
+              isMultiDay: isMultiDay,
+              originalStart: startDate,
+              originalEnd: endDate,
+              isRunning: false
+            };
+            entries.push(entry);
           }
+
+          // Move to next day
+          currentDate.setDate(currentDate.getDate() + 1);
+          currentDate.setHours(0, 0, 0, 0);
         }
       });
     }
@@ -1421,41 +1445,37 @@ async function loadTimeEntries() {
         const startDate = new Date(timer.start * 1000);
         const now = new Date();
 
-        // Only add if timer started within the current week
-        if (startDate >= weekStart && startDate <= weekEnd) {
-          // Add running timer entry for today
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
+        // Add running timer entry for today
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-          const runningEntry: TimeEntry = {
-            id: `${card.id}-running-${timer.memberId}`,
-            cardId: card.id,
-            cardName: card.name,
-            start: startDate > today ? startDate : today,
-            end: now,
-            memberId: timer.memberId,
-            range: new Range(
-              timer.memberId,
-              timer.start,
-              Math.floor(now.getTime() / 1000)
-            ),
-            isStacked: false,
-            stackOffset: 0,
-            isMultiDay:
-              startDate.getDate() !== now.getDate() ||
-              startDate.getMonth() !== now.getMonth() ||
-              startDate.getFullYear() !== now.getFullYear(),
-            originalStart: startDate,
-            originalEnd: now,
-            isRunning: true
-          };
-          entries.push(runningEntry);
-        }
+        const runningEntry: TimeEntry = {
+          id: `${card.id}-running-${timer.memberId}`,
+          cardId: card.id,
+          cardName: card.name,
+          start: startDate > today ? startDate : today,
+          end: now,
+          memberId: timer.memberId,
+          range: new Range(
+            timer.memberId,
+            timer.start,
+            Math.floor(now.getTime() / 1000)
+          ),
+          isStacked: false,
+          stackOffset: 0,
+          isMultiDay:
+            startDate.getDate() !== now.getDate() ||
+            startDate.getMonth() !== now.getMonth() ||
+            startDate.getFullYear() !== now.getFullYear(),
+          originalStart: startDate,
+          originalEnd: now,
+          isRunning: true
+        };
+        entries.push(runningEntry);
       });
     }
 
     timeEntries.value = entries;
-    detectOverlaps();
 
     // Ensure loading shows for at least 2 seconds
     const elapsedTime = Date.now() - startTime;

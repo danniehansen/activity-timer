@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.9.1] - 2025-11-10
+
+### Fixed
+
+- Fixed week calendar not showing trackings outside of the current week.
+
 ## [2.9.0] - 2025-09-30/2025-09-31/2025-10-01
 
 ### Security
