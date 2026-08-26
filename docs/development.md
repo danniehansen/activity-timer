@@ -38,7 +38,7 @@ First up is [creating a Trello team](https://help.trello.com/article/705-creatin
 
 Once the team is setup, then you're ready to [create your powerup](https://trello.com/power-ups/admin).
 
-Under basic information you need to fill in the iframe connector URL with: `https://localhost:3001/` - this is for local development.
+Under basic information you need to fill in the iframe connector URL with: `https://localhost:8080/` - this is for local development.
 
 After this you need to enable the capabilities that the powerup uses:
 
@@ -55,7 +55,7 @@ When this is done you can create a new Trello board under your new Trello team. 
 ```
 npm run dev
 ```
-This will startup the local development environment. Before you can view your powerup locally you need to open up `https://localhost:3001/` & allow the self signed certificate. Once allowed you can refresh the Trello board & see your local powerup in action!
+This will startup the local development environment. Before you can view your powerup locally you need to open up `https://localhost:8080/` & allow the self signed certificate. Once allowed you can refresh the Trello board & see your local powerup in action!
 <hr />
 
 ```

@@ -4,7 +4,7 @@
   "author": "Dannie Hansen",
   "license": "MIT",
   "scripts": {
-    "dev": "vite --port 3001",
+    "dev": "vite --port 8080",
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
     "lint": "eslint --ext .js --ext .ts --ext .vue .",

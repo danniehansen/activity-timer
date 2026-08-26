@@ -97,48 +97,25 @@
           outlined
           @click="openPricing"
         />
-        <Button
-          label="Read the Full Story"
-          icon="pi pi-book"
-          severity="secondary"
-          outlined
-          @click="openBlogPost"
-        />
-      </div>
-
-      <!-- Support Section -->
-      <div class="support-section">
-        <p>
-          <strong>Need help with Activity Timer?</strong><br />
-          <a
-            href="https://github.com/danniehansen/activity-timer/issues"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="support-link"
-            >Report issues on GitHub</a
-          >
-          or email
-          <a href="mailto:support@limita.org" class="support-link"
-            >support@limita.org</a
-          >
-        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { getLimitaUrl } from '../utils/limita-links';
+
 const openLimitaWebsite = () => {
-  window.open('https://limita.org', '_blank', 'noopener,noreferrer');
+  window.open(
+    getLimitaUrl('/', 'announcement-visit-site'),
+    '_blank',
+    'noopener,noreferrer'
+  );
 };
 
 const openPricing = () => {
-  window.open('https://limita.org/pricing/', '_blank', 'noopener,noreferrer');
-};
-
-const openBlogPost = () => {
   window.open(
-    'https://limita.org/blog/building-what-feels-right/',
+    getLimitaUrl('/pricing/', 'announcement-pricing'),
     '_blank',
     'noopener,noreferrer'
   );
@@ -278,41 +255,5 @@ html[data-color-mode='dark'] .info-card h3 {
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
-}
-
-.support-section {
-  padding-top: 1rem;
-  border-top: 1px solid #e9ecef;
-  font-size: 0.875rem;
-  color: #6c757d;
-}
-
-html[data-color-mode='dark'] .support-section {
-  border-top-color: #4a5568;
-  color: #a0aec0;
-}
-
-.support-section p {
-  margin: 0;
-  line-height: 1.6;
-}
-
-.support-link {
-  color: #0079bf;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.support-link:hover {
-  color: #005a8c;
-  text-decoration: underline;
-}
-
-html[data-color-mode='dark'] .support-link {
-  color: #4dabf7;
-}
-
-html[data-color-mode='dark'] .support-link:hover {
-  color: #74c0fc;
 }
 </style>

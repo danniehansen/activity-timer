@@ -1,5 +1,16 @@
 <template>
   <div v-if="visible" class="activity-timer-card-section">
+    <!-- Maintenance mode announcement banner -->
+    <div class="limita-banner" @click="openLimitaAnnouncement">
+      <div class="limita-banner-content">
+        <span class="limita-badge">New</span>
+        <span class="limita-banner-text"
+          >Activity Timer is entering maintenance mode</span
+        >
+      </div>
+      <span class="limita-banner-cta">Learn about maintenance mode →</span>
+    </div>
+
     <!-- Header with help button and settings icon -->
     <div class="section-header">
       <h3 class="section-title">Activity Timer</h3>
@@ -137,17 +148,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Limita announcement banner -->
-    <div class="limita-banner" @click="openLimitaAnnouncement">
-      <div class="limita-banner-content">
-        <span class="limita-badge">New</span>
-        <span class="limita-banner-text"
-          >Activity Timer is entering maintenance mode</span
-        >
-      </div>
-      <span class="limita-banner-cta">Learn about Limita →</span>
     </div>
   </div>
 
@@ -424,7 +424,7 @@ const openLimitaAnnouncement = async () => {
     title: 'Introducing Limita',
     url: './index.html?page=limita-announcement',
     fullscreen: false,
-    height: 900
+    height: 1100
   });
 };
 
@@ -671,7 +671,7 @@ html[data-color-mode='dark'] .progress-over {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.625rem 0.75rem;
-  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 6px;
   cursor: pointer;

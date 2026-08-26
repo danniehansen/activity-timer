@@ -566,13 +566,13 @@ AWS_REGION="eu-west-1"                   # AWS region
 ### Local Development
 ```bash
 npm install
-npm run dev  # Starts Vite on https://localhost:3001
+npm run dev  # Starts Vite on https://localhost:8080
 ```
 
 **Setup Requirements**:
 1. Create Trello team
 2. Create Power-Up at https://trello.com/power-ups/admin
-3. Set iframe URL to `https://localhost:3001/`
+3. Set iframe URL to `https://localhost:8080/`
 4. Enable capabilities: Board buttons, Card badges, Card buttons, Card back section, Show settings
 5. Accept self-signed certificate in browser
 

@@ -382,7 +382,7 @@ const openLimitaAnnouncement = async () => {
     title: 'Introducing Limita',
     url: './index.html?page=limita-announcement',
     fullscreen: false,
-    height: 900
+    height: 1100
   });
 };
 
