@@ -672,7 +672,9 @@ html[data-color-mode='dark'] .entry-duration {
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   user-select: none;
 }
 

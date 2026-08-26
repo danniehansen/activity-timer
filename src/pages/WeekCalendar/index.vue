@@ -1902,7 +1902,10 @@ onUnmounted(() => {
   overflow: hidden;
   z-index: 1;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: box-shadow 0.2s, opacity 0.2s, background 0.2s;
+  transition:
+    box-shadow 0.2s,
+    opacity 0.2s,
+    background 0.2s;
   font-size: 13px;
 
   &:hover {
@@ -2042,7 +2045,9 @@ onUnmounted(() => {
   justify-content: center;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s, background 0.2s;
+  transition:
+    opacity 0.2s,
+    background 0.2s;
   z-index: 10;
   padding: 0;
 

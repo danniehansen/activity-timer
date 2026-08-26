@@ -28,7 +28,6 @@ import Divider from 'primevue/divider';
 // Styling
 import './scss/base.scss';
 import 'primeicons/primeicons.css';
-import 'primeflex/primeflex.css';
 
 let incognito = false;
 

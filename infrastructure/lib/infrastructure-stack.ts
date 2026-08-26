@@ -19,13 +19,13 @@ import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import {
   HttpLambdaIntegration,
   WebSocketLambdaIntegration
-} from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
+} from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import {
   HttpApi,
   HttpMethod,
   WebSocketApi,
   WebSocketStage
-} from '@aws-cdk/aws-apigatewayv2-alpha';
+} from 'aws-cdk-lib/aws-apigatewayv2';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
@@ -176,7 +176,7 @@ export class InfrastructureStack extends cdk.Stack {
     });
 
     const apiLambda = new lambda.Function(this, 'api-lambda', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.main',
       code: lambda.Code.fromAsset(path.join(__dirname, '/../../src/api/http')),
       environment: {
@@ -191,7 +191,7 @@ export class InfrastructureStack extends cdk.Stack {
     table.grantReadWriteData(apiLambda);
 
     const websocketLambda = new lambda.Function(this, 'api-websocket-lambda', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.main',
       code: lambda.Code.fromAsset(
         path.join(__dirname, '/../../src/api/websocket')

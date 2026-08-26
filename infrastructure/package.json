@@ -11,19 +11,17 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@types/jest": "^29.0.0",
-    "@types/node": "^16.11.10",
-    "jest": "^29.0.0",
-    "ts-jest": "^29.0.0"
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.13.3",
+    "aws-cdk": "^2.1138.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.12"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.63.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.63.0-alpha.0",
-    "aws-cdk": "^2.63.0",
-    "aws-cdk-lib": "^2.63.0",
-    "constructs": "^10.1.234",
+    "aws-cdk-lib": "^2.266.0",
+    "constructs": "^10.8.1",
     "source-map-support": "^0.5.16",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.9.3"
   }
 }

@@ -636,7 +636,9 @@ html[data-color-mode='dark'] .progress-bar-container {
 
 .progress-bar-fill {
   height: 100%;
-  transition: width 0.3s ease, background-color 0.3s ease;
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
   border-radius: 4px;
 }
 
@@ -675,7 +677,9 @@ html[data-color-mode='dark'] .progress-over {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 6px;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .limita-banner:hover {

@@ -18,7 +18,8 @@ const props = defineProps({
 @font-face {
   font-family: 'icomoon';
   src: url('./assets/fonts/icomoon.eot');
-  src: url('./assets/fonts/icomoon.eot') format('embedded-opentype'),
+  src:
+    url('./assets/fonts/icomoon.eot') format('embedded-opentype'),
     url('./assets/fonts/icomoon.ttf') format('truetype'),
     url('./assets/fonts/icomoon.woff') format('woff'),
     url('./assets/fonts/icomoon.svg') format('svg');

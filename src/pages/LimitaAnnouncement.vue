@@ -3,6 +3,7 @@
     <!-- Video Section -->
     <div class="video-section">
       <div class="video-wrapper">
+        <!-- prettier-ignore -->
         <iframe
           src="https://www.youtube.com/embed/286wNFlJCpk"
           title="Introducing Limita - The paid successor to Activity Timer"

@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.11.0] - 2026-08-26
+
+Full dependency audit and modernisation across all four package manifests. Every
+known advisory in the repository is now closed: 57 vulnerabilities (3 critical,
+18 high) reduced to 0.
+
+### Security
+
+- Updated the AWS SDK in both Lambda packages from 3.398.0 to 3.1118.0, closing 25 advisories including a critical `fast-xml-parser` issue. This is the only code in the project that runs in production. No source changes were required.
+- Moved both Lambda functions from the `nodejs20.x` runtime to `nodejs22.x`. AWS deprecated `nodejs20.x` on 2026-04-30, so the runtime was no longer receiving security patches.
+- Enabled `escapeFormulas` on both CSV exporters. Trello card titles are controllable by anyone who can add a card to the board and were written unescaped into exported CSV, so a title beginning with `=`, `+`, `-` or `@` became a live formula when the export was opened in a spreadsheet (CWE-1236).
+- Updated `@typescript-eslint` from 6.x to 8.x. Version 6 pinned a vulnerable `minimatch` with no version range, which no lockfile refresh could reach.
+- Updated `aws-cdk-lib` to 2.266.0 and `ts-jest` to 29.4.12, the latter closing a critical `handlebars` advisory.
+- Updated Vite from 5 to 7. Vite 5 is end-of-life and was the last thing holding the remaining advisories open.
+- Moved CI from Node 20.x to Node 22.x. Node 20 reached end-of-life on 2026-04-30, so the production artefact was being built and deployed on an unpatched runtime.
+- Refreshed the root lockfile, which alone closed 13 advisories that were already patched inside the existing version ranges.
+
+### Changed
+
+- Migrated ESLint from 8 to 10, replacing `.eslintrc.js` and `.eslintignore` with flat config in `eslint.config.js`. ESLint 8 and 9 are both end-of-life; 10 is the only line still receiving security patches. Reporting behaviour is unchanged.
+- Updated Prettier from 2.7.1 to 3.9.6 as part of the ESLint migration. Because `.prettierrc.json` sets `trailingComma` explicitly, this reformatted only 5 files.
+- Updated `@vuepic/vue-datepicker` from 3.6.8 to 11.0.3. No source changes were needed — the CSS path and the `dp__` class names the dark-mode overrides depend on are unchanged.
+- Updated Vue to 3.5.41, `vue-tsc` to 3.3.11, Sass to 1.103.1, `export-to-csv` to 1.5.0 and `@vitejs/plugin-vue` to 6.0.8.
+- Renamed `vite.config.ts` to `vite.config.mts`, required because `@vitejs/plugin-vue` 6 is ESM-only.
+- Migrated the API Gateway v2 constructs from the deprecated `@aws-cdk/aws-apigatewayv2-alpha` packages to the stable `aws-cdk-lib` modules. This widens three Lambda invoke permissions from `/*/*$connect` to `/*$connect`, correcting a bug in the alpha packages; both patterns match the real invoke ARN.
+- Moved the `aws-cdk` CLI to `devDependencies` and updated it to 2.1138.0 to stay version-compatible with `aws-cdk-lib`.
+- Updated the infrastructure test toolchain to Jest 30 and `@types/node` 24.
+- Pinned PrimeVue to `^3.53.1`, the final v3 release. PrimeVue 4 removes the prebuilt theme stylesheets this project loads by URL to follow Trello's light/dark mode, and PrimeVue 5 is no longer MIT licensed.
+
+### Added
+
+- Inlined the 22 PrimeFlex utility classes the project uses into `src/scss/base.scss`, copied verbatim from PrimeFlex 3.3.1 so rendering is unchanged.
+
+### Removed
+
+- Removed `primeflex`. The upstream repository is archived and PrimeFlex is no longer maintained; its utilities are now inlined (see above).
+- Removed `@types/vue-router`, a deprecated stub package for a router this project does not use — routing is handled by a hand-rolled component.
+- Removed `@vue/eslint-config-typescript`, which had been orphaned since 2023 and was never loaded, but carried an end-of-life `@typescript-eslint` 5 tree.
+- Removed `@babel/types`, a leftover workaround for a `vue-tsc` issue that upstream has since fixed.
+- Removed both `@aws-cdk/aws-apigatewayv2-*-alpha` packages, deprecated in favour of the stable modules.
+
+### Fixed
+
+- Updated PrimeIcons to 7.0.0, which adds the `pi-bell-slash`, `pi-calendar-clock` and `pi-play-circle` icons. All three were referenced by the UI but did not exist in 6.0.1 and rendered as blank glyphs. PrimeIcons 8 was not taken, as it relicenses away from MIT and redesigns every glyph.
+
 ## [2.10.2] - 2026-08-26
 
 ### Removed

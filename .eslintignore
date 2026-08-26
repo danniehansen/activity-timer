@@ -1,5 +1,0 @@
-infrastructure/cdk.out
-node_modules
-infrastructure/node_modules
-dist
-src/types/trello.d.ts

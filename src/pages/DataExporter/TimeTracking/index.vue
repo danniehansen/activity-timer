@@ -819,6 +819,9 @@ const exportData = () => {
   const csvConfig = mkConfig({
     fieldSeparator: ',',
     quoteStrings: true,
+    // Trello card titles are attacker-controllable; prefix values starting
+    // with = + - @ so spreadsheets treat them as text, not formulas.
+    escapeFormulas: true,
     decimalSeparator: '.',
     useTextFile: false,
     filename: 'activity-timer-estimates',
