@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.10.1] - 2026-08-26
+
+### Changed
+
+- Moved the maintenance mode banner to the top of the card back section so it's visible without scrolling.
+- Reworded the banner call-to-action from "Learn about Limita" to "Learn about maintenance mode" so it leads with the change rather than the product.
+- Increased the height of the announcement modal so its content fits without being cut off.
+- Changed the local development server port from 3001 to 8080.
+
+### Added
+
+- Added UTM parameters to all limita.org links so traffic originating from the power-up can be measured.
+
+### Removed
+
+- Removed the "Read the Full Story" button from the announcement modal.
+- Removed the "Need help with Activity Timer?" footer from the announcement modal.
+
 ## [2.10.0] - 2026-02-01
 
 ### Changed
