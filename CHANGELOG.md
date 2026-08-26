@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.10.2] - 2026-08-26
+
+### Removed
+
+- Removed Sentry error monitoring entirely, along with the `@sentry/vue` and `@sentry/tracing` dependencies. Activity Timer is in maintenance mode and is no longer actively monitored.
+- Removed the Sentry script and ingest domains from the Content Security Policy.
+
+### Changed
+
+- Replaced the error reports that only went to Sentry with console logging, so failures stay visible in the browser console.
+
 ## [2.10.1] - 2026-08-26
 
 ### Changed

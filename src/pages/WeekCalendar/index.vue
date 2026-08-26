@@ -364,7 +364,6 @@ import {
   getCalendarSettings,
   setCalendarSettings
 } from '../../components/settings';
-import * as Sentry from '@sentry/vue';
 import AuthSplash from '../../components/AuthSplash.vue';
 import HelpButton from '../../components/HelpButton.vue';
 
@@ -1038,7 +1037,6 @@ async function createTimeEntry(cardId: string) {
       duration: 3
     });
   } catch (error) {
-    Sentry.captureException(error);
     console.error('Failed to create time entry:', error);
     await getTrelloCard().alert({
       message: 'Failed to create time entry',
@@ -1122,7 +1120,6 @@ async function onDeleteEntry(entry: TimeEntry, event: MouseEvent) {
         // Reload time entries
         await loadTimeEntries();
       } catch (error) {
-        Sentry.captureException(error);
         console.debug('Failed to delete time entry:', error);
         alert('Failed to delete time entry. Please try again.');
       } finally {
@@ -1300,7 +1297,6 @@ async function updateTimeEntry(entry: TimeEntry, newStart: Date, newEnd: Date) {
       duration: 2
     });
   } catch (error) {
-    Sentry.captureException(error);
     console.error('Failed to update time entry:', error);
     await getTrelloCard().alert({
       message: 'Failed to update time entry',
@@ -1484,7 +1480,6 @@ async function loadTimeEntries() {
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
     }
   } catch (e) {
-    Sentry.captureException(e);
     console.error('Failed to load time entries:', e);
 
     // Ensure loading shows for at least 2 seconds even on error
@@ -1552,7 +1547,7 @@ async function initialize() {
 
     ready.value = true;
   } catch (e) {
-    Sentry.captureException(e);
+    console.error('Failed to initialize calendar:', e);
 
     await getTrelloCard().alert({
       message: 'An error occurred while initializing the calendar',
@@ -1593,8 +1588,6 @@ async function authorize() {
       rejectedAuth.value = true;
       return;
     }
-
-    Sentry.captureException(e);
 
     await clearToken();
     throw e;

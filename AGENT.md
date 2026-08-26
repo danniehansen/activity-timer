@@ -25,7 +25,6 @@ Activity Timer integrates time tracking directly into Trello's UI, making it sea
 - **UI Library**: PrimeVue (DataTable, Dropdown, DatePicker, etc.)
 - **Styling**: SCSS + PrimeFlex (utility CSS)
 - **TypeScript**: Full type safety throughout
-- **Error Tracking**: Sentry for production error monitoring
 - **Integration**: Trello Power-Up Client API
 
 ### Backend Infrastructure (AWS)
@@ -427,8 +426,8 @@ try {
 **Solution**: Threshold setting (default 5 seconds) prevents saving short sessions
 
 ### 8. Plugin Disabled Error
-**Challenge**: Sentry flooded with "PluginDisabled" errors
-**Solution**: Filter these errors in `beforeSend` hook
+**Challenge**: "PluginDisabled" errors fire when the power-up is disabled on a board
+**Solution**: Guard against missing board context before acting on Trello callbacks
 
 ---
 
@@ -549,7 +548,6 @@ VITE_APP_KEY="<trello-api-key>"          # From https://trello.com/app-key
 VITE_WEBSOCKET="wss://..."               # WebSocket API endpoint
 VITE_API_HOST="..."                      # HTTP API host
 VITE_POWERUP_ID="..."                    # Power-Up ID (optional)
-VITE_MAILCHIMP_LINK="..."                # Enables Sentry if present
 ```
 
 ### Backend (CDK)

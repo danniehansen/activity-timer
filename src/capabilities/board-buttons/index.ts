@@ -4,7 +4,6 @@ import CalendarImageWhite from '../../assets/images/calendar_white.svg';
 import { clearToken, getMemberId, isAuthorized } from '../../components/trello';
 import { isVisible } from '../../utils/visibility';
 import { Card } from '../../components/card';
-import * as Sentry from '@sentry/vue';
 import {
   getConnectionState,
   reconnectWebsocket,
@@ -158,7 +157,7 @@ export async function getBoardButtons(): Promise<
                 display: 'info'
               });
             } catch (e) {
-              Sentry.captureException(e);
+              console.error('[ActivityTimer][ERROR]', e);
 
               await t.alert({
                 message:

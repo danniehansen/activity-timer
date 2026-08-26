@@ -1,5 +1,4 @@
 import { getTrelloInstance } from '../components/trello';
-import * as Sentry from '@sentry/vue';
 
 export enum Visibility {
   ALL,
@@ -47,7 +46,7 @@ export async function isVisible(): Promise<boolean> {
 
     return true;
   } catch (e) {
-    Sentry.captureException(e);
+    console.error('[ActivityTimer][ERROR]', e);
     return true;
   }
 }

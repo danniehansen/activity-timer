@@ -1,7 +1,6 @@
 import { getWebsocket } from './settings';
 import { getMemberId } from './trello';
 import { getAutoTimerListId, hasAutoTimer } from '../utils/auto-timer';
-import * as Sentry from '@sentry/vue';
 
 // Connection state enum
 enum ConnectionState {
@@ -118,17 +117,12 @@ async function connectWebsocket() {
         socket.send(JSON.stringify({ listen_member_id: memberId }));
       } catch (e) {
         console.debug('[ActivityTimer][WebSocket] Failed to send member ID', e);
-        Sentry.captureException(e);
         socket.close();
       }
     };
 
     socket.onerror = (error) => {
       console.debug('[ActivityTimer][WebSocket] Connection error', error);
-      Sentry.captureMessage('WebSocket connection error', {
-        level: Sentry.Severity.Warning,
-        extra: { retryCount, error }
-      });
     };
 
     socket.onmessage = (e) => {
@@ -161,15 +155,10 @@ async function connectWebsocket() {
           '[ActivityTimer][WebSocket] Max retry attempts reached, giving up'
         );
         setConnectionState(ConnectionState.FAILED);
-        Sentry.captureMessage('WebSocket connection failed after max retries', {
-          level: Sentry.Severity.Error,
-          extra: { retryCount, code: event.code, reason: event.reason }
-        });
       }
     };
   } catch (e) {
     console.debug('[ActivityTimer][WebSocket] Failed to create socket', e);
-    Sentry.captureException(e);
 
     if (retryCount < MAX_RETRY_ATTEMPTS) {
       scheduleReconnection();

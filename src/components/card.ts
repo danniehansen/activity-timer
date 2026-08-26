@@ -7,7 +7,6 @@ import { Ranges } from './ranges';
 import { getThresholdForTrackings } from './settings';
 import { Timer, TimerData } from './timer';
 import { Timers } from './timers';
-import * as Sentry from '@sentry/vue';
 
 export class Card {
   private _cardId: string;
@@ -168,10 +167,6 @@ export class Card {
         Math.abs(Math.floor(new Date().getTime() / 1000) - timer.start) <
         threshold
       ) {
-        Sentry.captureMessage(
-          'Ignored tracking due to it not meeting the threshold'
-        );
-
         if (t) {
           t.alert({
             message: `Time tracking ignored. Threshold for registering new trackings is ${threshold} second(s).`,
@@ -195,8 +190,6 @@ export class Card {
       try {
         await ranges.save();
       } catch (e) {
-        Sentry.captureException(e);
-
         console.error('[ActivityTimer][ERROR]', e);
 
         if (t) {
